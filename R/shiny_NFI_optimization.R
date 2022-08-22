@@ -3,7 +3,7 @@
 
 shiny_optimize_NFI <- function(...) {
 
-  ## GLOBAL
+  ## GLOBAL #################################################################
 
   ## + Libraries
   library(shiny)
@@ -13,7 +13,7 @@ shiny_optimize_NFI <- function(...) {
   library(tidyverse)
   library(stringr)
 
-
+  ## UI #####################################################################
   ui <- fluidPage(
     tabPanel(
       title = div(img(src="banner_en.png", width = '100%')),
@@ -25,11 +25,13 @@ shiny_optimize_NFI <- function(...) {
         title = i18n$t("Home"),
         value = "home",
         icon = icon("campground"),
-        home_UI("tab1")),
+        home_UI("tab_home")
+        )
+    ) ## END navbarPage
+  ) ## END fluidPage
 
 
-    tabPanel("Birthstone", birthstoneUI("tab2"))
-  )
+  ## Server #################################################################
   server <- function(input, output, session) {
     monthFeedbackServer("tab1", reactive(input$month))
     birthstoneServer("tab2", reactive(input$month))
