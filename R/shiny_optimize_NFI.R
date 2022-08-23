@@ -7,6 +7,7 @@ shiny_optimize_NFI <- function(...) {
 
   ## + Libraries
   library(shiny)
+  library(shinyFiles)
   library(sf)
   library(terra)
   library(extrafont)
@@ -22,7 +23,7 @@ shiny_optimize_NFI <- function(...) {
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
       tabPanel(title = "Home", value = "home", icon = icon("campground"), home_UI("tab_home")),
-      tabPanel(title = "AGB map", value = "AGB_map", icon = icon("map-location-dot"), AGB_map_UI("tab_AGB_map"))
+      tabPanel(title = "AGB map", value = "AGB_map", icon = icon("map-o"), AGB_map_UI("tab_AGB_map"))
     ) ## END navbarPage
   ) ## END fluidPage
 
@@ -31,6 +32,8 @@ shiny_optimize_NFI <- function(...) {
   server <- function(input, output, session) {
 
     home_server("tab_home")
+
+    AGB_map_server("tab_AGB_map")
 
 
   }
