@@ -8,6 +8,8 @@ library(roxygen2)
 ## Make package
 usethis::create_package("D:/github-repos/oNFI")
 
+##Load all functions
+devtools::load_all()
 
 ##
 ## Add dependencies

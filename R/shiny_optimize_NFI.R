@@ -15,26 +15,20 @@ shiny_optimize_NFI <- function(...) {
 
   ## UI #####################################################################
   ui <- fluidPage(
-    tabPanel(
-      title = div(img(src="banner_en.png", width = '100%')),
-      windowTitle = "PRAP Monitoring"
+    titlePanel(
+      title = div(img(src="assets/banner_en.png", width = '100%')),
+      windowTitle = "Optimize NFI"
       ),
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
-      tabPanel(
-        title = i18n$t("Home"),
-        value = "home",
-        icon = icon("campground"),
-        home_UI("tab_home")
-        )
+      tabPanel(title = "Home", value = "home", icon = icon("campground"), home_UI("tab_home"))
     ) ## END navbarPage
   ) ## END fluidPage
 
 
   ## Server #################################################################
   server <- function(input, output, session) {
-    monthFeedbackServer("tab1", reactive(input$month))
-    birthstoneServer("tab2", reactive(input$month))
+
   }
   shinyApp(ui, server, ...)
 }
