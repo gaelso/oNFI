@@ -7,6 +7,7 @@ home_UI <- function(id){
   # invoke later.
   ns <- NS(id)
 
+  ## UI elements wrapped in a tagList() function
   tagList(
 
     br(),
@@ -16,6 +17,7 @@ home_UI <- function(id){
 
     br(), br(),
 
+    ## + Introduction -------------------------------------------------------
     fluidRow(
       wellPanel(div(
         h3("In a Nutshell, how the app works"),
@@ -45,25 +47,27 @@ home_UI <- function(id){
         ))
     ), ## END fluidRow()
 
+    ## + Description inputs -------------------------------------------------
     fluidRow(
       column(6, wellPanel(div(
-        h3("Biomass variability"),
+        h3("1. Biomass variability"),
         br(),
         p("!!! This section presents the biomass maps and how they are used to
           calc CV !!!", align = "center")
         ), class="bg1")),
 
       column(6, wellPanel(div(
-        h3("Unit times"),
+        h3("3. Unit times"),
         br(),
         p("!!! This section deals with different unit times necessary to calculate
           the total cost of forest measurements !!!", align = "center")
         ), class="bg2"))
     ), ## End fluidRow
 
+    ## + Description inputs cont. -------------------------------------------
     fluidRow(
       column(6, wellPanel(div(
-        h3("Nested plot conditions"),
+        h3("2. Nested plot conditions"),
         br(),
         p("!!! This section aims to characterize forest condfitions for different
           tree diameter classes to optimize the respective size of 2 nested subplots for
@@ -71,13 +75,20 @@ home_UI <- function(id){
       ), class="bg3")),
 
       column(6, wellPanel(div(
-        h3("testing parameters"),
+        h3("4. Testing parameters"),
         br(),
         p("!!! List of parameters to be tested, the more parameters the more
           total number of designs need to be tested !!!", align = "center")
       ), class="bg4"))
     ), ## End fluidRow
 
+    ## + To next page button ------------------------------------------------
+    fluidRow(
+      h4(icon("arrow-right"), "Continue to Step 1:", HTML("&nbsp;"),
+        actionButton(ns("to_AGB_map"), "Biomass variability")
+        )
+      ) ## END fluidRow
+
   ) ## END tagList
 
-} ## END function
+} ## END function home_UI()
