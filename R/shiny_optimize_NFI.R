@@ -22,8 +22,8 @@ shiny_optimize_NFI <- function(...) {
       ),
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
-      tabPanel(title = "Home", value = "home", icon = icon("campground"), home_UI("tab_home")),
-      tabPanel(title = "AGB map", value = "AGB_map", icon = icon("map-o"), AGB_map_UI("tab_AGB_map"))
+      tabPanel(title = "Home"   , value = "home"   , icon = icon("campground"), home_UI("tab_home")      ),
+      tabPanel(title = "AGB map", value = "AGB_map", icon = icon("map")       , AGB_map_UI("tab_AGB_map"))
     ) ## END navbarPage
   ) ## END fluidPage
 
@@ -31,9 +31,15 @@ shiny_optimize_NFI <- function(...) {
   ## Server #################################################################
   server <- function(input, output, session) {
 
-    home_server("tab_home")
+    rv <- reactiveValues("to_AGB_map" = NULL)
+
+    home_server("tab_home", rv = rv)
 
     AGB_map_server("tab_AGB_map")
+
+    observeEvent(rv$to_AGB_map, {
+      updateTabsetPanel(session, "navbar", "AGB_map")
+    })
 
 
   }
