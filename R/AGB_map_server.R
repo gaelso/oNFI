@@ -10,7 +10,15 @@ AGB_map_server <- function(id) {
       roots = roots=c(wd='.')
 
       shinyDirChoose(input, 'folder', roots=roots, filetypes=c('', 'txt'), session = session)
-      output$rawInputValue <- renderPrint({str(input$folder)})
+
+      folder_path <- reactive({ parseDirPath(roots, input$folder) })
+
+      output$rawInputValue <- renderText({
+
+        if(length(folder_path()) == 0) "No folder selected" else folder_path()
+
+        })
+
       output$folder_path <- renderPrint({ parseDirPath(roots, input$folder) })
 
     }

@@ -34,7 +34,7 @@ AGB_map_UI <- function(id){
 
           div("Folder selected",
               verbatimTextOutput(ns("folder_path")),
-              verbatimTextOutput(ns('rawInputValue')),
+              textOutput(ns('rawInputValue')),
               style = "padding: 0.375em; border: 1px solid #e3e3e3;
                   border-radius: 4px; font-weight: bold; text-align: center;
                   margin-top: 5px;"),
@@ -48,7 +48,7 @@ AGB_map_UI <- function(id){
 
         ## + + Step 2: Get Area of Interest ----
         conditionalPanel(
-          condition = ns("to_step2"),
+          condition = "input.to_step2", ns = ns,
 
           p("Select country from list or upload AOI shapefile."),
 
