@@ -141,10 +141,39 @@ CV_model_UI <- function(id){
             zipfile ('.zip'), geoJSON files ('.geoJSON') and GeoPackage files ('.GPKG').
             The maximum file size allowed is 50 Mo."),
 
-          fileInput(ns("input_shp"), "Upload an AOI shapefile", multiple = F, accept = c(".zip", ".geoJSON", ".GPKG")),
+          fileInput(ns("input_shp"), "Upload an AOI shapefile:",
+                    multiple = F, accept = c(".zip", ".geoJSON", ".GPKG")),
+
+          actionButton(inputId = ns("to_step3"), label = "Continue"),
+
+        ), ## END conditionalPanel
+
+        hr(),
+
+        ## ++ Step 3: Select AGB maps ----
+        conditionalPanel(
+          condition = "input.to_step3", ns = ns,
+
+          h4("Select the Biomass map to use for the CV"),
+
+          checkboxGroupInput(
+            inputId = ns("map_select"),
+            label ="Biomass map",
+            choiceNames = c(
+              "Avitabile et al. 2016, 1 km res., 2000-2010",
+              "Santoro et al. 2018, 100m res., 2010"
+              ),
+            choiceValues = c("avitabile2016", "santoro2018")
+            ),
+
+          hr(),
+
+          ## + + Launch calculations
+          actionButton(inputId = ns("calc_CV"), label = "Calculate CV"),
 
         ),
 
+        ## Width sidebar
         width = 4
 
       ),

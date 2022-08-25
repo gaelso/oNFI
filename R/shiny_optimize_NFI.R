@@ -37,14 +37,15 @@ shiny_optimize_NFI <- function(...) {
   ## Server #################################################################
   server <- function(input, output, session) {
 
-
-
+    ## Initiate reactive values list to be passed between modules
     rv <- reactiveValues("to_CV" = NULL, CV_approach = NULL)
 
+    ## Module server functions
     home_server("tab_home", rv = rv)
 
     CV_model_server("tab_CV_model", rv = rv)
 
+    ## Trans modules events
     observeEvent(rv$to_CV_model, {
       updateTabsetPanel(session, "navbar", "CV_model")
     })
