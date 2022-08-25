@@ -7,6 +7,8 @@ shiny_optimize_NFI <- function(...) {
 
   ## + Libraries
   library(shiny)
+  library(shinyjs)
+  library(shinyWidgets)
   library(shinyFiles)
   library(sf)
   library(terra)
@@ -16,14 +18,18 @@ shiny_optimize_NFI <- function(...) {
 
   ## UI #####################################################################
   ui <- fluidPage(
+
+    useShinyjs(),  # Include shinyjs
+
     titlePanel(
       title = div(img(src="assets/banner_en.png", width = '100%')),
       windowTitle = "Optimize NFI"
       ),
+
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
       tabPanel(title = "Home"   , value = "home"   , icon = icon("campground"), home_UI("tab_home")      ),
-      tabPanel(title = "AGB map", value = "AGB_map", icon = icon("map")       , AGB_map_UI("tab_AGB_map"))
+      tabPanel(title = "CV model", value = "CV_model", icon = icon("map")     , CV_model_UI("tab_CV_model"))
     ) ## END navbarPage
   ) ## END fluidPage
 
@@ -31,14 +37,16 @@ shiny_optimize_NFI <- function(...) {
   ## Server #################################################################
   server <- function(input, output, session) {
 
-    rv <- reactiveValues("to_AGB_map" = NULL)
+
+
+    rv <- reactiveValues("to_CV" = NULL, CV_approach = NULL)
 
     home_server("tab_home", rv = rv)
 
-    AGB_map_server("tab_AGB_map")
+    CV_model_server("tab_CV_model", rv = rv)
 
-    observeEvent(rv$to_AGB_map, {
-      updateTabsetPanel(session, "navbar", "AGB_map")
+    observeEvent(rv$to_CV_model, {
+      updateTabsetPanel(session, "navbar", "CV_model")
     })
 
 

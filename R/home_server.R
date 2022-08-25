@@ -8,9 +8,8 @@ home_server <- function(id, rv) {
 
       ns <- session$ns
 
-      observeEvent(input$to_AGB_map, {
-        #updateTabsetPanel(session, "navbar", "AGB_map")
-        rv$to_AGB_map <- input$to_AGB_map
+      observeEvent(input$to_CV_model, {
+        rv$to_CV_model <- input$to_CV_model
       })
 
     }

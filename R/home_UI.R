@@ -85,7 +85,7 @@ home_UI <- function(id){
     ## + To next page button ------------------------------------------------
     fluidRow(
       h4(icon("arrow-right"), "Continue to Step 1:", HTML("&nbsp;"),
-        actionButton(ns("to_AGB_map"), "Biomass variability")
+        actionButton(ns("to_CV_model"), "CV model")
         )
       ) ## END fluidRow
 
