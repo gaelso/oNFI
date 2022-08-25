@@ -125,23 +125,23 @@ CV_model_UI <- function(id){
 
           h4("Select an Area of Interest (AOI)"),
 
-          p("Select a country from the list below or upload an AOI shapefile."),
+          ## !!! Not implemented, get the ata ffrom GADM automatically
+          # p("Select a country from the list below or upload an AOI shapefile."),
+          #
+          # p("If you pick from the list below, the approximative country boundaries
+          #   are taken from", a("GADM", href = "https://gadm.org/data.html")),
+          #
+          # selectInput(ns("input_country"), "Select country:", choices = c("<empty>", "Timor Leste"), selected = "<empty>"),
+          #
+          # br(),
+          # !!!
 
-          p("If you pick from the list below, the approximative country boundaries
-            are taken from", a("GADM", href = "https://gadm.org/data.html")),
-
-          selectInput(ns("input_country"), "Select country:", choices = c("<empty>", "Timor Leste"), selected = "<empty>"),
-
-          br(),
-
-          p("!!! NOT IMPLEMENTED YET !!!"),
-
-          p("You can upload a shapefile with the boundaries of your
+          p("Please upload a shapefile with the boundaries of your
             AOI. Accepted file types are shapefiles '.shp' loaded as
             zipfile ('.zip'), geoJSON files ('.geoJSON') and GeoPackage files ('.GPKG').
-            The maximum file size allowed is 50 Mo."),
+            The maximum file size allowed is 10 Mo."),
 
-          fileInput(ns("input_shp"), "Upload an AOI shapefile:",
+          fileInput(ns("AOI"), "Upload an AOI shapefile:",
                     multiple = F, accept = c(".zip", ".geoJSON", ".GPKG")),
 
           actionButton(inputId = ns("to_step3"), label = "Continue"),

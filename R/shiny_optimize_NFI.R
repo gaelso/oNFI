@@ -15,6 +15,9 @@ shiny_optimize_NFI <- function(...) {
   library(extrafont)
   library(tidyverse)
   library(stringr)
+  library(xfun)
+
+  options(shiny.maxRequestSize = 10*1024^2)
 
   ## UI #####################################################################
   ui <- fluidPage(
