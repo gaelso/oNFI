@@ -41,7 +41,7 @@ shiny_optimize_NFI <- function(...) {
   server <- function(input, output, session) {
 
     ## Initiate reactive values list to be passed between modules
-    rv <- reactiveValues("to_CV" = NULL, CV_approach = NULL)
+    rv <- reactiveValues(CV_model = NULL)
 
     ## Module server functions
     home_server("tab_home", rv = rv)

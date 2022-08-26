@@ -26,11 +26,7 @@
 download_agb <- function(path_data, data_name, url, zipfile = FALSE){
 
   ## Check if the data is already dowloaded
-  if (zipfile) {
-    check_data <- length(list.files(file.path(path_data, str_remove(data_name, ".zip")))) != 0
-  } else {
-    check_data <- data_name %in% list.files(path_data)
-  }
+  check_data <- xfun::sans_ext(data_name) %in% sans_ext(list.files(path_data))
 
   ## If not, downloading
   if (!check_data) {
