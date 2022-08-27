@@ -180,13 +180,15 @@ CV_model_UI <- function(id){
 
       ## + Define mainPanel -------------------------------------------------
       mainPanel(
-        h4(strong("Clip existing biomass maps with your area of interest")),
+        h4(strong("Area of Interest and Coefficient of Variation")),
 
         br(),
 
         fluidRow(
 
-          p("!!! placeholder for leaflet to display AGB map and AOI boundaries")
+          p("!!! placeholder for leaflet to display AGB map and AOI boundaries"),
+
+          plotOutput(outputId = ns("map_avitabile"))
 
         ),
 
