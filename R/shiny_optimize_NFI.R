@@ -15,7 +15,13 @@ shiny_optimize_NFI <- function(...) {
   library(extrafont)
   library(tidyverse)
   library(stringr)
-  library(xfun)
+  library(ggspatial)
+  library(showtext)
+
+  add_font(path_data = tempdir())
+
+  sysfonts::font_add("LoraIt", file.path(tempdir(), "fonts/Lora/static/Lora-Italic.ttf"))
+  showtext::showtext_auto()
 
   options(shiny.maxRequestSize = 10*1024^2)
 

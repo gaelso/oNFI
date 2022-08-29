@@ -148,9 +148,13 @@ CV_model_UI <- function(id){
 
           actionButton(inputId = ns("to_step3"), label = "Continue"),
 
-          verbatimTextOutput(ns("test_aoi")),
-
-          plotOutput(outputId = ns("map_aoi"), width = 200, height = 100)
+          div(
+            plotOutput(outputId = ns("map_aoi"), height = 200),
+            #align = "center",
+            style = "padding: 0.375em; border: 1px solid #e3e3e3;
+            border-radius: 4px; font-weight: bold; text-align: center;
+            margin-top: 5px; margin-bottom: 5px; align: center;"
+          )
 
         ), ## END conditionalPanel
 
@@ -193,8 +197,6 @@ CV_model_UI <- function(id){
         fluidRow(
 
           p("!!! placeholder for leaflet to display AGB map and AOI boundaries"),
-
-          textOutput(ns("test")),
 
           plotOutput(outputId = ns("map_avitabile"))
 

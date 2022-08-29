@@ -73,17 +73,12 @@ CV_model_server <- function(id, rv) {
 
       observeEvent(input$to_step3, {
 
-        #rv$CV_model$sf_aoi
-        #sf_aoi <- reactive({ st_read(input$AOI) %>% st_transform(crs = 4326) })
-        sf_aoi <- reactive({ sf::st_read(input$AOI$datapath) })
-
-        ## !!! For testing
-        output$test_aoi <- renderPrint({ input$AOI })
+        rv$CV_model$sf_aoi <- st_read(input$AOI$datapath) %>% st_transform(crs = 4326)
 
         output$map_aoi <- renderPlot({
           ggplot() +
-            # geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1)
-            geom_sf(data = sf_aoi(), fill = NA, col = "darkred", size = 1)
+            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+            theme_void()
         })
 
       })
@@ -103,58 +98,26 @@ CV_model_server <- function(id, rv) {
         ## Check at lest one biomass map selected
         ## !!! TBD !!!
 
-        ## + + Load AOI -----------------------------------------------------
-
-        ## !!! For testing
-        output$test <- renderText(rv$CV_model$file_path)
-
-
-
-        ## NOT NEEDED ANYMORE
-        # rv$CV_model$aoi_extent <- st_bbox(rv$CV_model$sf_aoi)[1:4] %>%
-        #   enframe() %>%
-        #   pivot_wider(names_from = "name", values_from = "value") %>%
-        #   mutate(
-        #     xmin = floor(xmin),
-        #     xmax = ceiling(xmax),
-        #     ymin = floor(ymin),
-        #     ymax = ceiling(ymax),
-        #     )
-        #
-        # rv$CV_model$aoi_extent <- terra::ext(
-        #   rv$CV_model$aoi_extent$xmin,
-        #   rv$CV_model$aoi_extent$xmax,
-        #   rv$CV_model$aoi_extent$ymin,
-        #   rv$CV_model$aoi_extent$ymax
-        #   )
-
         ## + + Avitabile et al. 2016 map, download, load and make map -------
-        # download_avitabile(path_data = rv$CV_model$file_path)
-        #
-        # rv$CV_model$rs_avitabile <- load_crop_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
+        download_avitabile(path_data = rv$CV_model$file_path)
 
-        ## !!! For testing
-        # plot(rv$CV_model$rs_avitabile)
-        # terra::writeRaster(rv$CV_model$rs_avitabile, file.path(rv$CV_model$file_path, "avitgabile_crop.tif"))
+        rv$CV_model$rs_avitabile <- load_crop_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
-        # rv$CV_model$df_avitabile <- mask(rv$CV_model$rs_avitabile, vect(rv$CV_model$sf_aoi)) %>%
-        #   terra::as.data.frame(xy = TRUE) %>%
-        #   as_tibble() %>%
-        #   na.omit()
+        rv$CV_model$df_avitabile <- mask(rv$CV_model$rs_avitabile, vect(rv$CV_model$sf_aoi)) %>%
+          terra::as.data.frame(xy = TRUE) %>%
+          as_tibble() %>%
+          na.omit()
 
-        ## !!! For testing
-        # ggplot() +
-        #   geom_raster(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-        #   scale_fill_viridis_c(direction = -1) +
-        #   geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "red", size = 1)
-        # write_csv(rv$CV_model$df_avitabile, file.path(rv$CV_model$file_path, "df_avitabile.csv"))
+        output$map_avitabile <- renderPlot({
+          ggplot() +
+            geom_raster(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
+            scale_fill_viridis_c(direction = -1) +
+            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+            theme_bw() +
+            add_ggspatial(font = "LoraIt") +
+            labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
 
-        # output$map_avitabile <- renderPlot({
-        #   ggplot() +
-        #     geom_raster(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-        #     scale_fill_viridis_c(direction = -1) +
-        #     geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1)
-        # })
+        })
 
 
 
