@@ -113,6 +113,9 @@ CV_model_UI <- function(id){
             margin-top: 5px; margin-bottom: 5px;"
             ),
 
+          ## !!! For testing
+          textOutput(ns("show_path2")),
+
           actionButton(inputId = ns("to_step2"), label = "Continue")
         ),
 
@@ -137,14 +140,17 @@ CV_model_UI <- function(id){
           # !!!
 
           p("Please upload a shapefile with the boundaries of your
-            AOI. Accepted file types are shapefiles '.shp' loaded as
-            zipfile ('.zip'), geoJSON files ('.geoJSON') and GeoPackage files ('.GPKG').
+            AOI. Accepted file types are geoJSON files ('.geoJSON') and GeoPackage files ('.GPKG').
             The maximum file size allowed is 10 Mo."),
 
           fileInput(ns("AOI"), "Upload an AOI shapefile:",
-                    multiple = F, accept = c(".zip", ".geoJSON", ".GPKG")),
+                    multiple = F, accept = c(".geoJSON", ".GPKG")),
 
           actionButton(inputId = ns("to_step3"), label = "Continue"),
+
+          verbatimTextOutput(ns("test_aoi")),
+
+          plotOutput(outputId = ns("map_aoi"), width = 200, height = 100)
 
         ), ## END conditionalPanel
 
@@ -187,6 +193,8 @@ CV_model_UI <- function(id){
         fluidRow(
 
           p("!!! placeholder for leaflet to display AGB map and AOI boundaries"),
+
+          textOutput(ns("test")),
 
           plotOutput(outputId = ns("map_avitabile"))
 

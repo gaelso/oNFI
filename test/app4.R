@@ -34,10 +34,10 @@ server <- shinyServer(function(input, output) {
   roots = roots=c(wd='.')
   shinyDirChoose(input, 'files', roots=roots, filetypes=c('', 'txt'))
   output$rawInputValue <- renderPrint({str(input$files)})
-  output$filepaths <- renderPrint({parseDirPath(roots, input$files)})
+  output$filepaths <- renderPrint({ rlang::is_empty(parseDirPath(roots, input$files)) })
 })
-
 runApp(list(
+
   ui=ui,
   server=server
 ))

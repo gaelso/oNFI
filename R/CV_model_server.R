@@ -1,13 +1,13 @@
 
 
-## For testing
-rv <- list(
-  CV_model = list(
-    file_path = "data",
-    sf_aoi = st_read("data/TimorLeste.geoJSON")  %>% st_transform(crs = 4326),
-    santoro_tile = NULL
-    )
-  )
+## !!! For testing
+# rv <- list(
+#   CV_model = list(
+#     file_path = "data",
+#     sf_aoi = st_read("data/TimorLeste.geoJSON")  %>% st_transform(crs = 4326),
+#     santoro_tile = NULL
+#     )
+#   )
 
 
 CV_model_server <- function(id, rv) {
@@ -40,25 +40,60 @@ CV_model_server <- function(id, rv) {
 
       })
 
-      ## AGB map ############################################################
 
-      ## + Choosing a dir on the computer ----
+
+      ## AGB map setup ######################################################
+
+      ## + Choosing a dir on the computer ===================================
       roots = c(wd='.')
 
       shinyFiles::shinyDirChoose(input, 'folder', roots = roots, filetypes = c('', 'txt'), session = session)
 
-      folder_path <- reactive({ shinyFiles::parseDirPath(roots, input$folder) })
+      observe({
+
+        if (rlang::is_empty(shinyFiles::parseDirPath(roots, input$folder))) {
+          rv$CV_model$file_path <- tempdir()
+        } else {
+          rv$CV_model$file_path <- as.character(shinyFiles::parseDirPath(roots, input$folder))
+        }
+
+      })
 
       output$show_path <- renderText({
 
-        if(length(folder_path()) == 0) "No folder selected" else folder_path()
+        if(rv$CV_model$file_path == tempdir()) "No folder selected" else rv$CV_model$file_path
 
         })
 
-      ## + AGB map spatial analysis -----------------------------------------
+      ## !!! For testing
+      output$show_path2 <- renderText({ rv$CV_model$file_path })
+
+
+      ## + + Loading AOI ----------------------------------------------------
+
+      observeEvent(input$to_step3, {
+
+        #rv$CV_model$sf_aoi
+        #sf_aoi <- reactive({ st_read(input$AOI) %>% st_transform(crs = 4326) })
+        sf_aoi <- reactive({ sf::st_read(input$AOI$datapath) })
+
+        ## !!! For testing
+        output$test_aoi <- renderPrint({ input$AOI })
+
+        output$map_aoi <- renderPlot({
+          ggplot() +
+            # geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1)
+            geom_sf(data = sf_aoi(), fill = NA, col = "darkred", size = 1)
+        })
+
+      })
+
+
+
+      ## + AGB map spatial analysis =========================================
       observeEvent(input$calc_CV, {
 
-        ## + + Checks ----
+        ## + + Checks -------------------------------------------------------
         ## Check path works
         ## !!! TBD !!!
 
@@ -68,13 +103,14 @@ CV_model_server <- function(id, rv) {
         ## Check at lest one biomass map selected
         ## !!! TBD !!!
 
-        ## + + Set path and load AOI ----
-        ## Directory to save data
-        rv$CV_model$file_path <- ifelse(length(folder_path()) == 0, tempdir(), folder_path())
+        ## + + Load AOI -----------------------------------------------------
 
-        ## Read AOI data
-        rv$CV_model$sf_aoi <- st_read(input$AOI) %>% st_transform(crs = 4326)
+        ## !!! For testing
+        output$test <- renderText(rv$CV_model$file_path)
 
+
+
+        ## NOT NEEDED ANYMORE
         # rv$CV_model$aoi_extent <- st_bbox(rv$CV_model$sf_aoi)[1:4] %>%
         #   enframe() %>%
         #   pivot_wider(names_from = "name", values_from = "value") %>%
@@ -92,19 +128,19 @@ CV_model_server <- function(id, rv) {
         #   rv$CV_model$aoi_extent$ymax
         #   )
 
-        ## + + Avitabile et al. 2016 map, download, load and make map ----
-        download_avitabile(path_data = rv$CV_model$file_path)
-
-        rv$CV_model$rs_avitabile <- load_crop_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
+        ## + + Avitabile et al. 2016 map, download, load and make map -------
+        # download_avitabile(path_data = rv$CV_model$file_path)
+        #
+        # rv$CV_model$rs_avitabile <- load_crop_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
         ## !!! For testing
         # plot(rv$CV_model$rs_avitabile)
         # terra::writeRaster(rv$CV_model$rs_avitabile, file.path(rv$CV_model$file_path, "avitgabile_crop.tif"))
 
-        rv$CV_model$df_avitabile <- mask(rv$CV_model$rs_avitabile, vect(rv$CV_model$sf_aoi)) %>%
-          terra::as.data.frame(xy = TRUE) %>%
-          as_tibble() %>%
-          na.omit()
+        # rv$CV_model$df_avitabile <- mask(rv$CV_model$rs_avitabile, vect(rv$CV_model$sf_aoi)) %>%
+        #   terra::as.data.frame(xy = TRUE) %>%
+        #   as_tibble() %>%
+        #   na.omit()
 
         ## !!! For testing
         # ggplot() +
@@ -113,12 +149,12 @@ CV_model_server <- function(id, rv) {
         #   geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "red", size = 1)
         # write_csv(rv$CV_model$df_avitabile, file.path(rv$CV_model$file_path, "df_avitabile.csv"))
 
-        output$map_avitabile <- renderPlot({
-          ggplot() +
-            geom_raster(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-            scale_fill_viridis_c(direction = -1) +
-            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1)
-        })
+        # output$map_avitabile <- renderPlot({
+        #   ggplot() +
+        #     geom_raster(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
+        #     scale_fill_viridis_c(direction = -1) +
+        #     geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1)
+        # })
 
 
 
