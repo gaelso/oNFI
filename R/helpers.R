@@ -29,7 +29,7 @@ add_ggspatial <- function(font = "LoraIt"){
   list(theme(text = element_text(family = font)),
 
        ggspatial::annotation_scale(
-         location = "tr",
+         location = "tl",
          bar_cols = c("grey60", "white"),
          text_family = font),
 

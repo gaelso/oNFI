@@ -114,7 +114,7 @@ CV_model_UI <- function(id){
             ),
 
           ## !!! For testing
-          textOutput(ns("show_path2")),
+          # textOutput(ns("show_path2")),
 
           actionButton(inputId = ns("to_step2"), label = "Continue")
         ),
@@ -139,8 +139,8 @@ CV_model_UI <- function(id){
           # br(),
           # !!!
 
-          p("Please upload a shapefile with the boundaries of your
-            AOI. Accepted file types are geoJSON files ('.geoJSON') and GeoPackage files ('.GPKG').
+          p("Please upload the spatial boundaries of your
+            AOI. Accepted file types are geoJSON ('.geoJSON') and GeoPackage ('.GPKG').
             The maximum file size allowed is 10 Mo."),
 
           fileInput(ns("AOI"), "Upload an AOI shapefile:",
@@ -149,7 +149,7 @@ CV_model_UI <- function(id){
           actionButton(inputId = ns("to_step3"), label = "Continue"),
 
           div(
-            plotOutput(outputId = ns("map_aoi"), height = 200),
+            plotOutput(outputId = ns("map_aoi"), height = 100),
             #align = "center",
             style = "padding: 0.375em; border: 1px solid #e3e3e3;
             border-radius: 4px; font-weight: bold; text-align: center;
@@ -164,17 +164,18 @@ CV_model_UI <- function(id){
         conditionalPanel(
           condition = "input.to_step3", ns = ns,
 
-          h4("Select the Biomass map to use for the CV"),
-
-          checkboxGroupInput(
-            inputId = ns("map_select"),
-            label ="Biomass map",
-            choiceNames = c(
-              "Avitabile et al. 2016, 1 km res., 2000-2010",
-              "Santoro et al. 2018, 100m res., 2010"
-              ),
-            choiceValues = c("avitabile2016", "santoro2018")
-            ),
+          # !!! Force both products for now
+          # h4("Select the Biomass map to use for the CV"),
+          #
+          # checkboxGroupInput(
+          #   inputId = ns("map_select"),
+          #   label ="Biomass map",
+          #   choiceNames = c(
+          #     "Avitabile et al. 2016, 1 km res., 2000-2010",
+          #     "Santoro et al. 2018, 100m res., 2010"
+          #     ),
+          #   choiceValues = c("avitabile2016", "santoro2018")
+          #   ),
 
           hr(),
 
@@ -198,7 +199,11 @@ CV_model_UI <- function(id){
 
           p("!!! placeholder for leaflet to display AGB map and AOI boundaries"),
 
-          plotOutput(outputId = ns("map_avitabile"))
+          plotOutput(outputId = ns("map_avitabile"), height = 300),
+
+          hr(),
+
+          plotOutput(outputId = ns("map_santoro"), height = 300)
 
         ),
 
@@ -221,4 +226,4 @@ CV_model_UI <- function(id){
 
   ) ## END tagList
 
-} ## END function AGB_map_UI()
+} ## END function CV_model_UI()

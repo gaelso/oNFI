@@ -110,10 +110,6 @@ download_santoro <- function(path_data, url){
 
 
 
-path_data <- "data"
-sf_aoi    <- st_read("data/TimorLeste.geoJSON")
-url       <- "globbiomass.org/wp-content/uploads/GB_Maps/"
-
 ##
 ## Main function to get tiles, download if necessary and crop to AOI ########
 ##
@@ -166,6 +162,8 @@ get_santoro <- function(path_data, sf_aoi = NULL, tile_name = "N00E140_agb.zip",
     rs_tmp1 <- NULL
     rs_tmp2 <- NULL
   }
+
+  names(rs_out) <- "agb_santoro"
 
   rs_out
 

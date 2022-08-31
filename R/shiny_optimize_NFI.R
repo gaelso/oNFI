@@ -54,8 +54,11 @@ shiny_optimize_NFI <- function(...) {
         sf_aoi = NULL,
         rs_avitabile = NULL,
         df_avitabile = NULL,
+        cv_avitabile = NULL,
         rs_santoro = NULL,
-        df_santoro = NULL
+        df_santoro = NULL,
+        cv_santoro = NULL,
+        cv_params = NULL
       ))
 
     ## Module server functions

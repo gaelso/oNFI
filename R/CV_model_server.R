@@ -66,7 +66,7 @@ CV_model_server <- function(id, rv) {
         })
 
       ## !!! For testing
-      output$show_path2 <- renderText({ rv$CV_model$file_path })
+      # output$show_path2 <- renderText({ rv$CV_model$file_path })
 
 
       ## + + Loading AOI ----------------------------------------------------
@@ -99,10 +99,6 @@ CV_model_server <- function(id, rv) {
         ## !!! TBD !!!
 
         ## + + Avitabile et al. 2016 map, download, load and make map -------
-        # download_avitabile(path_data = rv$CV_model$file_path)
-        #
-        # rv$CV_model$rs_avitabile <- load_crop_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
-
         rv$CV_model$rs_avitabile <- get_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
         rv$CV_model$df_avitabile <- mask(rv$CV_model$rs_avitabile, vect(rv$CV_model$sf_aoi)) %>%
@@ -113,7 +109,7 @@ CV_model_server <- function(id, rv) {
         output$map_avitabile <- renderPlot({
           ggplot() +
             geom_raster(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-            scale_fill_viridis_c(direction = -1) +
+            scale_fill_viridis_c(limits = c(0, 500), direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
             add_ggspatial(font = "LoraIt") +
@@ -121,9 +117,7 @@ CV_model_server <- function(id, rv) {
 
         })
 
-
-
-        ## + + Santoro et al. 2018 map, download, load and make map ----
+        ## + + Santoro et al. 2018 map, download, load and make map ---------
         rv$CV_model$rs_santoro <- get_santoro(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
         rv$CV_model$df_santoro <- mask(rv$CV_model$rs_santoro, vect(rv$CV_model$sf_aoi)) %>%
@@ -131,11 +125,23 @@ CV_model_server <- function(id, rv) {
           as_tibble() %>%
           na.omit()
 
+        output$map_santoro <- renderPlot({
+          ggplot() +
+            geom_raster(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
+            scale_fill_viridis_c(limits = c(0, 500), direction = -1) +
+            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+            theme_bw() +
+            add_ggspatial(font = "LoraIt") +
+            labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
 
+        })
+
+        ## + + Get CV model table -------------------------------------------
+        #rv$CV_model$cv_avitabile <- get_cv_avitabile(df = rv$CV_model$df_avitabile)
 
 
       }) ## END observeEvent spatial analysis
 
     }
   )
-} ## END function home_server()
+} ## END function CV_model_server()
