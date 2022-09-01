@@ -4,7 +4,7 @@
 # rv <- list(
 #   CV_model = list(
 #     file_path = "data",
-#     sf_aoi = st_read("data/TimorLeste.geoJSON")  %>% st_transform(crs = 4326),
+#     sf_aoi = st_read("data/TimorLeste.geoJSON"),
 #     santoro_tile = NULL
 #     )
 #   )
@@ -73,7 +73,7 @@ CV_model_server <- function(id, rv) {
 
       observeEvent(input$to_step3, {
 
-        rv$CV_model$sf_aoi <- st_read(input$AOI$datapath) %>% st_transform(crs = 4326)
+        rv$CV_model$sf_aoi <- st_read(input$AOI$datapath)
 
         output$map_aoi <- renderPlot({
           ggplot() +
@@ -106,17 +106,6 @@ CV_model_server <- function(id, rv) {
           as_tibble() %>%
           na.omit()
 
-        output$map_avitabile <- renderPlot({
-          ggplot() +
-            geom_raster(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-            scale_fill_viridis_c(limits = c(0, 500), direction = -1) +
-            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
-            theme_bw() +
-            add_ggspatial(font = "LoraIt") +
-            labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
-
-        })
-
         ## + + Santoro et al. 2018 map, download, load and make map ---------
         rv$CV_model$rs_santoro <- get_santoro(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
@@ -125,19 +114,75 @@ CV_model_server <- function(id, rv) {
           as_tibble() %>%
           na.omit()
 
-        output$map_santoro <- renderPlot({
+        ## + + Show maps ----------------------------------------------------
+
+        max_agb <- reactive({
+
+          max1 <- max(c(rv$CV_model$df_santoro$agb_santoro, rv$CV_model$df_avitabile$agb_avitabile))
+          max2 <- ceiling(max1 / 100) * 100
+          max2
+
+        })
+
+        output$map_avitabile <- renderPlot({
           ggplot() +
-            geom_raster(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
-            scale_fill_viridis_c(limits = c(0, 500), direction = -1) +
+            geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
+            scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
+            theme(legend.position = "bottom", legend.key.width = unit(3, "cm")) +
+            add_ggspatial(font = "LoraIt") +
+            labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
+
+        })
+
+        output$map_santoro <- renderPlot({
+          ggplot() +
+            geom_tile(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
+            scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
+            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+            theme_bw() +
+            theme(legend.position = "bottom", legend.key.width = unit(3, "cm")) +
             add_ggspatial(font = "LoraIt") +
             labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
 
         })
 
         ## + + Get CV model table -------------------------------------------
-        #rv$CV_model$cv_avitabile <- get_cv_avitabile(df = rv$CV_model$df_avitabile)
+        rv$CV_model$cv_avitabile <- get_CV_AGB(df = rv$CV_model$df_avitabile, agb_min = input$agb_min) %>%
+          mutate(
+            CV_init_area = terra::res(rv$CV_model$rs_avitabile)[1]^2 / 100^2,
+            source       = "Avitabile et al. 2016"
+            )
+
+        rv$CV_model$cv_santoro <- get_CV_AGB(df = rv$CV_model$df_santoro, agb_min = input$agb_min) %>%
+          mutate(
+            CV_init_area = terra::res(rv$CV_model$rs_santoro)[1]^2 / 100^2,
+            source       = "Santoro et al. 2018"
+          )
+
+        rv$CV_model$cv_mixed <- tibble(
+          CV_init = mean(rv$CV_model$cv_santoro$CV_init, rv$CV_model$cv_avitabile$CV_init),
+          CV_init_area = max(rv$CV_model$cv_santoro$CV_init_area, rv$CV_model$cv_avitabile$CV_init_area),
+          source = "Average CV"
+        )
+
+        rv$CV_model$areas <- tibble(
+          country_area = round(as.numeric(st_area(rv$CV_model$sf_aoi)) / 1000^2),
+          forest_area  = round(country_area * input$forest_cover / 100)
+        )
+
+        output$CV_table <- renderTable({
+
+          rv$CV_model$cv_avitabile %>%
+            bind_rows(rv$CV_model$cv_santoro) %>%
+            bind_rows(rv$CV_model$cv_mixed)
+
+        })
+
+
+
+
 
 
       }) ## END observeEvent spatial analysis

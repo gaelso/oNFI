@@ -5,6 +5,9 @@
 
 get_santoro_tiles <- function(sf_aoi){
 
+  ## Check input
+  if(st_crs(sf_aoi)$input != "EPSG:4326") stop("AOI CRS should be 4326 to get tiles")
+
   url1 <- NULL
   url2 <- NULL
   url3 <- NULL
@@ -110,18 +113,30 @@ download_santoro <- function(path_data, url){
 
 
 
+path_data = "data"
+
 ##
 ## Main function to get tiles, download if necessary and crop to AOI ########
 ##
 
 get_santoro <- function(path_data, sf_aoi = NULL, tile_name = "N00E140_agb.zip", url = "globbiomass.org/wp-content/uploads/GB_Maps/"){
 
-  if(is.null(sf_aoi) & is.null(tile_name)) stop("Need either an AOI boundary simple feature or a tile name")
+  ## Check inputs
+  if (is.null(sf_aoi) & is.null(tile_name)) stop("Need either an AOI boundary simple feature or a tile name")
 
-  if(!is.null(sf_aoi) & st_crs(sf_aoi)$input != "EPSG:4326") sf_aoi <- st_transform(sf_aoi, crs = 4326)
+  ## Check CRS
+  if(!is.null(sf_aoi)){
+
+    epsg_value <- st_crs(sf_aoi)$srid %>% str_remove("EPSG:") %>% as.numeric()
+    if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric units and WGS 84 UTM zone")
+
+  }
+
+  ## Transform CRS to get tiles
+  if(!is.null(sf_aoi)) sf_aoi_wgs84 <- st_transform(sf_aoi, crs = 4326)
 
   ## Get tile names
-  santoro_tiles <- ifelse(is.null(sf_aoi), tile_name,  get_santoro_tiles(sf_aoi = sf_aoi))
+  santoro_tiles <- ifelse(is.null(sf_aoi), tile_name,  get_santoro_tiles(sf_aoi = sf_aoi_wgs84))
 
   ## Download tiles if necessary
   purrr::walk(santoro_tiles, function(x){
@@ -138,8 +153,8 @@ get_santoro <- function(path_data, sf_aoi = NULL, tile_name = "N00E140_agb.zip",
     rs <- terra::rast(file.path(paste0(path_data, "/Santoro_agb"), x))
 
     if (!is.null(sf_aoi)) {
-      check <- terra::intersect(ext(rs), vect(sf_aoi))
-      if (!is.null(check))  rs_out <- terra::crop(rs, vect(sf_aoi)) else rs_out <- rs
+      check <- terra::intersect(ext(rs), vect(sf_aoi_wgs84))
+      if (!is.null(check))  rs_out <- terra::crop(rs, vect(sf_aoi_wgs84)) else rs_out <- rs
     }
 
   })
@@ -165,6 +180,16 @@ get_santoro <- function(path_data, sf_aoi = NULL, tile_name = "N00E140_agb.zip",
 
   names(rs_out) <- "agb_santoro"
 
-  rs_out
+  if (!is.null(sf_aoi)) {
+
+    rs_out_proj <- terra::project(rs_out, st_crs(sf_aoi)$srid, method = "near")
+
+  } else {
+
+    rs_out_proj <- rs_out
+
+  }
+
+  rs_out_proj
 
 } ## END function get_santoro()

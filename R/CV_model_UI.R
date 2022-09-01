@@ -160,7 +160,7 @@ CV_model_UI <- function(id){
 
         hr(),
 
-        ## ++ Step 3: Select AGB maps ----
+        ## ++ Step 3: Default values ----
         conditionalPanel(
           condition = "input.to_step3", ns = ns,
 
@@ -176,6 +176,20 @@ CV_model_UI <- function(id){
           #     ),
           #   choiceValues = c("avitabile2016", "santoro2018")
           #   ),
+
+          p("The maps provide AGB estimates for all land use types, with values
+            ranging from 0 to around 700 ton/ha. As forest lands are expected to
+            have a minimum AGB, this value can be selected below to reduce the CV
+            estimate from the maps. Default to 0, meaning all land is considered
+            in the calcuation of CV"),
+
+          numericInput(ns("agb_min"), "Pick a minimum AGB value for forest (in ton/ha)", value = 0, min = 0, max = 100),
+
+          br(),
+
+          p("To refine the grid spacing, please provide the estimated forest cover of you AOI in %."),
+
+          numericInput(ns("forest_cover"), "Forest cover in %", value = 50, min = 0, max = 100),
 
           hr(),
 
@@ -203,7 +217,11 @@ CV_model_UI <- function(id){
 
           hr(),
 
-          plotOutput(outputId = ns("map_santoro"), height = 300)
+          plotOutput(outputId = ns("map_santoro"), height = 300),
+
+          hr(),
+
+          tableOutput(outputId = ns("CV_table"))
 
         ),
 

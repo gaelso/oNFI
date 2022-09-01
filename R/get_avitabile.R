@@ -3,6 +3,16 @@
 
 get_avitabile <- function(path_data, sf_aoi = NULL, url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
 
+
+  ## Check AOI CRS
+  if(!is.null(sf_aoi)){
+
+    epsg_value <- st_crs(sf_aoi)$srid %>% str_remove("EPSG:") %>% as.numeric()
+    if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric unit and WGS 84 UTM zone")
+
+  }
+
+
   ## + Download if necessasry ----
   ## Get file name from URL
   server_filename <- str_remove(url, ".*/")
@@ -50,18 +60,20 @@ get_avitabile <- function(path_data, sf_aoi = NULL, url = "http://lucid.wur.nl/s
   ## + Crop to AOI
   if (!is.null(sf_aoi)){
 
-    if (st_crs(sf_aoi)$input != "EPSG:4326") sf_aoi <- sf_aoi %>% st_transform(crs = 4326)
+    sf_aoi_wgs84 <- sf_aoi %>% st_transform(crs = 4326)
 
-    sf_aoi2 <- sf_aoi %>% st_buffer(dist = 1)
+    #sf_aoi2 <- sf_aoi %>% st_buffer(dist = 1)
 
-    rs_out <- terra::crop(rs, terra::vect(sf_aoi2))
+    rs_out <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
+
+    rs_out_proj <- terra::project(rs_out, st_crs(sf_aoi)$srid, method = "near")
 
   } else {
 
-    rs_out <- rs
+    rs_out_proj <- rs
 
   }
 
-  rs_out
+  rs_out_proj
 
 }
