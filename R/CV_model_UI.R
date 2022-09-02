@@ -117,8 +117,8 @@ CV_model_UI <- function(id){
           # textOutput(ns("show_path2")),
 
           actionButton(inputId = ns("to_step2"), label = "Continue")
-        ),
 
+        ),
 
         hr(),
 
@@ -193,18 +193,27 @@ CV_model_UI <- function(id){
 
           hr(),
 
-          ## + + Step 4: Launch calculations --------------------------------
+          actionButton(inputId = ns("to_step4"), label = "Continue"),
+
+        ), ## END conditionalPanel
+
+        hr(),
+
+        ## + + Step 4: Launch calculations ----------------------------------
+        conditionalPanel(
+          condition = "input.to_step4", ns = ns,
+
           actionButton(inputId = ns("calc_CV"), label = "Calculate CV"),
 
           shinyWidgets::progressBar(
             id = ns("progress_CV"),
             value = 0,
-            total = 100,
+            #total = 100,
             title = "CV calculation progress",
             display_pct = TRUE
           )
 
-        ),
+        ), ## END conditionalPanel
 
         ## Width sidebar
         width = 4
@@ -221,11 +230,7 @@ CV_model_UI <- function(id){
 
           p("Aboveground biomass maps for the are of interest:"),
 
-          plotOutput(outputId = ns("map_avitabile"), height = 300),
-
-          br(),
-
-          plotOutput(outputId = ns("map_santoro"), height = 300),
+          plotOutput(outputId = ns("map_agb"), height = 400),
 
           hr(),
 

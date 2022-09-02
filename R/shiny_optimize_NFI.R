@@ -16,6 +16,7 @@ shiny_optimize_NFI <- function(...) {
   library(tidyverse)
   library(stringr)
   library(ggspatial)
+  library(ggpubr)
   library(showtext)
 
   add_font(path_data = tempdir())

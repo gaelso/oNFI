@@ -93,11 +93,11 @@ CV_model_server <- function(id, rv) {
         updateProgressBar(
           session = session,
           id = "progress_CV",
-          value = 1, total = 100,
+          value = 1,
           title = "Checking input values"
         )
 
-        ## TO BE REMOVED when checks implemented
+        ## !!! TO BE REMOVED when checks implemented
         Sys.sleep(2)
 
         ## Check path works
@@ -113,13 +113,13 @@ CV_model_server <- function(id, rv) {
         updateProgressBar(
           session = session,
           id = "progress_CV",
-          value = 10, total = 100,
+          value = 10,
           title = "Downloading and preparing Avitabile et al. 2016 raster data"
         )
 
         rv$CV_model$rs_avitabile <- get_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
-        rv$CV_model$df_avitabile <- mask(rv$CV_model$rs_avitabile, vect(rv$CV_model$sf_aoi)) %>%
+        rv$CV_model$df_avitabile <- terra::mask(rv$CV_model$rs_avitabile, terra::vect(rv$CV_model$sf_aoi)) %>%
           terra::as.data.frame(xy = TRUE) %>%
           as_tibble() %>%
           na.omit()
@@ -128,13 +128,13 @@ CV_model_server <- function(id, rv) {
         updateProgressBar(
           session = session,
           id = "progress_CV",
-          value = 30, total = 100,
-          title = "Downloading and preparing Avitabile et al. 2016 raster data"
+          value = 30,
+          title = "Downloading and preparing Santoro et al. 2018 raster data"
         )
 
         rv$CV_model$rs_santoro <- get_santoro(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
-        rv$CV_model$df_santoro <- mask(rv$CV_model$rs_santoro, vect(rv$CV_model$sf_aoi)) %>%
+        rv$CV_model$df_santoro <- terra::mask(rv$CV_model$rs_santoro, terra::vect(rv$CV_model$sf_aoi)) %>%
           terra::as.data.frame(rv$CV_model$rs_santoro, xy = TRUE) %>%
           as_tibble() %>%
           na.omit()
@@ -143,47 +143,70 @@ CV_model_server <- function(id, rv) {
         updateProgressBar(
           session = session,
           id = "progress_CV",
-          value = 50, total = 100,
+          value = 50,
           title = "Making maps"
         )
 
-        max_agb <- reactive({
+        output$map_agb <- renderPlot({
 
-          max1 <- max(c(rv$CV_model$df_santoro$agb_santoro, rv$CV_model$df_avitabile$agb_avitabile))
-          max2 <- ceiling(max1 / 100) * 100
-          max2
-
-        })
-
-        output$map_avitabile <- renderPlot({
-          ggplot() +
+          gr1 <- ggplot() +
             geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-            scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
+            scale_fill_viridis_c(direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
-            theme(legend.position = "bottom", legend.key.width = unit(2, "cm")) +
+            #theme(legend.position = "bottom", legend.key.width = unit(2, "cm")) +
             add_ggspatial(font = "LoraIt") +
             labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
 
-        })
-
-        output$map_santoro <- renderPlot({
-          ggplot() +
+          gr2 <- ggplot() +
             geom_tile(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
-            scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
+            scale_fill_viridis_c(direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
-            theme(legend.position = "none") +
+            #theme(legend.position = "none") +
             add_ggspatial(font = "LoraIt") +
             labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
 
+          ggpubr::ggarrange(gr1, gr2, ncol = 1, nrow = 2, common.legend = TRUE, legend = "right")
+
         })
+
+        # max_agb <- reactive({
+        #
+        #   max1 <- max(c(rv$CV_model$df_santoro$agb_santoro, rv$CV_model$df_avitabile$agb_avitabile))
+        #   max2 <- ceiling(max1 / 100) * 100
+        #   max2
+        #
+        # })
+        #
+        # output$map_avitabile <- renderPlot({
+        #   ggplot() +
+        #     geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
+        #     scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
+        #     geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+        #     theme_bw() +
+        #     theme(legend.position = "bottom", legend.key.width = unit(2, "cm")) +
+        #     add_ggspatial(font = "LoraIt") +
+        #     labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
+        # })
+        #
+        # output$map_santoro <- renderPlot({
+        #   ggplot() +
+        #     geom_tile(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
+        #     scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
+        #     geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+        #     theme_bw() +
+        #     theme(legend.position = "none") +
+        #     add_ggspatial(font = "LoraIt") +
+        #     labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
+        #
+        # })
 
         ## + + Get CV -------------------------------------------------------
         updateProgressBar(
           session = session,
           id = "progress_CV",
-          value = 70, total = 100,
+          value = 70,
           title = "Performing CV calculations"
         )
 
@@ -215,7 +238,7 @@ CV_model_server <- function(id, rv) {
         updateProgressBar(
           session = session,
           id = "progress_CV",
-          value = 90, total = 100,
+          value = 90,
           title = "Making tables"
         )
 
@@ -236,7 +259,7 @@ CV_model_server <- function(id, rv) {
         updateProgressBar(
           session = session,
           id = "progress_CV",
-          value = 100, total = 100,
+          value = 100,
           title = "Tasks completed",
           status = "success"
         )
