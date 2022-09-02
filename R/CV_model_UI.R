@@ -94,10 +94,10 @@ CV_model_UI <- function(id){
     ## Approach 1: AGB map Sidebar Layout ###################################
     shinyjs::hidden(div(id = ns("AGB_map"), sidebarLayout(
 
-      ## + Define sidebarPanel ----------------------------------------------
+      ## + Define sidebarPanel ==============================================
       sidebarPanel(
 
-        ## + + Step1: Set a path to data ----
+        ## + + Step 1: Set a path to data -----------------------------------
         div(
           h4("Select a folder"),
           p("Select a destination folder for spatial data. If you don't the data
@@ -122,13 +122,13 @@ CV_model_UI <- function(id){
 
         hr(),
 
-        ## + + Step 2: Get Area of Interest ----
+        ## + + Step 2: Get Area of Interest ---------------------------------
         conditionalPanel(
           condition = "input.to_step2", ns = ns,
 
           h4("Select an Area of Interest (AOI)"),
 
-          ## !!! Not implemented, get the ata ffrom GADM automatically
+          ## !!! Not implemented, get the data from GADM automatically
           # p("Select a country from the list below or upload an AOI shapefile."),
           #
           # p("If you pick from the list below, the approximative country boundaries
@@ -160,7 +160,7 @@ CV_model_UI <- function(id){
 
         hr(),
 
-        ## ++ Step 3: Default values ----
+        ## + + Step 3: Default values ---------------------------------------
         conditionalPanel(
           condition = "input.to_step3", ns = ns,
 
@@ -193,8 +193,16 @@ CV_model_UI <- function(id){
 
           hr(),
 
-          ## + + Launch calculations
+          ## + + Step 4: Launch calculations --------------------------------
           actionButton(inputId = ns("calc_CV"), label = "Calculate CV"),
+
+          shinyWidgets::progressBar(
+            id = ns("progress_CV"),
+            value = 0,
+            total = 100,
+            title = "CV calculation progress",
+            display_pct = TRUE
+          )
 
         ),
 
@@ -211,17 +219,27 @@ CV_model_UI <- function(id){
 
         fluidRow(
 
-          p("!!! placeholder for leaflet to display AGB map and AOI boundaries"),
+          p("Aboveground biomass maps for the are of interest:"),
 
           plotOutput(outputId = ns("map_avitabile"), height = 300),
 
-          hr(),
+          br(),
 
           plotOutput(outputId = ns("map_santoro"), height = 300),
 
           hr(),
 
-          tableOutput(outputId = ns("CV_table"))
+          p("Initial CV values for forest inventory optimization following Avitabile
+            et al. 2016, Santoro et al. 2018 and a mixed approach (average CV, highest area):"),
+
+          tableOutput(outputId = ns("CV_table")),
+
+          br(),
+
+          p("Based on the input area of interest spatial data and the specified forest
+            cover percentage the AOI area and forest area are (in km^2):"),
+
+          tableOutput(outputId = ns("area_table"))
 
         ),
 

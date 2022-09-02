@@ -89,6 +89,17 @@ CV_model_server <- function(id, rv) {
       observeEvent(input$calc_CV, {
 
         ## + + Checks -------------------------------------------------------
+
+        updateProgressBar(
+          session = session,
+          id = "progress_CV",
+          value = 1, total = 100,
+          title = "Checking input values"
+        )
+
+        ## TO BE REMOVED when checks implemented
+        Sys.sleep(2)
+
         ## Check path works
         ## !!! TBD !!!
 
@@ -99,6 +110,13 @@ CV_model_server <- function(id, rv) {
         ## !!! TBD !!!
 
         ## + + Avitabile et al. 2016 map, download, load and make map -------
+        updateProgressBar(
+          session = session,
+          id = "progress_CV",
+          value = 10, total = 100,
+          title = "Downloading and preparing Avitabile et al. 2016 raster data"
+        )
+
         rv$CV_model$rs_avitabile <- get_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
         rv$CV_model$df_avitabile <- mask(rv$CV_model$rs_avitabile, vect(rv$CV_model$sf_aoi)) %>%
@@ -107,6 +125,13 @@ CV_model_server <- function(id, rv) {
           na.omit()
 
         ## + + Santoro et al. 2018 map, download, load and make map ---------
+        updateProgressBar(
+          session = session,
+          id = "progress_CV",
+          value = 30, total = 100,
+          title = "Downloading and preparing Avitabile et al. 2016 raster data"
+        )
+
         rv$CV_model$rs_santoro <- get_santoro(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
 
         rv$CV_model$df_santoro <- mask(rv$CV_model$rs_santoro, vect(rv$CV_model$sf_aoi)) %>%
@@ -115,6 +140,12 @@ CV_model_server <- function(id, rv) {
           na.omit()
 
         ## + + Show maps ----------------------------------------------------
+        updateProgressBar(
+          session = session,
+          id = "progress_CV",
+          value = 50, total = 100,
+          title = "Making maps"
+        )
 
         max_agb <- reactive({
 
@@ -130,7 +161,7 @@ CV_model_server <- function(id, rv) {
             scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
-            theme(legend.position = "bottom", legend.key.width = unit(3, "cm")) +
+            theme(legend.position = "bottom", legend.key.width = unit(2, "cm")) +
             add_ggspatial(font = "LoraIt") +
             labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
 
@@ -142,13 +173,20 @@ CV_model_server <- function(id, rv) {
             scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
-            theme(legend.position = "bottom", legend.key.width = unit(3, "cm")) +
+            theme(legend.position = "none") +
             add_ggspatial(font = "LoraIt") +
             labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
 
         })
 
-        ## + + Get CV model table -------------------------------------------
+        ## + + Get CV -------------------------------------------------------
+        updateProgressBar(
+          session = session,
+          id = "progress_CV",
+          value = 70, total = 100,
+          title = "Performing CV calculations"
+        )
+
         rv$CV_model$cv_avitabile <- get_CV_AGB(df = rv$CV_model$df_avitabile, agb_min = input$agb_min) %>%
           mutate(
             CV_init_area = terra::res(rv$CV_model$rs_avitabile)[1]^2 / 100^2,
@@ -172,6 +210,15 @@ CV_model_server <- function(id, rv) {
           forest_area  = round(country_area * input$forest_cover / 100)
         )
 
+
+        ## + + Show tables --------------------------------------------------
+        updateProgressBar(
+          session = session,
+          id = "progress_CV",
+          value = 90, total = 100,
+          title = "Making tables"
+        )
+
         output$CV_table <- renderTable({
 
           rv$CV_model$cv_avitabile %>%
@@ -180,9 +227,19 @@ CV_model_server <- function(id, rv) {
 
         })
 
+        output$area_table <- renderTable({
 
+          rv$CV_model$areas
 
+        })
 
+        updateProgressBar(
+          session = session,
+          id = "progress_CV",
+          value = 100, total = 100,
+          title = "Tasks completed",
+          status = "success"
+        )
 
 
       }) ## END observeEvent spatial analysis
