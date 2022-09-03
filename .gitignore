@@ -1,8 +1,9 @@
 # custom gitignore
 data/
 fonts/
-inst/
-www/
+inst/assets/scott-webb-2OPTOJNNY2Y-unsplash.jpg
+#inst/
+#www/
 
 # History files
 .Rhistory
