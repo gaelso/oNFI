@@ -128,19 +128,7 @@ CV_model_UI <- function(id){
 
           h4("Select an Area of Interest (AOI)"),
 
-          ## !!! Not implemented, get the data from GADM automatically
-          # p("Select a country from the list below or upload an AOI shapefile."),
-          #
-          # p("If you pick from the list below, the approximative country boundaries
-          #   are taken from", a("GADM", href = "https://gadm.org/data.html")),
-          #
-          # selectInput(ns("input_country"), "Select country:", choices = c("<empty>", "Timor Leste"), selected = "<empty>"),
-          #
-          # br(),
-          # !!!
-
-          p("Please upload the spatial boundaries of your
-            AOI. Accepted file types are geoJSON ('.geoJSON') and GeoPackage ('.GPKG').
+          p("Accepted file types are geoJSON ('.geoJSON') and GeoPackage ('.GPKG').
             The maximum file size allowed is 10 Mo."),
 
           fileInput(ns("AOI"), "Upload an AOI shapefile:",
@@ -177,11 +165,12 @@ CV_model_UI <- function(id){
           #   choiceValues = c("avitabile2016", "santoro2018")
           #   ),
 
-          p("The maps provide AGB estimates for all land use types, with values
-            ranging from 0 to around 700 ton/ha. As forest lands are expected to
-            have a minimum AGB, this value can be selected below to reduce the CV
-            estimate from the maps. Default to 0, meaning all land is considered
-            in the calcuation of CV"),
+          ## !!! TO BE MOVED TO POPUP EXPLANATION
+          # p("The maps provide AGB estimates for all land use types, with values
+          #   ranging from 0 to around 700 ton/ha. As forest lands are expected to
+          #   have a minimum AGB, this value can be selected below to reduce the CV
+          #   estimate from the maps. Default to 0, meaning all land is considered
+          #   in the calcuation of CV"),
 
           numericInput(ns("agb_min"), "Pick a minimum AGB value for forest (in ton/ha)", value = 0, min = 0, max = 100),
 
@@ -205,14 +194,6 @@ CV_model_UI <- function(id){
 
           actionButton(inputId = ns("calc_CV"), label = "Calculate CV"),
 
-          shinyWidgets::progressBar(
-            id = ns("progress_CV"),
-            value = 0,
-            #total = 100,
-            title = "CV calculation progress",
-            display_pct = TRUE
-          )
-
         ), ## END conditionalPanel
 
         ## Width sidebar
@@ -220,33 +201,95 @@ CV_model_UI <- function(id){
 
       ),
 
-      ## + Define mainPanel -------------------------------------------------
+      ## + Define mainPanel =================================================
       mainPanel(
         h4(strong("Area of Interest and Coefficient of Variation")),
 
         br(),
 
-        fluidRow(
+        ## + + Progress bars ------------------------------------------------
+        shinyjs::hidden(div(
+          id = ns("CV_progress"),
 
-          p("Aboveground biomass maps for the are of interest:"),
+          shinyWidgets::progressBar(
+            id = ns("prog_checks"),
+            value = 0,
+            title = "Check input",
+            display_pct = TRUE
+          ),
 
-          plotOutput(outputId = ns("map_agb"), height = 400),
+          shinyWidgets::progressBar(
+            id = ns("prog_avit"),
+            value = 0,
+            title = "Prepare Avitabile et al. 2016 raster data",
+            display_pct = TRUE
+          ),
 
-          hr(),
+          shinyWidgets::progressBar(
+            id = ns("prog_sant"),
+            value = 0,
+            title = "Prepare Santoro et al. 2018 raster data",
+            display_pct = TRUE
+          ),
 
-          p("Initial CV values for forest inventory optimization following Avitabile
+          shinyWidgets::progressBar(
+            id = ns("prog_maps"),
+            value = 0,
+            title = "Make maps",
+            display_pct = TRUE
+          ),
+
+          shinyWidgets::progressBar(
+            id = ns("prog_CV"),
+            value = 0,
+            title = "Calculate initial CV for optimization",
+            display_pct = TRUE
+          ),
+
+          shinyWidgets::progressBar(
+            id = ns("prog_tables"),
+            value = 0,
+            title = "Make tables",
+            display_pct = TRUE
+          )
+
+          )), ## END progress
+
+        shinyjs::hidden(div(
+          id = ns("CV_to_results"),
+
+          actionButton(inputId = ns("show_CV"), label = "Show results")
+
+        )), ## END to results
+
+
+        ## + + Maps and CV tables -------------------------------------------
+        shinyjs::hidden(div(
+          id = ns("CV_results"),
+
+          fluidRow(
+
+            p("Aboveground biomass maps for the are of interest:"),
+
+            plotOutput(outputId = ns("map_agb"), height = 600),
+
+            hr(),
+
+            p("Initial CV values for forest inventory optimization following Avitabile
             et al. 2016, Santoro et al. 2018 and a mixed approach (average CV, highest area):"),
 
-          tableOutput(outputId = ns("CV_table")),
+            tableOutput(outputId = ns("CV_table")),
 
-          br(),
+            br(),
 
-          p("Based on the input area of interest spatial data and the specified forest
+            p("Based on the input area of interest spatial data and the specified forest
             cover percentage the AOI area and forest area are (in km^2):"),
 
-          tableOutput(outputId = ns("area_table"))
+            tableOutput(outputId = ns("area_table"))
 
-        ),
+          )
+
+          )), ## END results
 
         width = 8
 

@@ -70,7 +70,6 @@ CV_model_server <- function(id, rv) {
 
 
       ## + + Loading AOI ----------------------------------------------------
-
       observeEvent(input$to_step3, {
 
         rv$CV_model$sf_aoi <- st_read(input$AOI$datapath)
@@ -88,15 +87,19 @@ CV_model_server <- function(id, rv) {
       ## + AGB map spatial analysis =========================================
       observeEvent(input$calc_CV, {
 
+        ## Show and reset progress bars
+        shinyjs::show("CV_progress")
+        shinyjs::hide("CV_to_results")
+        shinyjs::hide("CV_results")
+
+        updateProgressBar(session = session, id = "prog_checks", value = 0, status = NULL)
+        updateProgressBar(session = session, id = "prog_avit"  , value = 0, status = NULL)
+        updateProgressBar(session = session, id = "prog_sant"  , value = 0, status = NULL)
+        updateProgressBar(session = session, id = "prog_maps"  , value = 0, status = NULL)
+        updateProgressBar(session = session, id = "prog_CV"    , value = 0, status = NULL)
+        updateProgressBar(session = session, id = "prog_tables", value = 0, status = NULL)
+
         ## + + Checks -------------------------------------------------------
-
-        updateProgressBar(
-          session = session,
-          id = "progress_CV",
-          value = 1,
-          title = "Checking input values"
-        )
-
         ## !!! TO BE REMOVED when checks implemented
         Sys.sleep(2)
 
@@ -109,44 +112,35 @@ CV_model_server <- function(id, rv) {
         ## Check at lest one biomass map selected
         ## !!! TBD !!!
 
-        ## + + Avitabile et al. 2016 map, download, load and make map -------
-        updateProgressBar(
-          session = session,
-          id = "progress_CV",
-          value = 10,
-          title = "Downloading and preparing Avitabile et al. 2016 raster data"
-        )
+        updateProgressBar(session = session, id = "prog_checks", value = 100, status = "success")
 
-        rv$CV_model$rs_avitabile <- get_avitabile(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
+        ## + + Avitabile et al. 2016 map, download, load and make map -------
+        rv$CV_model$rs_avitabile <- get_avitabile(path_data   = rv$CV_model$file_path,
+                                                  sf_aoi      = rv$CV_model$sf_aoi,
+                                                  progress_id = "prog_avit",
+                                                  session     = session)
 
         rv$CV_model$df_avitabile <- terra::mask(rv$CV_model$rs_avitabile, terra::vect(rv$CV_model$sf_aoi)) %>%
           terra::as.data.frame(xy = TRUE) %>%
           as_tibble() %>%
           na.omit()
 
-        ## + + Santoro et al. 2018 map, download, load and make map ---------
-        updateProgressBar(
-          session = session,
-          id = "progress_CV",
-          value = 30,
-          title = "Downloading and preparing Santoro et al. 2018 raster data"
-        )
+        updateProgressBar(session = session, id = "prog_avit", value = 100, status = "success")
 
-        rv$CV_model$rs_santoro <- get_santoro(path_data = rv$CV_model$file_path, sf_aoi = rv$CV_model$sf_aoi)
+        ## + + Santoro et al. 2018 map, download, load and make map ---------
+        rv$CV_model$rs_santoro <- get_santoro(path_data   = rv$CV_model$file_path,
+                                              sf_aoi      = rv$CV_model$sf_aoi,
+                                              progress_id = "prog_sant",
+                                              session     = session)
 
         rv$CV_model$df_santoro <- terra::mask(rv$CV_model$rs_santoro, terra::vect(rv$CV_model$sf_aoi)) %>%
           terra::as.data.frame(rv$CV_model$rs_santoro, xy = TRUE) %>%
           as_tibble() %>%
           na.omit()
 
-        ## + + Show maps ----------------------------------------------------
-        updateProgressBar(
-          session = session,
-          id = "progress_CV",
-          value = 50,
-          title = "Making maps"
-        )
+        updateProgressBar(session = session, id = "prog_sant", value = 100, status = "success")
 
+        ## + + Show maps ----------------------------------------------------
         output$map_agb <- renderPlot({
 
           gr1 <- ggplot() +
@@ -154,7 +148,7 @@ CV_model_server <- function(id, rv) {
             scale_fill_viridis_c(direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
-            #theme(legend.position = "bottom", legend.key.width = unit(2, "cm")) +
+            theme(legend.key.height = unit(2, "cm")) +
             add_ggspatial(font = "LoraIt") +
             labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
 
@@ -163,7 +157,7 @@ CV_model_server <- function(id, rv) {
             scale_fill_viridis_c(direction = -1) +
             geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
             theme_bw() +
-            #theme(legend.position = "none") +
+            theme(legend.key.height = unit(2, "cm")) +
             add_ggspatial(font = "LoraIt") +
             labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
 
@@ -171,6 +165,9 @@ CV_model_server <- function(id, rv) {
 
         })
 
+        updateProgressBar(session = session, id = "prog_maps", value = 100, status = "success")
+
+        ## !!! REPLACED by ggarrange() to combine both maps more easily
         # max_agb <- reactive({
         #
         #   max1 <- max(c(rv$CV_model$df_santoro$agb_santoro, rv$CV_model$df_avitabile$agb_avitabile))
@@ -203,13 +200,6 @@ CV_model_server <- function(id, rv) {
         # })
 
         ## + + Get CV -------------------------------------------------------
-        updateProgressBar(
-          session = session,
-          id = "progress_CV",
-          value = 70,
-          title = "Performing CV calculations"
-        )
-
         rv$CV_model$cv_avitabile <- get_CV_AGB(df = rv$CV_model$df_avitabile, agb_min = input$agb_min) %>%
           mutate(
             CV_init_area = terra::res(rv$CV_model$rs_avitabile)[1]^2 / 100^2,
@@ -223,7 +213,7 @@ CV_model_server <- function(id, rv) {
           )
 
         rv$CV_model$cv_mixed <- tibble(
-          CV_init = mean(rv$CV_model$cv_santoro$CV_init, rv$CV_model$cv_avitabile$CV_init),
+          CV_init = mean(c(rv$CV_model$cv_santoro$CV_init, rv$CV_model$cv_avitabile$CV_init)),
           CV_init_area = max(rv$CV_model$cv_santoro$CV_init_area, rv$CV_model$cv_avitabile$CV_init_area),
           source = "Average CV"
         )
@@ -233,15 +223,9 @@ CV_model_server <- function(id, rv) {
           forest_area  = round(country_area * input$forest_cover / 100)
         )
 
+        updateProgressBar(session = session, id = "prog_CV", value = 100, status = "success")
 
         ## + + Show tables --------------------------------------------------
-        updateProgressBar(
-          session = session,
-          id = "progress_CV",
-          value = 90,
-          title = "Making tables"
-        )
-
         output$CV_table <- renderTable({
 
           rv$CV_model$cv_avitabile %>%
@@ -256,16 +240,24 @@ CV_model_server <- function(id, rv) {
 
         })
 
-        updateProgressBar(
-          session = session,
-          id = "progress_CV",
-          value = 100,
-          title = "Tasks completed",
-          status = "success"
-        )
+        updateProgressBar(session = session, id = "prog_tables", value = 100, status = "success")
+
+        ## + + Allow button to see results ----------------------------------
+
+        shinyjs::show("CV_to_results")
+
+        }) ## END observeEvent spatial analysis
 
 
-      }) ## END observeEvent spatial analysis
+
+      ## + Show results =====================================================
+      observeEvent(input$show_CV, {
+
+        shinyjs::hide("CV_progress")
+        shinyjs::hide("CV_to_results")
+        shinyjs::show("CV_results")
+
+      })
 
     }
   )
