@@ -1,7 +1,7 @@
 
 
 
-get_avitabile <- function(path_data, sf_aoi = NULL, url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
+get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL, url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
 
 
   ## Check AOI CRS
@@ -13,7 +13,8 @@ get_avitabile <- function(path_data, sf_aoi = NULL, url = "http://lucid.wur.nl/s
   }
 
 
-  ## + Download if necessasry ----
+
+  ## + Download if necessary ----
   ## Get file name from URL
   server_filename <- str_remove(url, ".*/")
   file_ext        <- str_sub(server_filename, start = -4, end = -1)
@@ -49,6 +50,11 @@ get_avitabile <- function(path_data, sf_aoi = NULL, url = "http://lucid.wur.nl/s
     message(paste0("...Done", " - ", dt, " sec."))
 
   }
+
+  ## Update progress
+  if (!is.null(progress_id)) updateProgressBar(session = session, id = progress_id, value = 50)
+
+
 
   ## + Load raster ----
   rs <- terra::rast(

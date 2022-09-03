@@ -113,14 +113,13 @@ download_santoro <- function(path_data, url){
 
 
 
-path_data = "data"
-
 ##
 ## Main function to get tiles, download if necessary and crop to AOI ########
 ##
 
-get_santoro <- function(path_data, sf_aoi = NULL, tile_name = "N00E140_agb.zip", url = "globbiomass.org/wp-content/uploads/GB_Maps/"){
+get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL, tile_name = "N00E140_agb.zip", url = "globbiomass.org/wp-content/uploads/GB_Maps/"){
 
+  ## + Checks ----
   ## Check inputs
   if (is.null(sf_aoi) & is.null(tile_name)) stop("Need either an AOI boundary simple feature or a tile name")
 
@@ -132,17 +131,25 @@ get_santoro <- function(path_data, sf_aoi = NULL, tile_name = "N00E140_agb.zip",
 
   }
 
+  ## + Get tiles ----
   ## Transform CRS to get tiles
   if(!is.null(sf_aoi)) sf_aoi_wgs84 <- st_transform(sf_aoi, crs = 4326)
 
   ## Get tile names
   santoro_tiles <- ifelse(is.null(sf_aoi), tile_name,  get_santoro_tiles(sf_aoi = sf_aoi_wgs84))
 
-  ## Download tiles if necessary
+  ## Update Progress
+  if (!is.null(progress_id)) updateProgressBar(session = session, id = progress_id, value = 20)
+
+  ## + Download tiles if necessary ----
   purrr::walk(santoro_tiles, function(x){
     download_santoro(path_data = path_data, url = paste0(url, x, ".zip"))
   })
 
+  ## Update Progress
+  if (!is.null(progress_id)) updateProgressBar(session = session, id = progress_id, value = 50)
+
+  ## + Read data ----
   ## List tiles
   santoro_filelist <- list.files(file.path(path_data, "Santoro_agb"), pattern = "_agb.tif")
   santoro_files    <- santoro_filelist[match(paste0(santoro_tiles, ".tif"), santoro_filelist)]
@@ -161,6 +168,10 @@ get_santoro <- function(path_data, sf_aoi = NULL, tile_name = "N00E140_agb.zip",
 
   rs_list <- rs_list[!sapply(rs_list, is.null)]
 
+  ## Update Progress
+  if (!is.null(progress_id)) updateProgressBar(session = session, id = progress_id, value = 80)
+
+  ## + Prepare final raster object ----
   ## Merging elements
   if (length(rs_list) == 1) {
     rs_out <- rs_list[[1]]
