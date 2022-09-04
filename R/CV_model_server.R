@@ -26,14 +26,16 @@ CV_model_server <- function(id, rv) {
       })
 
       ## Approach selection #################################################
-      CV_approach <- reactive({ input$approach })
 
+      ## Show approach based panel
       observeEvent(input$start_CV, {
 
-        if(CV_approach() == "a1") {
+        rv$CV_model$cv_approach <- input$approach
+
+        if(rv$CV_model$cv_approach == "a1") {
           shinyjs::show("AGB_map")
           shinyjs::hide("CV_params")
-        } else if(CV_approach() == "a2") {
+        } else if(rv$CV_model$cv_approach == "a2") {
           shinyjs::hide("AGB_map")
           shinyjs::show("CV_params")
         }
@@ -65,32 +67,41 @@ CV_model_server <- function(id, rv) {
 
         })
 
-      ## !!! For testing
-      # output$show_path2 <- renderText({ rv$CV_model$file_path })
 
 
-      ## + + Loading AOI ----------------------------------------------------
-      observeEvent(input$to_step3, {
+      ## + Loading AOI ======================================================
 
+      observe({
+        req(input$AOI)
         rv$CV_model$sf_aoi <- st_read(input$AOI$datapath)
-
-        output$map_aoi <- renderPlot({
-          ggplot() +
-            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
-            theme_void()
         })
 
+      observe({
+        req(rv$CV_model$sf_aoi)
+        shinyjs::enable(id = "to_step3")
+        shinyjs::hide(id = "msg_to_step3")
+        })
+
+      output$map_aoi <- renderPlot({
+
+        req(rv$CV_model$sf_aoi)
+
+        ggplot() +
+          geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+          theme_void()
       })
 
 
 
       ## + AGB map spatial analysis =========================================
+
       observeEvent(input$calc_CV, {
 
         ## Show and reset progress bars
         shinyjs::show("CV_progress")
         shinyjs::hide("CV_to_results")
         shinyjs::hide("CV_results")
+        shinyjs::hide("CV_to_params")
 
         updateProgressBar(session = session, id = "prog_checks", value = 0, status = NULL)
         updateProgressBar(session = session, id = "prog_avit"  , value = 0, status = NULL)
@@ -98,6 +109,9 @@ CV_model_server <- function(id, rv) {
         updateProgressBar(session = session, id = "prog_maps"  , value = 0, status = NULL)
         updateProgressBar(session = session, id = "prog_CV"    , value = 0, status = NULL)
         updateProgressBar(session = session, id = "prog_tables", value = 0, status = NULL)
+
+        ## Reset reactive values
+        rv$CV_model$cv_mixed <- NULL
 
         ## + + Checks -------------------------------------------------------
         ## !!! TO BE REMOVED when checks implemented
@@ -140,65 +154,6 @@ CV_model_server <- function(id, rv) {
 
         updateProgressBar(session = session, id = "prog_sant", value = 100, status = "success")
 
-        ## + + Show maps ----------------------------------------------------
-        output$map_agb <- renderPlot({
-
-          gr1 <- ggplot() +
-            geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-            scale_fill_viridis_c(direction = -1) +
-            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
-            theme_bw() +
-            theme(legend.key.height = unit(2, "cm")) +
-            add_ggspatial(font = "LoraIt") +
-            labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
-
-          gr2 <- ggplot() +
-            geom_tile(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
-            scale_fill_viridis_c(direction = -1) +
-            geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
-            theme_bw() +
-            theme(legend.key.height = unit(2, "cm")) +
-            add_ggspatial(font = "LoraIt") +
-            labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
-
-          ggpubr::ggarrange(gr1, gr2, ncol = 1, nrow = 2, common.legend = TRUE, legend = "right")
-
-        })
-
-        updateProgressBar(session = session, id = "prog_maps", value = 100, status = "success")
-
-        ## !!! REPLACED by ggarrange() to combine both maps more easily
-        # max_agb <- reactive({
-        #
-        #   max1 <- max(c(rv$CV_model$df_santoro$agb_santoro, rv$CV_model$df_avitabile$agb_avitabile))
-        #   max2 <- ceiling(max1 / 100) * 100
-        #   max2
-        #
-        # })
-        #
-        # output$map_avitabile <- renderPlot({
-        #   ggplot() +
-        #     geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
-        #     scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
-        #     geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
-        #     theme_bw() +
-        #     theme(legend.position = "bottom", legend.key.width = unit(2, "cm")) +
-        #     add_ggspatial(font = "LoraIt") +
-        #     labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
-        # })
-        #
-        # output$map_santoro <- renderPlot({
-        #   ggplot() +
-        #     geom_tile(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
-        #     scale_fill_viridis_c(limits = c(0, max_agb()), direction = -1) +
-        #     geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
-        #     theme_bw() +
-        #     theme(legend.position = "none") +
-        #     add_ggspatial(font = "LoraIt") +
-        #     labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
-        #
-        # })
-
         ## + + Get CV -------------------------------------------------------
         rv$CV_model$cv_avitabile <- get_CV_AGB(df = rv$CV_model$df_avitabile, agb_min = input$agb_min) %>%
           mutate(
@@ -225,29 +180,67 @@ CV_model_server <- function(id, rv) {
 
         updateProgressBar(session = session, id = "prog_CV", value = 100, status = "success")
 
-        ## + + Show tables --------------------------------------------------
-        output$CV_table <- renderTable({
-
-          rv$CV_model$cv_avitabile %>%
-            bind_rows(rv$CV_model$cv_santoro) %>%
-            bind_rows(rv$CV_model$cv_mixed)
-
-        })
-
-        output$area_table <- renderTable({
-
-          rv$CV_model$areas
-
-        })
-
-        updateProgressBar(session = session, id = "prog_tables", value = 100, status = "success")
-
-        ## + + Allow button to see results ----------------------------------
-
-        shinyjs::show("CV_to_results")
-
         }) ## END observeEvent spatial analysis
 
+
+
+      ## + Make outputs =====================================================
+
+      ## + + Show maps ----------------------------------------------------
+      output$map_agb <- renderPlot({
+
+        gr1 <- ggplot() +
+          geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
+          scale_fill_viridis_c(direction = -1) +
+          geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+          theme_bw() +
+          theme(legend.key.height = unit(2, "cm")) +
+          add_ggspatial(font = "LoraIt") +
+          labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
+
+        gr2 <- ggplot() +
+          geom_tile(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
+          scale_fill_viridis_c(direction = -1) +
+          geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
+          theme_bw() +
+          theme(legend.key.height = unit(2, "cm")) +
+          add_ggspatial(font = "LoraIt") +
+          labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
+
+        ggpubr::ggarrange(gr1, gr2, ncol = 1, nrow = 2, common.legend = TRUE, legend = "right")
+
+      })
+
+      ## + + Show tables --------------------------------------------------
+      output$CV_table <- renderTable({
+
+        rv$CV_model$cv_avitabile %>%
+          bind_rows(rv$CV_model$cv_santoro) %>%
+          bind_rows(rv$CV_model$cv_mixed)
+
+      })
+
+      output$area_table <- renderTable({
+
+        rv$CV_model$areas
+
+      })
+
+
+
+      ## + Show button to results ===========================================
+
+      # !!! Not working, using req() instead
+      # observeEvent(!is.null(rv$CV_model$cv_mixed), {
+      #
+      #   shinyjs::show("CV_to_results")
+      #
+      # })
+
+      observe({
+        req(rv$CV_model$cv_mixed)
+        shinyjs::show("CV_to_results")
+      })
 
 
       ## + Show results =====================================================
@@ -257,6 +250,14 @@ CV_model_server <- function(id, rv) {
         shinyjs::hide("CV_to_results")
         shinyjs::show("CV_results")
 
+        Sys.sleep(10)
+        shinyjs::show("CV_to_params")
+
+      })
+
+      ## Change tab #########################################################
+      observeEvent(input$to_params, {
+        rv$to_params <- input$to_params
       })
 
     }

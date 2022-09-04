@@ -66,7 +66,7 @@ CV_model_UI <- function(id){
 
     fluidRow(
 
-      wellPanel(div(
+      wellPanel(
         div(
           shinyWidgets::radioGroupButtons(
             inputId = ns("approach"),
@@ -81,12 +81,12 @@ CV_model_UI <- function(id){
               yes = icon("ok",
                          lib = "glyphicon")),
             justified = FALSE
-            ),
+          ),
           align = "center"),
         div(
           actionButton(inputId = ns("start_CV"), label = "Continue")
-          )
-      ), class="bg1"),
+        ),
+        class="bg1"),
 
     ), ## END fluidRow
 
@@ -111,7 +111,7 @@ CV_model_UI <- function(id){
             style = "padding: 0.375em; border: 1px solid #e3e3e3;
             border-radius: 4px; font-weight: bold; text-align: center;
             margin-top: 5px; margin-bottom: 5px;"
-            ),
+          ),
 
           ## !!! For testing
           # textOutput(ns("show_path2")),
@@ -134,14 +134,19 @@ CV_model_UI <- function(id){
           fileInput(ns("AOI"), "Upload an AOI shapefile:",
                     multiple = F, accept = c(".geoJSON", ".GPKG")),
 
-          actionButton(inputId = ns("to_step3"), label = "Continue"),
-
           div(
             plotOutput(outputId = ns("map_aoi"), height = 100),
             #align = "center",
             style = "padding: 0.375em; border: 1px solid #e3e3e3;
             border-radius: 4px; font-weight: bold; text-align: center;
             margin-top: 5px; margin-bottom: 5px; align: center;"
+          ),
+
+          ## Next step button
+          shinyjs::disabled(actionButton(inputId = ns("to_step3"), label = "Continue")),
+          p(id = ns("msg_to_step3"),
+            "A valid spatial file is required to move to the next step",
+            style = "color: red; font-style: italic;"
           )
 
         ), ## END conditionalPanel
@@ -152,19 +157,6 @@ CV_model_UI <- function(id){
         conditionalPanel(
           condition = "input.to_step3", ns = ns,
 
-          # !!! Force both products for now
-          # h4("Select the Biomass map to use for the CV"),
-          #
-          # checkboxGroupInput(
-          #   inputId = ns("map_select"),
-          #   label ="Biomass map",
-          #   choiceNames = c(
-          #     "Avitabile et al. 2016, 1 km res., 2000-2010",
-          #     "Santoro et al. 2018, 100m res., 2010"
-          #     ),
-          #   choiceValues = c("avitabile2016", "santoro2018")
-          #   ),
-
           ## !!! TO BE MOVED TO POPUP EXPLANATION
           # p("The maps provide AGB estimates for all land use types, with values
           #   ranging from 0 to around 700 ton/ha. As forest lands are expected to
@@ -173,12 +165,6 @@ CV_model_UI <- function(id){
           #   in the calcuation of CV"),
 
           numericInput(ns("agb_min"), "Pick a minimum AGB value for forest (in ton/ha)", value = 0, min = 0, max = 100),
-
-          br(),
-
-          p("To refine the grid spacing, please provide the estimated forest cover of you AOI in %."),
-
-          numericInput(ns("forest_cover"), "Forest cover in %", value = 50, min = 0, max = 100),
 
           hr(),
 
@@ -233,28 +219,15 @@ CV_model_UI <- function(id){
           ),
 
           shinyWidgets::progressBar(
-            id = ns("prog_maps"),
-            value = 0,
-            title = "Make maps",
-            display_pct = TRUE
-          ),
-
-          shinyWidgets::progressBar(
             id = ns("prog_CV"),
             value = 0,
             title = "Calculate initial CV for optimization",
             display_pct = TRUE
           ),
 
-          shinyWidgets::progressBar(
-            id = ns("prog_tables"),
-            value = 0,
-            title = "Make tables",
-            display_pct = TRUE
-          )
+        )), ## END progress
 
-          )), ## END progress
-
+        ## + + Show results -------------------------------------------------
         shinyjs::hidden(div(
           id = ns("CV_to_results"),
 
@@ -269,7 +242,7 @@ CV_model_UI <- function(id){
 
           fluidRow(
 
-            p("Aboveground biomass maps for the are of interest:"),
+            p("Aboveground biomass maps for the area of interest:"),
 
             plotOutput(outputId = ns("map_agb"), height = 600),
 
@@ -278,6 +251,7 @@ CV_model_UI <- function(id){
             p("Initial CV values for forest inventory optimization following Avitabile
             et al. 2016, Santoro et al. 2018 and a mixed approach (average CV, highest area):"),
 
+            ## !!! TO BE IMPROVED !!!
             tableOutput(outputId = ns("CV_table")),
 
             br(),
@@ -285,11 +259,23 @@ CV_model_UI <- function(id){
             p("Based on the input area of interest spatial data and the specified forest
             cover percentage the AOI area and forest area are (in km^2):"),
 
-            tableOutput(outputId = ns("area_table"))
+            ## !!! TO BE IMPROVED !!!
+            tableOutput(outputId = ns("area_table")),
 
+          ) ## END fluidRow
+
+        )), ## END results div
+
+        shinyjs::hidden(div(
+          id = ns("CV_to_params"),
+
+        fluidRow(
+          h4(icon("arrow-right"), "Continue to Step 2:", HTML("&nbsp;"),
+             actionButton(ns("to_params"), "Optimization parameters")
           )
+        ) ## END fluidRow
 
-          )), ## END results
+        )),
 
         width = 8
 
