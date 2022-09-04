@@ -57,25 +57,25 @@ home_UI <- function(id){
         ), class="bg1")),
 
       column(6, wellPanel(div(
-        h3("3. Unit times"),
+        h3("2. Nested plot conditions"),
         br(),
-        p("!!! This section deals with different unit times necessary to calculate
-          the total cost of forest measurements !!!", align = "center")
+        p("!!! This section aims to characterize forest condfitions for different
+          tree diameter classes to optimize the respective size of 2 nested subplots for
+          small and big trees (seedling fixed to 2.5 m radius circle for now) !!!", align = "center")
         ), class="bg2"))
     ), ## End fluidRow
 
     ## + Description inputs cont. -------------------------------------------
     fluidRow(
       column(6, wellPanel(div(
-        h3("2. Nested plot conditions"),
+        h3("3. Unit times"),
         br(),
-        p("!!! This section aims to characterize forest condfitions for different
-          tree diameter classes to optimize the respective size of 2 nested subplots for
-          small and big trees (seedling fixed to 2.5 m radius circle for now) !!!", align = "center")
+        p("!!! This section deals with different unit times necessary to calculate
+          the total cost of forest measurements !!!", align = "center")
       ), class="bg3")),
 
       column(6, wellPanel(div(
-        h3("4. Testing parameters"),
+        h3("4. Optimization parameters"),
         br(),
         p("!!! List of parameters to be tested, the more parameters the more
           total number of designs need to be tested !!!", align = "center")
