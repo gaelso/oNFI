@@ -10,6 +10,7 @@ usethis::create_package("D:/github-repos/oNFI")
 
 ##Load all functions
 devtools::load_all()
+shiny_optimize_NFI()
 
 ##
 ## Add dependencies
