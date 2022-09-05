@@ -9,7 +9,7 @@ CV_model_UI <- function(id){
   ## UI elements wrapped in a tagList() function
   tagList(
 
-    h3("Coefficient of Variation for your main forest inventory variable", alignn = "center"),
+    h3("Coefficient of Variation for your main forest inventory variable", align = "center"),
 
     br(),
 
@@ -83,10 +83,12 @@ CV_model_UI <- function(id){
             justified = FALSE
           ),
           align = "center"),
+
         div(
           actionButton(inputId = ns("start_CV"), label = "Continue")
         ),
-        class="bg1"),
+
+        class="bg1") ## END wellPanel approach
 
     ), ## END fluidRow
 
@@ -256,11 +258,11 @@ CV_model_UI <- function(id){
 
             br(),
 
-            p("Based on the input area of interest spatial data and the specified forest
-            cover percentage the AOI area and forest area are (in km^2):"),
+            # p("Based on the input area of interest spatial data and the specified forest
+            # cover percentage the AOI area and forest area are (in km^2):"),
 
             ## !!! TO BE IMPROVED !!!
-            tableOutput(outputId = ns("area_table")),
+            textOutput(outputId = ns("area_aoi")),
 
           ) ## END fluidRow
 

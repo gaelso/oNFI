@@ -16,6 +16,10 @@ CV_model_server <- function(id, rv) {
     ## Below is the module function
     function(input, output, session) {
 
+      ns <- session$ns
+
+
+
       ## Introduction #######################################################
 
       ## Show/hide Introduction
@@ -25,6 +29,8 @@ CV_model_server <- function(id, rv) {
         shinyjs::toggle(id = "intro3", anim = T, animType = "fade")
       })
 
+
+
       ## Approach selection #################################################
 
       ## Show approach based panel
@@ -32,6 +38,7 @@ CV_model_server <- function(id, rv) {
 
         rv$CV_model$cv_approach <- input$approach
 
+        ## Show tab for approaches
         if(rv$CV_model$cv_approach == "a1") {
           shinyjs::show("AGB_map")
           shinyjs::hide("CV_params")
@@ -39,6 +46,17 @@ CV_model_server <- function(id, rv) {
           shinyjs::hide("AGB_map")
           shinyjs::show("CV_params")
         }
+
+        ## Reset CV_model values
+        # rv$CV_model$file_path    = NULL
+        rv$CV_model$sf_aoi       = NULL
+        rv$CV_model$rs_avitabile = NULL
+        rv$CV_model$df_avitabile = NULL
+        rv$CV_model$cv_avitabile = NULL
+        rv$CV_model$rs_santoro   = NULL
+        rv$CV_model$df_santoro   = NULL
+        rv$CV_model$cv_santoro   = NULL
+        rv$CV_model$cv_mixed     = NULL
 
       })
 
@@ -173,10 +191,7 @@ CV_model_server <- function(id, rv) {
           source = "Average CV"
         )
 
-        rv$CV_model$areas <- tibble(
-          country_area = round(as.numeric(st_area(rv$CV_model$sf_aoi)) / 1000^2),
-          forest_area  = round(country_area * input$forest_cover / 100)
-        )
+        rv$CV_model$area_aoi <- round(as.numeric(st_area(rv$CV_model$sf_aoi)) / 1000^2)
 
         updateProgressBar(session = session, id = "prog_CV", value = 100, status = "success")
 
@@ -220,9 +235,9 @@ CV_model_server <- function(id, rv) {
 
       })
 
-      output$area_table <- renderTable({
+      output$area_aoi <- renderText({
 
-        rv$CV_model$areas
+        paste0("Based on the shapefile uploaded the area if interest has an area of ",  rv$CV_model$areas, ".")
 
       })
 
@@ -243,7 +258,9 @@ CV_model_server <- function(id, rv) {
       })
 
 
+
       ## + Show results =====================================================
+
       observeEvent(input$show_CV, {
 
         shinyjs::hide("CV_progress")
@@ -255,11 +272,15 @@ CV_model_server <- function(id, rv) {
 
       })
 
+
+
       ## Change tab #########################################################
+
       observeEvent(input$to_params, {
         rv$to_params <- input$to_params
       })
 
-    }
+    } ## END module server function
   )
+
 } ## END function CV_model_server()
