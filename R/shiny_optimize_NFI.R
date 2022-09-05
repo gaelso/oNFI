@@ -29,7 +29,18 @@ shiny_optimize_NFI <- function(...) {
   ## UI #####################################################################
   ui <- fluidPage(
 
-    useShinyjs(),  # Include shinyjs
+    shinyjs::useShinyjs(),  # Include shinyjs
+
+    withMathJax(),
+
+    ## section below allows in-line LaTeX via $ in mathjax.
+    ## See https://stackoverflow.com/questions/54876731/inline-latex-equations-in-shiny-app-with-mathjax
+    tags$div(HTML("<script type='text/x-mathjax-config' >
+            MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+            });
+            </script >
+            ")),
 
     titlePanel(
       title = div(img(src="assets/banner_en.png", width = '100%')),
