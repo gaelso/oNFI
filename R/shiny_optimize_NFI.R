@@ -35,11 +35,12 @@ shiny_optimize_NFI <- function(...) {
 
     ## section below allows in-line LaTeX via $ in mathjax.
     ## See https://stackoverflow.com/questions/54876731/inline-latex-equations-in-shiny-app-with-mathjax
-    tags$div(HTML("<script type='text/x-mathjax-config' >
+    ## and https://stackoverflow.com/questions/60639117/r-shiny-with-mathjax-how-to-avoid-parentheses-being-automatically-placed-in-mat
+    tags$div(HTML("<script type='text/x-mathjax-config'>
             MathJax.Hub.Config({
-            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+            tex2jax: {inlineMath: [['$','$']]}
             });
-            </script >
+            </script>
             ")),
 
     titlePanel(
@@ -107,3 +108,4 @@ shiny_optimize_NFI <- function(...) {
   shinyApp(ui, server, ...)
 
 } ## END function shiny_optimize_NFI()
+
