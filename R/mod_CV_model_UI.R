@@ -176,10 +176,10 @@ mod_CV_model_UI <- function(id){
                       multiple = F, accept = c(".geoJSON", ".GPKG")),
 
             div(
-              plotOutput(outputId = ns("map_aoi"), height = 100),
+              plotOutput(outputId = ns("map_aoi"), height = 120),
               style = "padding: 0.375em; border: 1px solid #e3e3e3;
-            border-radius: 4px; font-weight: bold; text-align: center;
-            margin-top: 5px; margin-bottom: 5px; align: center;"
+            border-radius: 4px; width: 160px;
+            margin: 5px auto;"
               )
 
             ),
@@ -210,8 +210,6 @@ mod_CV_model_UI <- function(id){
           hr(),
 
           ## + + Step 4: Launch calculations --------------------------------
-          shinyjs::disabled(actionButton(inputId = ns("calc_CV"), label = "Calculate CV")),
-
           p(id = ns("msg_step_path_data"),
             "If you don't select a folder, the data will be downloaded in a temporary folder.",
             style = "color: #17a2b8; font-style: italic;"), ## bootstrap info color
@@ -238,6 +236,8 @@ mod_CV_model_UI <- function(id){
             id = ns("msg_step_agb_min_ok"),
             "Minimum AGB  set!",
             style = "color: #28a745; font-style: italic;")),  ## Bootstrap success color
+
+          shinyjs::disabled(actionButton(inputId = ns("calc_CV"), label = "Calculate CV")),
 
 
 
@@ -300,26 +300,27 @@ mod_CV_model_UI <- function(id){
 
             fluidRow(
 
-              p("Aboveground biomass maps for the area of interest:"),
+              h5(strong("Aboveground biomass maps for the area of interest:")),
 
               plotOutput(outputId = ns("map_agb"), height = 600),
 
               hr(),
 
+              h5(strong("Initial Coefficient of variation:")),
+
               p("Initial CV values for forest inventory optimization following
                 Avitabile et al. 2016, Santoro et al. 2018 and a mixed approach
-                (average CV, highest area):"),
+                (average CV, highest area)."),
 
               ## !!! TO BE IMPROVED !!!
               tableOutput(outputId = ns("CV_table")),
 
-              br(),
+              hr(),
 
-              # p("Based on the input area of interest spatial data and the specified forest
-              # cover percentage the AOI area and forest area are (in km^2):"),
+              h5(strong("Area of AOI from uplodaed shapefile")),
 
               ## !!! TO BE IMPROVED !!!
-              textOutput(outputId = ns("area_aoi")),
+              textOutput(outputId = ns("area_aoi"))
 
             ) ## END fluidRow
 
@@ -409,14 +410,13 @@ mod_CV_model_UI <- function(id){
     shinyjs::hidden(div(
       id = ns("box_CV_to_params"),
 
-      fluidRow(
-        h4(icon("arrow-right"), "Continue to Step 2:", HTML("&nbsp;"),
-           actionButton(ns("btn_to_params"), "Optimization parameters")
-        )
-      ) ## END fluidRow
+      h4(icon("arrow-right"),
+         "Continue to Step 2:",
+         HTML("&nbsp;"),
+         actionButton(ns("btn_to_params"), "Optimization parameters")
+         )
 
     ))
-
 
   ) ## END tagList
 

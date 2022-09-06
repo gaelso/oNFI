@@ -55,6 +55,8 @@ mod_CV_model_server <- function(id, rv) {
 
           shinyjs::hide("panel_a1_progress")
           shinyjs::hide("box_progress_to_results")
+          shinyjs::hide("panel_a1_results")
+          shinyjs::hide("box_CV_to_params")
 
           ## Reset calculation button and associated messages
           shinyjs::disable("calc_CV")
@@ -71,32 +73,30 @@ mod_CV_model_server <- function(id, rv) {
           shinyjs::reset("layout_a2")
           shinyjs::show("layout_a2")
           shinyjs::hide("layout_a1")
+          shinyjs::show("box_CV_to_params")
 
         }
-
-        ## In any case
-        shinjs::hide("box_CV_to_params")
 
 
 
         ## + Reset CV_model values ==========================================
 
-        # rv$CV_model$file_path    = NULL
-        rv$CV_model$sf_aoi       = NULL
-        rv$CV_model$rs_avitabile = NULL
-        rv$CV_model$df_avitabile = NULL
-        rv$CV_model$cv_avitabile = NULL
-        rv$CV_model$rs_santoro   = NULL
-        rv$CV_model$df_santoro   = NULL
-        rv$CV_model$cv_santoro   = NULL
-        rv$CV_model$cv_mixed     = NULL
+        rv$CV_model$file_path    <- NULL
+        rv$CV_model$sf_aoi       <- NULL
+        rv$CV_model$rs_avitabile <- NULL
+        rv$CV_model$df_avitabile <- NULL
+        rv$CV_model$cv_avitabile <- NULL
+        rv$CV_model$rs_santoro   <- NULL
+        rv$CV_model$df_santoro   <- NULL
+        rv$CV_model$cv_santoro   <- NULL
+        rv$CV_model$cv_mixed     <- NULL
 
       })
 
 
 
       ##
-      ## Panal A1 server ####################################################
+      ## Panel A1 server ####################################################
       ##
 
       ## + Choosing a dir on the computer ===================================
@@ -108,10 +108,14 @@ mod_CV_model_server <- function(id, rv) {
 
         if (rlang::is_empty(shinyFiles::parseDirPath(roots, input$folder))) {
           rv$CV_model$file_path <- tempdir()
+        } else {
+          rv$CV_model$file_path <- as.character(shinyFiles::parseDirPath(roots, input$folder))
+        }
+
+        if (rv$CV_model$file_path == tempdir()) {
           shinyjs::show("msg_step_path_data")
           shinyjs::hide("msg_step_path_data_ok")
         } else {
-          rv$CV_model$file_path <- as.character(shinyFiles::parseDirPath(roots, input$folder))
           shinyjs::hide("msg_step_path_data")
           shinyjs::show("msg_step_path_data_ok")
         }
@@ -133,7 +137,6 @@ mod_CV_model_server <- function(id, rv) {
         rv$CV_model$sf_aoi <- st_read(input$AOI$datapath)
         })
 
-
       output$map_aoi <- renderPlot({
 
         req(rv$CV_model$sf_aoi)
@@ -141,11 +144,12 @@ mod_CV_model_server <- function(id, rv) {
         ggplot() +
           geom_sf(data = rv$CV_model$sf_aoi, fill = NA, col = "darkred", size = 1) +
           theme_void()
+
       })
 
 
 
-      ## + Loading AOI ======================================================
+      ## + Checking AGB min value ===========================================
 
       observe({
 
@@ -303,7 +307,7 @@ mod_CV_model_server <- function(id, rv) {
 
         req(rv$CV_model$area_aoi)
 
-        paste0("Based on the shapefile uploaded the area if interest has an area of ",  rv$CV_model$area_aoi, "sq. km.")
+        paste0("Based on the shapefile uploaded the area if interest has an area of ",  rv$CV_model$area_aoi, " sq. km.")
 
       })
 
@@ -333,10 +337,17 @@ mod_CV_model_server <- function(id, rv) {
 
 
       ##
+      ## Panel A2 server ####################################################
+      ##
+
+
+
+
+      ##
       ## Change tab #########################################################
       ##
 
-      observeEvent(input$to_params, {
+      observeEvent(input$btn_to_params, {
         rv$to_params <- input$btn_to_params
       })
 
