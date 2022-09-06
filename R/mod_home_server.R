@@ -1,6 +1,6 @@
 
 
-home_server <- function(id, rv) {
+mod_home_server <- function(id, rv) {
   moduleServer(
     id,
     ## Below is the module function
@@ -8,8 +8,8 @@ home_server <- function(id, rv) {
 
       ns <- session$ns
 
-      observeEvent(input$to_CV_model, {
-        rv$to_CV_model <- input$btn_to_CV
+      observeEvent(input$btn_to_CV, {
+        rv$to_CV <- input$btn_to_CV
       })
 
     }
