@@ -43,6 +43,16 @@ shiny_optimize_NFI <- function(...) {
             </script>
             ")),
 
+
+    ## Set max width
+    tags$head(tags$style(HTML("
+                               body {
+                                  max-width: 1200px !important;
+                                  margin: 0 auto;
+                               }
+
+                               "))),
+
     titlePanel(
       title = div(img(src="assets/banner_en.png", width = '100%')),
       windowTitle = "Optimize NFI"
@@ -50,8 +60,8 @@ shiny_optimize_NFI <- function(...) {
 
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
-      tabPanel(title = "Home"    , value = "home"    , icon = icon("campground"), home_UI("tab_home")        ),
-      tabPanel(title = "CV model", value = "CV_model", icon = icon("map")       , CV_model_UI("tab_CV_model")),
+      tabPanel(title = "Home"    , value = "home"    , icon = icon("campground"), mod_home_UI("tab_home")        ),
+      tabPanel(title = "CV model", value = "CV_model", icon = icon("map")       , mod_CV_model_UI("tab_CV_model")),
       tabPanel(title = "Parameters", value = "params", icon = icon("table")     , params_UI("tab_params"))
     ) ## END navbarPage
   ) ## END fluidPage
@@ -85,16 +95,16 @@ shiny_optimize_NFI <- function(...) {
 
 
     ## + Module server functions ============================================
-    home_server("tab_home", rv = rv)
+    mod_home_server("tab_home", rv = rv)
 
-    CV_model_server("tab_CV_model", rv = rv)
+    mod_CV_model_server("tab_CV_model", rv = rv)
 
     params_server("tab_params", rv = rv)
 
 
 
     ## + Trans modules events ===============================================
-    observeEvent(rv$to_CV_model, {
+    observeEvent(rv$to_CV, {
       updateTabsetPanel(session, "navbar", "CV_model")
     })
 
