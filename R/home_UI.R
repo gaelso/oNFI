@@ -12,14 +12,15 @@ home_UI <- function(id){
 
     br(),
 
-    h2("Welcome to the oNFI application:", align = 'center'),
-    h2("Optimization tool for Forest Inventory Design", align = 'center'),
+    h2("Welcome to oNFI", align = 'center'),
+
+    h2("the Optimization tool for Forest Inventory Design", align = 'center'),
 
     br(), br(),
 
     ## + Introduction -------------------------------------------------------
     fluidRow(
-      wellPanel(div(
+      wellPanel(
         h3("In a Nutshell, how the app works"),
         h4("Forest inventory design..."),
         p("... refers to creating a robust statistical design that will allow
@@ -44,48 +45,48 @@ home_UI <- function(id){
         minimal variance, minimal cost or a balanced solution."),
         br(),
         h4("The application builds on four sets of user inputs described below."),
-        ))
+        )
     ), ## END fluidRow()
 
     ## + Description inputs -------------------------------------------------
     fluidRow(
-      column(6, wellPanel(div(
+      column(6, wellPanel(
         h3("1. Biomass variability"),
         br(),
         p("!!! This section presents the biomass maps and how they are used to
-          calc CV !!!", align = "center")
-        ), class="bg1")),
+          calc CV !!!", align = "center"),
+        class="bg1")),
 
-      column(6, wellPanel(div(
+      column(6, wellPanel(
         h3("2. Nested plot conditions"),
         br(),
         p("!!! This section aims to characterize forest condfitions for different
           tree diameter classes to optimize the respective size of 2 nested subplots for
-          small and big trees (seedling fixed to 2.5 m radius circle for now) !!!", align = "center")
-        ), class="bg2"))
+          small and big trees (seedling fixed to 2.5 m radius circle for now) !!!", align = "center"),
+        class="bg2"))
     ), ## End fluidRow
 
     ## + Description inputs cont. -------------------------------------------
     fluidRow(
-      column(6, wellPanel(div(
+      column(6, wellPanel(
         h3("3. Unit times"),
         br(),
         p("!!! This section deals with different unit times necessary to calculate
-          the total cost of forest measurements !!!", align = "center")
-      ), class="bg3")),
+          the total cost of forest measurements !!!", align = "center"),
+        class="bg3")),
 
-      column(6, wellPanel(div(
+      column(6, wellPanel(
         h3("4. Optimization parameters"),
         br(),
         p("!!! List of parameters to be tested, the more parameters the more
-          total number of designs need to be tested !!!", align = "center")
-      ), class="bg4"))
+          total number of designs need to be tested !!!", align = "center"),
+        class="bg4"))
     ), ## End fluidRow
 
     ## + To next page button ------------------------------------------------
     fluidRow(
       h4(icon("arrow-right"), "Continue to Step 1:", HTML("&nbsp;"),
-        actionButton(ns("to_CV_model"), "CV model")
+        actionButton(ns("btn_to_CV"), "CV model")
         )
       ) ## END fluidRow
 

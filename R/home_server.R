@@ -9,7 +9,7 @@ home_server <- function(id, rv) {
       ns <- session$ns
 
       observeEvent(input$to_CV_model, {
-        rv$to_CV_model <- input$to_CV_model
+        rv$to_CV_model <- input$btn_to_CV
       })
 
     }
