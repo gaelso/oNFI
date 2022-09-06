@@ -10,7 +10,7 @@
 #   )
 
 
-CV_model_server <- function(id, rv) {
+mod_CV_model_server <- function(id, rv) {
   moduleServer(
     id,
     ## Below is the module function
@@ -20,34 +20,67 @@ CV_model_server <- function(id, rv) {
 
 
 
+      ##
       ## Introduction #######################################################
+      ##
 
       ## Show/hide Introduction
       observeEvent(input$toggle_intro, {
         shinyjs::toggle(id = "intro1", anim = T, animType = "slide")
-        shinyjs::toggle(id = "intro2", anim = T, animType = "fade")
-        shinyjs::toggle(id = "intro3", anim = T, animType = "fade")
+        shinyjs::toggle(id = "intro2", anim = T, animType = "slide")
+        shinyjs::toggle(id = "intro3", anim = T, animType = "slide")
       })
 
 
 
+      ##
       ## Approach selection #################################################
+      ##
 
-      ## Show approach based panel
+      ## Reset/initiate approach based panels
       observeEvent(input$start_CV, {
 
         rv$CV_model$cv_approach <- input$approach
 
-        ## Show tab for approaches
+
+
+        ## + Re-initiate panels and steps ===================================
+
         if(rv$CV_model$cv_approach == "a1") {
-          shinyjs::show("AGB_map")
-          shinyjs::hide("CV_params")
-        } else if(rv$CV_model$cv_approach == "a2") {
-          shinyjs::hide("AGB_map")
-          shinyjs::show("CV_params")
+
+          ## Re-initiate panels
+          shinyjs::reset("layout_a1")
+          shinyjs::show("layout_a1")
+          shinyjs::hide("layout_a2")
+
+          shinyjs::hide("panel_a1_progress")
+          shinyjs::hide("box_progress_to_results")
+
+          ## Reset calculation button and associated messages
+          shinyjs::disable("calc_CV")
+          shinyjs::show("msg_step_path_data")
+          shinyjs::hide("msg_step_path_data_ok")
+          shinyjs::show("msg_step_aoi_file")
+          shinyjs::hide("msg_step_aoi_file_ok")
+          shinyjs::show("msg_step_agb_min")
+          shinyjs::hide("msg_step_agb_min_ok")
+
+        } else if (rv$CV_model$cv_approach == "a2") {
+
+          ## Re-initiate panels
+          shinyjs::reset("layout_a2")
+          shinyjs::show("layout_a2")
+          shinyjs::hide("layout_a1")
+
         }
 
-        ## Reset CV_model values
+        ## In any case
+        shinjs::hide("box_CV_to_params")
+
+
+
+        ## + Reset CV_model values ==========================================
+
         # rv$CV_model$file_path    = NULL
         rv$CV_model$sf_aoi       = NULL
         rv$CV_model$rs_avitabile = NULL
@@ -62,7 +95,9 @@ CV_model_server <- function(id, rv) {
 
 
 
-      ## AGB map setup ######################################################
+      ##
+      ## Panal A1 server ####################################################
+      ##
 
       ## + Choosing a dir on the computer ===================================
       roots = c(wd='.')
@@ -73,8 +108,12 @@ CV_model_server <- function(id, rv) {
 
         if (rlang::is_empty(shinyFiles::parseDirPath(roots, input$folder))) {
           rv$CV_model$file_path <- tempdir()
+          shinyjs::show("msg_step_path_data")
+          shinyjs::hide("msg_step_path_data_ok")
         } else {
           rv$CV_model$file_path <- as.character(shinyFiles::parseDirPath(roots, input$folder))
+          shinyjs::hide("msg_step_path_data")
+          shinyjs::show("msg_step_path_data_ok")
         }
 
       })
@@ -94,11 +133,6 @@ CV_model_server <- function(id, rv) {
         rv$CV_model$sf_aoi <- st_read(input$AOI$datapath)
         })
 
-      observe({
-        req(rv$CV_model$sf_aoi)
-        shinyjs::enable(id = "to_step3")
-        shinyjs::hide(id = "msg_to_step3")
-        })
 
       output$map_aoi <- renderPlot({
 
@@ -111,22 +145,48 @@ CV_model_server <- function(id, rv) {
 
 
 
-      ## + AGB map spatial analysis =========================================
+      ## + Loading AOI ======================================================
+
+      observe({
+
+        rv$CV_model$agb_min <- input$agb_min
+
+        if (rv$CV_model$agb_min == 0) {
+          shinyjs::show("msg_step_agb_min")
+          shinyjs::hide("msg_step_agb_min_ok")
+        } else {
+          shinyjs::hide("msg_step_agb_min")
+          shinyjs::show("msg_step_agb_min_ok")
+        }
+
+      })
+
+
+
+      ## + Enable calculations ==============================================
+
+      observe({
+        req(rv$CV_model$sf_aoi)
+        shinyjs::enable("calc_CV")
+        shinyjs::hide("msg_step_aoi_file")
+        shinyjs::show("msg_step_aoi_file_ok")
+      })
+
+
+
+      ## + A1 spatial analysis ==============================================
 
       observeEvent(input$calc_CV, {
 
-        ## Show and reset progress bars
-        shinyjs::show("CV_progress")
-        shinyjs::hide("CV_to_results")
-        shinyjs::hide("CV_results")
-        shinyjs::hide("CV_to_params")
+        ## Initiate/reset progress bars
+        shinyjs::show("panel_a1_progress")
+        shinyjs::hide("box_progress_to_results")
+        shinyjs::hide("panel_a1_results")
 
         updateProgressBar(session = session, id = "prog_checks", value = 0, status = NULL)
         updateProgressBar(session = session, id = "prog_avit"  , value = 0, status = NULL)
         updateProgressBar(session = session, id = "prog_sant"  , value = 0, status = NULL)
-        updateProgressBar(session = session, id = "prog_maps"  , value = 0, status = NULL)
         updateProgressBar(session = session, id = "prog_CV"    , value = 0, status = NULL)
-        updateProgressBar(session = session, id = "prog_tables", value = 0, status = NULL)
 
         ## Reset reactive values
         rv$CV_model$cv_mixed <- NULL
@@ -199,10 +259,12 @@ CV_model_server <- function(id, rv) {
 
 
 
-      ## + Make outputs =====================================================
+      ## + A1 make outputs ==================================================
 
-      ## + + Show maps ----------------------------------------------------
+      ## + + Show maps ------------------------------------------------------
       output$map_agb <- renderPlot({
+
+        req(rv$CV_model$sf_aoi, rv$CV_model$df_avitabile, rv$CV_model$df_santoro)
 
         gr1 <- ggplot() +
           geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
@@ -226,8 +288,10 @@ CV_model_server <- function(id, rv) {
 
       })
 
-      ## + + Show tables --------------------------------------------------
+      ## + + Show tables ----------------------------------------------------
       output$CV_table <- renderTable({
+
+        req(rv$CV_model$cv_avitabile)
 
         rv$CV_model$cv_avitabile %>%
           bind_rows(rv$CV_model$cv_santoro) %>%
@@ -237,13 +301,13 @@ CV_model_server <- function(id, rv) {
 
       output$area_aoi <- renderText({
 
-        paste0("Based on the shapefile uploaded the area if interest has an area of ",  rv$CV_model$areas, ".")
+        req(rv$CV_model$area_aoi)
+
+        paste0("Based on the shapefile uploaded the area if interest has an area of ",  rv$CV_model$area_aoi, "sq. km.")
 
       })
 
-
-
-      ## + Show button to results ===========================================
+      ## + Show results =====================================================
 
       # !!! Not working, using req() instead
       # observeEvent(!is.null(rv$CV_model$cv_mixed), {
@@ -254,30 +318,26 @@ CV_model_server <- function(id, rv) {
 
       observe({
         req(rv$CV_model$cv_mixed)
-        shinyjs::show("CV_to_results")
+        shinyjs::show("box_progress_to_results")
       })
 
+      observeEvent(input$btn_show_results, {
 
-
-      ## + Show results =====================================================
-
-      observeEvent(input$show_CV, {
-
-        shinyjs::hide("CV_progress")
-        shinyjs::hide("CV_to_results")
-        shinyjs::show("CV_results")
-
-        Sys.sleep(10)
-        shinyjs::show("CV_to_params")
+        shinyjs::hide("panel_a1_progress")
+        shinyjs::hide("box_progress_to_results")
+        shinyjs::show("panel_a1_results")
+        shinyjs::show("box_CV_to_params")
 
       })
 
 
 
+      ##
       ## Change tab #########################################################
+      ##
 
       observeEvent(input$to_params, {
-        rv$to_params <- input$to_params
+        rv$to_params <- input$btn_to_params
       })
 
     } ## END module server function
