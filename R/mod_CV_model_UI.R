@@ -125,6 +125,10 @@ mod_CV_model_UI <- function(id){
       $A_{i} = n_{i} \\times a_{i}$, with $n_{i}$ the number of subplots in inventory $i$
       and $a_{i}$ the subplot size in ha."),
 
+      p("Approach 1 uses pan-tropical biomass maps to calulate $CV_{init}$ and $A_{init}$
+        so that for each combination of plot characteristics of the optimization process
+        $A_{opti}$ a CV is calculated and compared to the costs of implementing this plot
+        design."),
 
 
       sidebarLayout(
@@ -220,7 +224,7 @@ mod_CV_model_UI <- function(id){
             style = "color: #28a745; font-style: italic;")),  ## Bootstrap success color
 
           p(id = ns("msg_step_aoi_file"),
-            "A valid spatial file is required to move to launch the calculations",
+            "A valid spatial file is required to launch the calculations",
             style = "color: #dc3545; font-style: italic;"),  ## Bootstrap danger color
 
           shinyjs::hidden(p(

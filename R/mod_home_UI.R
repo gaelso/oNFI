@@ -1,6 +1,6 @@
 
 
-mode_home_UI <- function(id){
+mod_home_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html
   # `NS(id)` returns a namespace function, which was save as `ns` and will
