@@ -32,11 +32,14 @@ mod_CV_model_UI <- function(id){
       column(4, wellPanel(
         id = ns("intro1"),
 
-        p("Presentation formula from Stein method 1945: n = (CV1_hat x t(1- alpha/2, n1 - 1) / E)^2"),
-        p("This section focus on CV and it's variability for different plot design."),
-        p("two approaches are proposed here:"),
+        h5(strong("Overview")),
+
+        p("Presentation formula from Stein method 1945:
+          $$n = \\left( \\frac{ \\hat{CV_{i}} \\times t_{n_{i} - 1}^{1 - \\frac{\\alpha}{2}} }{ E } \\right)^{2}$$"),
+        p("This section focus on how CV can be derived from plot dimensions."),
+        p("Two approaches are proposed here:"),
         HTML("<ol>
-          <li>CV variation with plot size, CV obtain from Biomass maps.</li>
+          <li>CV variation with plot size, CV obtain from biomass maps.</li>
           <li>CV as a function of plot size and distance from subplot from user inputs
           (Values can be modeled from large research forest plots for example).</li>
           </ol>"),
@@ -47,18 +50,27 @@ mod_CV_model_UI <- function(id){
       column(4, wellPanel(
         id = ns("intro2"),
 
-        p("In the absence of a CV model, approach 1 requires selecting a country or area of interest.
+        h5(strong("Approach 1")),
+
+        p("In the absence of a CV model, approach 1 requires uploading and area of interest shapefile.
           Two biomass maps are then used to get a CV and a plot area (in this case pixel size): ",
-          a("Avitabile et al. 2016, An integrated pan-tropical biomass map using
-            multiple reference datasets", href = "https://doi.org/10.1111/gcb.13139"), "and ",
-          a("Santoro et al. 2018, A detailed portrait of the forest aboveground
-            biomass pool for the year 2010 obtained from multiple remote sensing observations",
-            href = "https://globbiomass.org/wp-content/uploads/GB_Maps/Globbiomass_global_dataset.html")),
-        p("the forest inventory CV is then adapted to different plot size with the formula:"),
-        p("CV2 = sqrt(CV^2 * sqrt(plot_area1/plot_area2)) ",
-          a("lynch 2017", href = "https://doi.org/10.1093/forestry/cpw038")),
+          a("Avitabile et al. 2016", href = "https://doi.org/10.1111/gcb.13139"), "and ",
+          a("Santoro et al. 2018",
+            href = "https://globbiomass.org/wp-content/uploads/GB_Maps/Globbiomass_global_dataset.html"),
+          "."),
+
+        p("The forest inventory CV is then adapted to different plot sizes with the following formula (",
+          a("Lynch 2017", href = "https://doi.org/10.1093/forestry/cpw038"), "):"),
+
+        p("$$CV_{opti} = \\sqrt{CV_{init} \\times \\left( \\frac{ A_{init} }{ A_{opti} } \\right)^{0.5} }$$"),
+
+        p("With $A_{i}$ plot size or pixel size in ha of respectively the forest inventory
+      or raster spatial data used to calculate $CV_{i}$. In case of forest inventory
+      $A_{i} = n_{i} \\times a_{i}$, with $n_{i}$ the number of subplots in inventory $i$
+      and $a_{i}$ the subplot size in ha."),
+
         p("This method takes longer time as it requires spatial analysis to get an initial CV for biomass.
-          On the other hand it doesn't any prior knowledge on the taget forests."),
+          On the other hand it doesn't any prior knowledge on the target forests."),
 
         class = "bg_explanations")),
 
@@ -66,10 +78,17 @@ mod_CV_model_UI <- function(id){
       column(4, wellPanel(
         id = ns("intro3"),
 
-        p("If you have a CV model, instead any main variable can be selected and the application
-          only needs the model parameters beta0, beta1, beta2 and beta3 for the following model:"),
-        p("CV = beta0 * subplot_count^beta1 * subplot_distance^beta2 * subplot_area^beta3",
-          a("(Scott 1993)", href = "https://www.nrs.fs.fed.us/pubs/jrnl/1993/ne_1993_scott-c_001.pdf")),
+        h5(strong("Approach 2")),
+
+        p("If you already have a CV model, any main variable can be selected and the application
+          only needs the model parameters ",
+          a("(Scott 1993)", href = "https://www.nrs.fs.fed.us/pubs/jrnl/1993/ne_1993_scott-c_001.pdf"), ":"),
+
+        p("$$CV_{opti} = \\beta_{0} \\times n^{\\beta_{1}} \\times d^{\\beta_{2}} \\times a^{\\beta_{3}}$$"),
+
+        p("With: $n$ the number of subplots, $d$ the distance between subplots,
+        $a$ the subplot size in ha and $\\beta_{0}$, $\\beta_{1}$, $\\beta_{2}$,
+        $\\beta_{3}$ the model's parameters."),
 
         class="bg_explanations"))
 
