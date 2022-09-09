@@ -19,9 +19,27 @@ shiny_optimize_NFI <- function(...) {
   library(ggpubr)
   library(showtext)
 
-  add_font(path_data = tempdir())
+  if ("fonts" %in% list.files()) {
 
-  sysfonts::font_add("LoraIt", file.path(tempdir(), "fonts/Lora/static/Lora-Italic.ttf"))
+    font_files <- list.files("fonts", recursive = TRUE) %>% str_remove(".*/")
+
+    if ("Lora-Italic.ttf" %in% font_files) {
+      path_lora <- list.files("fonts", recursive = TRUE, full.names = TRUE, pattern = "Lora-Italic.ttf")
+    } else {
+      add_font(path_data = tempdir())
+      path_lora <- list.files(tempdir(), recursive = TRUE, full.names = TRUE, pattern = "Lora-Italic.ttf")
+    }
+
+  } else {
+
+    add_font(path_data = tempdir())
+
+    path_lora <- list.files(tempdir(), recursive = TRUE, full.names = TRUE, pattern = "Lora-Italic.ttf")
+
+  }
+
+  sysfonts::font_add("LoraIt", path_lora)
+
   showtext::showtext_auto()
 
   options(shiny.maxRequestSize = 10*1024^2)
