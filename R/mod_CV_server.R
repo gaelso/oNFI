@@ -10,7 +10,7 @@
 #   )
 
 
-mod_CV_model_server <- function(id, rv) {
+mod_CV_server <- function(id, rv) {
   moduleServer(
     id,
     ## Below is the module function
@@ -24,12 +24,14 @@ mod_CV_model_server <- function(id, rv) {
       ## Introduction #######################################################
       ##
 
-      ## Show/hide Introduction
-      observeEvent(input$toggle_intro, {
-        shinyjs::toggle(id = "intro1", anim = T, animType = "slide")
-        shinyjs::toggle(id = "intro2", anim = T, animType = "slide")
-        shinyjs::toggle(id = "intro3", anim = T, animType = "slide")
-      })
+      mod_CV_sub_intro_server("cv_intro", rv = rv)
+
+      # ## Show/hide Introduction
+      # observeEvent(input$toggle_intro, {
+      #   shinyjs::toggle(id = "intro1", anim = T, animType = "slide")
+      #   shinyjs::toggle(id = "intro2", anim = T, animType = "slide")
+      #   shinyjs::toggle(id = "intro3", anim = T, animType = "slide")
+      # })
 
 
 

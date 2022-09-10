@@ -79,7 +79,7 @@ shiny_optimize_NFI <- function(...) {
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
       tabPanel(title = "Home"    , value = "home"    , icon = icon("campground"), mod_home_UI("tab_home")        ),
-      tabPanel(title = "CV model", value = "CV_model", icon = icon("map")       , mod_CV_model_UI("tab_CV_model")),
+      tabPanel(title = "CV model", value = "CV_model", icon = icon("map")       , mod_CV_UI("tab_CV_model")),
       tabPanel(title = "Parameters", value = "params", icon = icon("table")     , params_UI("tab_params"))
     ) ## END navbarPage
   ) ## END fluidPage
@@ -115,7 +115,7 @@ shiny_optimize_NFI <- function(...) {
     ## + Module server functions ============================================
     mod_home_server("tab_home", rv = rv)
 
-    mod_CV_model_server("tab_CV_model", rv = rv)
+    mod_CV_server("tab_CV_model", rv = rv)
 
     params_server("tab_params", rv = rv)
 
