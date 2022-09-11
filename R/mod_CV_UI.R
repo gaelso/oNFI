@@ -60,6 +60,8 @@ mod_CV_UI <- function(id){
     shinyjs::hidden(div(
       id = ns("layout_a1"),
 
+      mod_CV_sub_a1_UI(ns("cv_a1")),
+
       # h4(strong("Input parameters for approach 1:")),
       #
       # h4("$$CV_{opti} = \\sqrt{CV_{init} \\times \\left( \\frac{ A_{init} }{ A_{opti} } \\right)^{0.5} }$$"),

@@ -12,7 +12,7 @@ mod_CV_sub_a1_UI <- function(id){
 
     h4(strong("Input parameters for approach 1:")),
 
-    h4("$$CV_{opti} = \\sqrt{CV_{init} \\times \\left( \\frac{ A_{init} }{ A_{opti} } \\right)^{0.5} }$$"),
+    h4("$$CV_{opti} = \\sqrt{ CV_{init} \\times \\left( \\frac{ A_{init} }{ A_{opti} } \\right)^{0.5} }$$"),
 
     p("With $A_{i}$ plot size or pixel size in ha of respectively the forest inventory
       or raster spatial data used to calculate $CV_{i}$. In case of forest inventory
@@ -39,8 +39,7 @@ mod_CV_sub_a1_UI <- function(id){
 
           h4("Select a folder"),
 
-          p("Select a destination folder for spatial data. If you don't the data
-          will be downloaded in a temporary folder."),
+          p("Select a destination folder for the spatial data."),
 
           shinyFiles::shinyDirButton(
             id = ns('folder'),
@@ -50,7 +49,7 @@ mod_CV_sub_a1_UI <- function(id){
           ),
 
           div(
-            p("Path:"),
+            #p("Path:"),
             textOutput(ns("show_path")),
             style = "padding: 0.375em; border: 1px solid #e3e3e3;
             border-radius: 4px; font-weight: bold; text-align: center;
@@ -59,34 +58,39 @@ mod_CV_sub_a1_UI <- function(id){
 
         ),
 
-        hr(),
+        br(),
 
         ## + + Step 2: Get Area of Interest -------------------------------
         div(
           id = ns("step_aoi_file"),
 
-          h4("Select an Area of Interest (AOI)"),
+          h4("Upload an Area of Interest (AOI)"),
 
-          p("Accepted file types are geoJSON ('.geoJSON') and GeoPackage ('.GPKG').
-            The maximum file size allowed is 10 Mo."),
+          p("Accepted file types are '.geoJSON' and '.GPKG'. Max. 10 Mo."),
 
-          fileInput(ns("AOI"), "Upload an AOI shapefile:",
-                    multiple = F, accept = c(".geoJSON", ".GPKG")),
+          fileInput(
+            inputId  = ns("AOI"),
+            label    = NULL,
+            multiple = F,
+            accept   = c(".geoJSON", ".GPKG")
+            ),
 
           div(
-            plotOutput(outputId = ns("map_aoi"), height = 120),
+            plotOutput(outputId = ns("map_aoi"), height =120),
             style = "padding: 0.375em; border: 1px solid #e3e3e3;
-            border-radius: 4px; width: 160px;
-            margin: 5px auto;"
+            border-radius: 4px; width: 180px;
+            margin: 0px auto;"
           )
 
         ),
 
-        hr(),
+        br(),
 
         ## + + Step 3: Default values -------------------------------------
         div(
           id = ns("step_agb_min"),
+
+          h4("Choose minimum forest AGB"),
 
           ## !!! TO BE MOVED TO POPUP EXPLANATION
           # p("The maps provide AGB estimates for all land use types, with values
@@ -95,9 +99,11 @@ mod_CV_sub_a1_UI <- function(id){
           #   estimate from the maps. Default to 0, meaning all land is considered
           #   in the calculation of CV"),
 
+          p("Min. forest AGB in ton/ha."),
+
           numericInput(
             inputId = ns("agb_min"),
-            label = "Pick a minimum AGB value for forest (in ton/ha)",
+            label = NULL,
             value = 0,
             min = 0,
             max = 100
@@ -105,12 +111,12 @@ mod_CV_sub_a1_UI <- function(id){
 
         ),
 
-        hr(),
+        br(),
 
         ## + + Step 4: Launch calculations --------------------------------
         p(id = ns("msg_step_path_data"),
           "If you don't select a folder, the data will be downloaded in a temporary folder.",
-          style = "color: #17a2b8; font-style: italic;"), ## bootstrap info color
+          style = "color: #ffc107; font-style: italic;"), ## bootstrap warning color ## bootstrap info color: #17a2b8
 
         shinyjs::hidden(p(
           id = ns("msg_step_path_data_ok"),
@@ -127,12 +133,12 @@ mod_CV_sub_a1_UI <- function(id){
           style = "color: #28a745; font-style: italic;")),  ## Bootstrap success color
 
         p(id = ns("msg_step_agb_min"),
-          "Keeping 0 as minimum AGB increases the risk of including non-forest land in the CV calculations.",
-          style = "color: #17a2b8; font-style: italic;"), ## bootstrap info color
+          "AGB 0 increases the risk of including non-forest land in the CV calculations.",
+          style = "color: #ffc107; font-style: italic;"), ## bootstrap warning color
 
         shinyjs::hidden(p(
           id = ns("msg_step_agb_min_ok"),
-          "Minimum AGB  set!",
+          "Minimum AGB set!",
           style = "color: #28a745; font-style: italic;")),  ## Bootstrap success color
 
         shinyjs::disabled(actionButton(inputId = ns("calc_CV"), label = "Calculate CV")),
@@ -215,10 +221,12 @@ mod_CV_sub_a1_UI <- function(id){
 
             hr(),
 
-            h5(strong("Area of AOI from uplodaed shapefile")),
+            h5(strong("Area of AOI from uploaded shapefile")),
 
             ## !!! TO BE IMPROVED !!!
-            textOutput(outputId = ns("area_aoi"))
+            textOutput(outputId = ns("area_aoi")),
+
+            br()
 
           ) ## END fluidRow
 

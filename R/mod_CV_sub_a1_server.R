@@ -9,6 +9,39 @@ mod_CV_sub_a1_server <- function(id, rv) {
     rv_a1 <- reactiveValues()
 
     ##
+    ## Re-initiate paramns and show/hide on click start_CV ##################
+    ##
+
+    observeEvent(rv$CV_model$start_CV, {
+
+      shinyjs::hide("panel_a1_progress")
+      shinyjs::hide("box_progress_to_results")
+      shinyjs::hide("panel_a1_results")
+
+      ## Reset calculation button and associated messages
+      shinyjs::disable("calc_CV")
+      shinyjs::show("msg_step_path_data")
+      shinyjs::hide("msg_step_path_data_ok")
+      shinyjs::show("msg_step_aoi_file")
+      shinyjs::hide("msg_step_aoi_file_ok")
+      shinyjs::show("msg_step_agb_min")
+      shinyjs::hide("msg_step_agb_min_ok")
+
+      rv_a1 <- reactiveValues(
+        sf_aoi       = NULL,
+        agb_min      = NULL,
+        rs_avitabile = NULL,
+        df_avitabile = NULL,
+        cv_avitabile = NULL,
+        rs_santoro   = NULL,
+        df_santoro   = NULL,
+        cv_santoro   = NULL
+      )
+
+    })
+
+
+    ##
     ## Input checks #########################################################
     ##
 
@@ -18,18 +51,20 @@ mod_CV_sub_a1_server <- function(id, rv) {
 
     shinyFiles::shinyDirChoose(input, 'folder', roots = roots, filetypes = c('', 'txt'), session = session)
 
-    observe({
+    file_path <- reactive({
 
       if (rlang::is_empty(shinyFiles::parseDirPath(roots, input$folder))) {
-        #rv$CV_model$file_path <- tempdir()
-        rv_a1$file_path <- tempdir()
+        tempdir()
       } else {
-        #rv$CV_model$file_path <- as.character(shinyFiles::parseDirPath(roots, input$folder))
-        rv_a1$file_path <- as.character(shinyFiles::parseDirPath(roots, input$folder))
+        as.character(shinyFiles::parseDirPath(roots, input$folder))
       }
 
-      #if (rv$CV_model$file_path == tempdir()) {
-      if (rv_a1$file_path == tempdir()) {
+    })
+
+
+    observe({
+
+      if (file_path() == tempdir()) {
         shinyjs::show("msg_step_path_data")
         shinyjs::hide("msg_step_path_data_ok")
       } else {
@@ -39,10 +74,10 @@ mod_CV_sub_a1_server <- function(id, rv) {
 
     })
 
+
     output$show_path <- renderText({
 
-      #if(rv$CV_model$file_path == tempdir()) "No folder selected" else rv$CV_model$file_path
-      if(rv_a1$file_path == tempdir()) "No folder selected" else rv_a1$file_path
+      if(file_path() == tempdir()) "No folder selected" else file_path()
 
       })
 
@@ -52,7 +87,6 @@ mod_CV_sub_a1_server <- function(id, rv) {
 
     observe({
       req(input$AOI)
-      # rv_a1$sf_aoi <- st_read(input$AOI$datapath)
       rv_a1$sf_aoi <- st_read(input$AOI$datapath)
       })
 
@@ -136,13 +170,19 @@ mod_CV_sub_a1_server <- function(id, rv) {
 
       updateProgressBar(session = session, id = "prog_checks", value = 100, status = "success")
 
-      ## + + Avitabile et al. 2016 map, download, load and make map -------
-      rv$CV_model$rs_avitabile <- get_avitabile(path_data   = rv$CV_model$file_path,
-                                                sf_aoi      = rv_a1$sf_aoi,
-                                                progress_id = "prog_avit",
-                                                session     = session)
 
-      rv$CV_model$df_avitabile <- terra::mask(rv$CV_model$rs_avitabile, terra::vect(rv_a1$sf_aoi)) %>%
+
+      ## + Get Raster data ==================================================
+
+      ## + + Avitabile et al. 2016 map, download, load and make map ---------
+      rv_a1$rs_avitabile <- get_avitabile(
+        path_data   = file_path(),
+        sf_aoi      = rv_a1$sf_aoi,
+        progress_id = "prog_avit",
+        session     = session
+        )
+
+      rv_a1$df_avitabile <- terra::mask(rv_a1$rs_avitabile, terra::vect(rv_a1$sf_aoi)) %>%
         terra::as.data.frame(xy = TRUE) %>%
         as_tibble() %>%
         na.omit()
@@ -150,34 +190,40 @@ mod_CV_sub_a1_server <- function(id, rv) {
       updateProgressBar(session = session, id = "prog_avit", value = 100, status = "success")
 
       ## + + Santoro et al. 2018 map, download, load and make map ---------
-      rv$CV_model$rs_santoro <- get_santoro(path_data   = rv$CV_model$file_path,
-                                            sf_aoi      = rv_a1$sf_aoi,
-                                            progress_id = "prog_sant",
-                                            session     = session)
+      rv_a1$rs_santoro <- get_santoro(
+        path_data   = file_path(),
+        sf_aoi      = rv_a1$sf_aoi,
+        progress_id = "prog_sant",
+        session     = session
+        )
 
-      rv$CV_model$df_santoro <- terra::mask(rv$CV_model$rs_santoro, terra::vect(rv_a1$sf_aoi)) %>%
-        terra::as.data.frame(rv$CV_model$rs_santoro, xy = TRUE) %>%
+      rv_a1$df_santoro <- terra::mask(rv_a1$rs_santoro, terra::vect(rv_a1$sf_aoi)) %>%
+        terra::as.data.frame(rv_a1$rs_santoro, xy = TRUE) %>%
         as_tibble() %>%
         na.omit()
 
       updateProgressBar(session = session, id = "prog_sant", value = 100, status = "success")
 
-      ## + + Get CV -------------------------------------------------------
-      rv$CV_model$cv_avitabile <- get_CV_AGB(df = rv$CV_model$df_avitabile, agb_min = input$agb_min) %>%
+
+
+      ## + Calculate CV =====================================================
+
+      rv_a1$cv_avitabile <- get_CV_AGB(df = rv_a1$df_avitabile, agb_min = input$agb_min) %>%
         mutate(
-          CV_init_area = terra::res(rv$CV_model$rs_avitabile)[1]^2 / 100^2,
-          source       = "Avitabile et al. 2016"
+          area_init = terra::res(rv_a1$rs_avitabile)[1]^2 / 100^2,
+          source    = "Avitabile et al. 2016"
           )
 
-      rv$CV_model$cv_santoro <- get_CV_AGB(df = rv$CV_model$df_santoro, agb_min = input$agb_min) %>%
+      rv_a1$cv_santoro <- get_CV_AGB(df = rv_a1$df_santoro, agb_min = input$agb_min) %>%
         mutate(
-          CV_init_area = terra::res(rv$CV_model$rs_santoro)[1]^2 / 100^2,
-          source       = "Santoro et al. 2018"
+          area_init = terra::res(rv_a1$rs_santoro)[1]^2 / 100^2,
+          source    = "Santoro et al. 2018"
         )
 
+      ## Pass cv_mixed and area_aoi to global reactive Value
       rv$CV_model$cv_mixed <- tibble(
-        CV_init = mean(c(rv$CV_model$cv_santoro$CV_init, rv$CV_model$cv_avitabile$CV_init)),
-        CV_init_area = max(rv$CV_model$cv_santoro$CV_init_area, rv$CV_model$cv_avitabile$CV_init_area),
+        CV_init   = mean(c(rv_a1$cv_santoro$CV_init, rv_a1$cv_avitabile$CV_init)),
+        area_init = max(c(rv_a1$cv_santoro$area_init, rv_a1$cv_avitabile$area_init)),
         source = "Average CV"
       )
 
@@ -189,15 +235,16 @@ mod_CV_sub_a1_server <- function(id, rv) {
 
 
 
-    ## + A1 make outputs ==================================================
+    ##
+    ## Make outputs #########################################################
+    ##
 
-    ## + + Show maps ------------------------------------------------------
     output$map_agb <- renderPlot({
 
-      req(rv_a1$sf_aoi, rv$CV_model$df_avitabile, rv$CV_model$df_santoro)
+      req(rv_a1$sf_aoi, rv_a1$df_avitabile, rv_a1$df_santoro)
 
       gr1 <- ggplot() +
-        geom_tile(data = rv$CV_model$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
+        geom_tile(data = rv_a1$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
         scale_fill_viridis_c(direction = -1) +
         geom_sf(data = rv_a1$sf_aoi, fill = NA, col = "darkred", size = 1) +
         theme_bw() +
@@ -206,7 +253,7 @@ mod_CV_sub_a1_server <- function(id, rv) {
         labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
 
       gr2 <- ggplot() +
-        geom_tile(data = rv$CV_model$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
+        geom_tile(data = rv_a1$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
         scale_fill_viridis_c(direction = -1) +
         geom_sf(data = rv_a1$sf_aoi, fill = NA, col = "darkred", size = 1) +
         theme_bw() +
@@ -218,16 +265,17 @@ mod_CV_sub_a1_server <- function(id, rv) {
 
     })
 
-    ## + + Show tables ----------------------------------------------------
+
     output$CV_table <- renderTable({
 
-      req(rv$CV_model$cv_avitabile)
+      req(rv_a1$cv_avitabile, rv_a1$cv_santoro, rv$CV_model$cv_mixed)
 
-      rv$CV_model$cv_avitabile %>%
-        bind_rows(rv$CV_model$cv_santoro) %>%
+      rv_a1$cv_avitabile %>%
+        bind_rows(rv_a1$cv_santoro) %>%
         bind_rows(rv$CV_model$cv_mixed)
 
     })
+
 
     output$area_aoi <- renderText({
 
@@ -237,30 +285,23 @@ mod_CV_sub_a1_server <- function(id, rv) {
 
     })
 
-    ## + Show results =====================================================
 
-    # !!! Not working, using req() instead
-    # observeEvent(!is.null(rv$CV_model$cv_mixed), {
-    #
-    #   shinyjs::show("CV_to_results")
-    #
-    # })
-
+    ## Update show / hide panels
     observe({
+
       req(rv$CV_model$cv_mixed)
       shinyjs::show("box_progress_to_results")
+
     })
+
 
     observeEvent(input$btn_show_results, {
 
       shinyjs::hide("panel_a1_progress")
       shinyjs::hide("box_progress_to_results")
       shinyjs::show("panel_a1_results")
-      shinyjs::show("box_CV_to_params")
 
     })
-
-
 
   }) ## END module server function
 

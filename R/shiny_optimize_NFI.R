@@ -89,6 +89,7 @@ shiny_optimize_NFI <- function(...) {
   server <- function(input, output, session) {
 
     ## + Initiate reactive values list to be passed between modules =========
+    ## See https://rtask.thinkr.fr/communication-between-modules-and-its-whims/
     rv <- reactiveValues(
       CV_model = reactiveValues(
         cv_approach  = NULL,

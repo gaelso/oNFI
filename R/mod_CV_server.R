@@ -43,6 +43,7 @@ mod_CV_server <- function(id, rv) {
       observeEvent(input$start_CV, {
 
         rv$CV_model$cv_approach <- input$approach
+        rv$CV_model$start_CV    <- input$start_CV
 
 
 
@@ -54,20 +55,7 @@ mod_CV_server <- function(id, rv) {
           shinyjs::reset("layout_a1")
           shinyjs::show("layout_a1")
           shinyjs::hide("layout_a2")
-
-          shinyjs::hide("panel_a1_progress")
-          shinyjs::hide("box_progress_to_results")
-          shinyjs::hide("panel_a1_results")
           shinyjs::hide("box_CV_to_params")
-
-          ## Reset calculation button and associated messages
-          shinyjs::disable("calc_CV")
-          shinyjs::show("msg_step_path_data")
-          shinyjs::hide("msg_step_path_data_ok")
-          shinyjs::show("msg_step_aoi_file")
-          shinyjs::hide("msg_step_aoi_file_ok")
-          shinyjs::show("msg_step_agb_min")
-          shinyjs::hide("msg_step_agb_min_ok")
 
         } else if (rv$CV_model$cv_approach == "a2") {
 
@@ -79,20 +67,6 @@ mod_CV_server <- function(id, rv) {
 
         }
 
-
-
-        ## + Reset CV_model values ==========================================
-
-        rv$CV_model$file_path    <- NULL
-        rv$CV_model$sf_aoi       <- NULL
-        rv$CV_model$rs_avitabile <- NULL
-        rv$CV_model$df_avitabile <- NULL
-        rv$CV_model$cv_avitabile <- NULL
-        rv$CV_model$rs_santoro   <- NULL
-        rv$CV_model$df_santoro   <- NULL
-        rv$CV_model$cv_santoro   <- NULL
-        rv$CV_model$cv_mixed     <- NULL
-
       })
 
 
@@ -100,6 +74,9 @@ mod_CV_server <- function(id, rv) {
       ##
       ## Panel A1 server ####################################################
       ##
+
+      mod_CV_sub_a1_server("cv_a1", rv = rv)
+
 
       # ## + Choosing a dir on the computer ===================================
       # roots = c(wd='.')
@@ -348,6 +325,12 @@ mod_CV_server <- function(id, rv) {
       ##
       ## Change tab #########################################################
       ##
+
+      observe({
+        req(rv$CV_model$cv_mixed)
+        shinyjs::show("box_CV_to_params")
+      })
+
 
       observeEvent(input$btn_to_params, {
         rv$to_params <- input$btn_to_params
