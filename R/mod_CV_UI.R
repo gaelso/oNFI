@@ -46,7 +46,7 @@ mod_CV_UI <- function(id){
         align = "center"),
 
       div(
-        actionButton(inputId = ns("start_CV"), label = "Continue")
+        actionButton(inputId = ns("start_cv"), label = "Continue")
       ),
 
       class="bg1"), ## END wellPanel approach
@@ -358,7 +358,7 @@ mod_CV_UI <- function(id){
     ## Move to next section #################################################
 
     shinyjs::hidden(div(
-      id = ns("box_CV_to_params"),
+      id = ns("box_cv_to_params"),
 
       h4(icon("arrow-right"),
          "Continue to Step 2:",
@@ -370,4 +370,4 @@ mod_CV_UI <- function(id){
 
   ) ## END tagList
 
-} ## END function CV_model_UI()
+} ## END function module UI

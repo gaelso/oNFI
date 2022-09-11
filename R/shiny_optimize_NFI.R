@@ -91,24 +91,8 @@ shiny_optimize_NFI <- function(...) {
     ## + Initiate reactive values list to be passed between modules =========
     ## See https://rtask.thinkr.fr/communication-between-modules-and-its-whims/
     rv <- reactiveValues(
-      CV_model = reactiveValues(
-        cv_approach  = NULL,
-        file_path    = NULL,
-        sf_aoi       = NULL,
-        rs_avitabile = NULL,
-        df_avitabile = NULL,
-        cv_avitabile = NULL,
-        rs_santoro   = NULL,
-        df_santoro   = NULL,
-        cv_santoro   = NULL,
-        cv_mixed     = NULL
-        ),
-      params = reactiveValues(
-        cv_params     = NULL,
-        nested_params = NULL,
-        time_params   = NULL,
-        opti_params   = NULL
-        )
+      cv_model = reactiveValues(),
+      params = reactiveValues()
       )
 
 

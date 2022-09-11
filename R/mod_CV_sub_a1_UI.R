@@ -141,7 +141,7 @@ mod_CV_sub_a1_UI <- function(id){
           "Minimum AGB set!",
           style = "color: #28a745; font-style: italic;")),  ## Bootstrap success color
 
-        shinyjs::disabled(actionButton(inputId = ns("calc_CV"), label = "Calculate CV")),
+        shinyjs::disabled(actionButton(inputId = ns("calc_cv"), label = "Calculate CV")),
 
 
 
@@ -181,7 +181,7 @@ mod_CV_sub_a1_UI <- function(id){
           ),
 
           shinyWidgets::progressBar(
-            id = ns("prog_CV"),
+            id = ns("prog_cv"),
             value = 0,
             title = "Calculate initial CV for optimization",
             display_pct = TRUE
@@ -217,7 +217,7 @@ mod_CV_sub_a1_UI <- function(id){
                 (average CV, highest area)."),
 
             ## !!! TO BE IMPROVED !!!
-            tableOutput(outputId = ns("CV_table")),
+            tableOutput(outputId = ns("cv_table")),
 
             hr(),
 

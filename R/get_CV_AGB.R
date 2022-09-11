@@ -21,7 +21,7 @@ get_CV_AGB <- function(df, agb_min = 20){
       agb_sd = round(sd(agb), 2),
     ) %>%
     mutate(
-      CV_init = round(agb_sd / agb_mean * 100, 1)
+      cv_init = round(agb_sd / agb_mean * 100, 1)
     )
 
   }
