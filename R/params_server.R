@@ -9,18 +9,18 @@ params_server <- function(id, rv) {
       ns <- session$ns
 
       ## !!! For testing only
-      output$test_approach <- renderText({ paste0("Approach selected: ", rv$CV_model$cv_approach) })
+      output$test_approach <- renderText({ paste0("Approach selected: ", rv$cv_model$cv_approach) })
 
-      output$test_CV <- renderTable({ rv$CV_model$cv_mixed })
+      output$test_cv <- renderTable({ rv$cv_model$cv_mixed })
 
 
 
       ## Check if CV model approach selected ################################
       observe({
 
-        req(rv$CV_model$cv_approach)
+        req(rv$cv_model$cv_approach)
 
-        if (rv$CV_model$cv_approach == "a2") {
+        if (rv$cv_model$cv_approach == "a2") {
           shinyjs::hide("check_approach")
           shinyjs::show("params_setup")
           shinyjs::show("params_a2")
@@ -34,10 +34,10 @@ params_server <- function(id, rv) {
 
       observe({
 
-        req(rv$CV_model$cv_approach)
-        req(rv$CV_model$cv_mixed)
+        req(rv$cv_model$cv_approach)
+        req(rv$cv_model$cv_mixed)
 
-        if (rv$CV_model$cv_approach == "a1") {
+        if (rv$cv_model$cv_approach == "a1") {
           shinyjs::hide("check_approach")
           shinyjs::show("params_setup")
           shinyjs::show("params_a1")

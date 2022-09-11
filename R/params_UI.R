@@ -18,7 +18,7 @@ params_UI <- function(id){
 
     textOutput(outputId = ns("test_approach")),
 
-    tableOutput(outputId = ns("test_CV")),
+    tableOutput(outputId = ns("test_cv")),
 
     hr(),
 
