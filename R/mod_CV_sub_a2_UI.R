@@ -31,7 +31,7 @@ mod_CV_sub_a2_UI <- function(id){
         p("The CV model parameters are pre-filled with default values from a Forest
           Inventory in the tropics. They are intended for testing purposes and should
           be replaced with values from your area of interest or similar conditions.",
-          style = "color: #ffc107; font-style: italic;"), ## Bootstrap warning color
+          style = "color: #17a2b8; font-style: italic;"), ## bootstrap info color
 
         fluidRow(
 
@@ -56,7 +56,11 @@ mod_CV_sub_a2_UI <- function(id){
 
       mainPanel(
 
+        p("This table recaps where default parameters are used:"),
+
         tableOutput(outputId = ns("a2_check")),
+
+        p(strong("Parameters test:")),
 
         textOutput(outputId = ns("a2_test")),
 
