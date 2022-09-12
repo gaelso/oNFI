@@ -38,7 +38,7 @@ mod_CV_server <- function(id, rv) {
         shinyjs::reset("layout_a1")
         shinyjs::show("layout_a1")
         shinyjs::hide("layout_a2")
-        shinyjs::hide("box_cv_to_params")
+        shinyjs::hide("box_cv_to_time")
 
       } else if (rv$cv_model$cv_approach == "a2") {
 
@@ -46,7 +46,7 @@ mod_CV_server <- function(id, rv) {
         shinyjs::reset("layout_a2")
         shinyjs::show("layout_a2")
         shinyjs::hide("layout_a1")
-        shinyjs::show("box_cv_to_params")
+        shinyjs::show("box_cv_to_time")
 
       }
 
@@ -88,11 +88,11 @@ mod_CV_server <- function(id, rv) {
 
     observe({
       req(rv$cv_model$cv_mixed)
-      shinyjs::show("box_cv_to_params")
+      shinyjs::show("box_cv_to_time")
     })
 
-    observeEvent(input$btn_to_params, {
-      rv$to_params <- input$btn_to_params
+    observeEvent(input$btn_to_time, {
+      rv$to_time <- input$btn_to_time
     })
 
   }) ## END module server function

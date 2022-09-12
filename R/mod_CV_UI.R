@@ -82,12 +82,12 @@ mod_CV_UI <- function(id){
     ## Move to next section #################################################
 
     shinyjs::hidden(div(
-      id = ns("box_cv_to_params"),
+      id = ns("box_cv_to_time"),
 
       h4(icon("arrow-right"),
          "Continue to Step 2:",
          HTML("&nbsp;"),
-         actionButton(ns("btn_to_params"), "Optimization parameters")
+         actionButton(ns("btn_to_time"), "Unit times")
          )
 
     ))
