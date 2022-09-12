@@ -13,32 +13,76 @@ mod_params_UI <- function(id){
 
     br(),
 
-    ## !!! For testing only !!!
+
+
+    ##
+    ## Check messages #######################################################
+    ##
+
     hr(),
 
     textOutput(outputId = ns("test_approach")),
 
     tableOutput(outputId = ns("test_cv")),
 
+    br(),
+
+    textOutput(outputId = ns("test_nested")),
+
+    textOutput(outputId = ns("test_time")),
+
     hr(),
 
 
 
-    ## Default message ######################################################
+    ##
+    ## Introduction #########################################################
+    ##
 
-    div(id = ns("check_approach"), fluidRow(
+    h4("Introduction"),
 
-      wellPanel(
-        p("Make sure you fill in the CV model approach and complete the approach 1
-          if you don't have any CV model to apply before coming to this section",
-          style = "color:red; font-style:italic; text-align:center;")
-      )
+    ## Toggle on/off the introduction
+    checkboxInput(
+      inputId = ns("toggle_intro"),
+      label = "Show the introduction",
+      value = FALSE
+    ),
 
-    )), ## End check_approach
+    wellPanel(
+      id = ns("params_intro"),
+
+      p(strong("Overview")),
+
+      p("This section is dedicated to optimization parameters. For each parameter,
+        several values can be tested. The optimization script will then create
+        all the possible combinations of all the parameters, calculate their CV
+        and cost and return the optimal designs.")
+
+    ),
+
+    br(),
 
 
-
+    ##
     ## Parameters interface #################################################
+    ##
+
+    h4("Parameters to be tested"),
+
+    br(),
+
+    ## Message if previous steps not completed
+    wellPanel(
+      id = ns("check_approach"),
+
+      p("First choose a CV model approach",
+        style = "color: #dc3545; font-style: italic; text-align: center;"),  ## Bootstrap danger color
+
+      p("If you selected approach 1, make sure you complete all the steps to
+        get an initial CV from the biomass maps.",
+        style = "color: #dc3545; font-style: italic; text-align: center;"),  ## Bootstrap danger color
+
+    ), ## End check_approach
 
     shinyjs::hidden(div(id = ns("params_setup"), fluidRow(
 
