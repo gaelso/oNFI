@@ -86,7 +86,7 @@ mod_home_UI <- function(id){
     ## + To next page button ------------------------------------------------
     fluidRow(
       h4(icon("arrow-right"), "Continue to Step 1:", HTML("&nbsp;"),
-        actionButton(ns("btn_to_CV"), "CV model")
+        actionButton(ns("btn_to_cv"), "CV model")
         )
       ) ## END fluidRow
 

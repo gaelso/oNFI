@@ -6,8 +6,8 @@ mod_home_server <- function(id, rv) {
 
     ns <- session$ns
 
-    observeEvent(input$btn_to_CV, {
-      rv$to_CV <- input$btn_to_CV
+    observeEvent(input$btn_to_cv, {
+      rv$to_cv <- input$btn_to_cv
     })
 
   }) ## END module server function
