@@ -1,17 +1,15 @@
 
 
 mod_home_server <- function(id, rv) {
-  moduleServer(
-    id,
-    ## Below is the module function
-    function(input, output, session) {
 
-      ns <- session$ns
+  moduleServer(id, function(input, output, session) {
 
-      observeEvent(input$btn_to_CV, {
-        rv$to_CV <- input$btn_to_CV
-      })
+    ns <- session$ns
 
-    }
-  )
-} ## END function home_server()
+    observeEvent(input$btn_to_CV, {
+      rv$to_CV <- input$btn_to_CV
+    })
+
+  }) ## END module server function
+
+}
