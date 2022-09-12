@@ -11,9 +11,24 @@ mod_time_UI <- function(id){
   ## UI elements wrapped in a tagList() function
   tagList(
 
-    h3("Unit time for the different forest inventory operations", align = "center"),
+    h3("Unit times for the different forest inventory operations", align = "center"),
 
     br(),
+
+
+
+    ##
+    ## Check messages #######################################################
+    ##
+
+    hr(),
+
+    textOutput(outputId = ns("test_approach")),
+
+    tableOutput(outputId = ns("test_cv")),
+
+    hr(),
+
 
 
     ##
@@ -32,25 +47,29 @@ mod_time_UI <- function(id){
     wellPanel(
       id = ns("time_intro"),
 
-    p("This section is dedicated to unit times necessary to perform the main
-      inventory operations, such as time to measure trees, time to get to the
-      plots etc. The user inputs are split in two boxes."),
+      p(strong("Overview")),
 
-    p(strong("Box 1")),
+      p("This section is dedicated to unit times necessary to perform the main
+        inventory operations, such as time to measure trees, time to get to the
+        plots etc. The user inputs are split in two boxes."),
 
-    p("Box 1 focuses on tree measurements following a nested circular subplot
-      design with three nested levels. Level 1 is the largest circle dedicated
-      to large trees (usually bigger than 30 cm diameter at breast height - DBH),
-      level 2 is a smaller circle for small trees (from tree minimum DBH to the
-      threshold for big trees), and level 3 is a small circle for seedlings."),
+      p(strong("Box 1")),
 
-    p(strong("Box 2")),
+      p("Box 1 focuses on tree measurements following a nested circular subplot
+        design with three nested levels. Level 1 is the largest circle dedicated
+        to large trees (usually bigger than 30 cm diameter at breast height - DBH),
+        level 2 is a smaller circle for small trees (from tree minimum DBH to the
+        threshold for big trees), and level 3 is a small circle for seedlings."),
 
-    p("Box 2 focuses on unit times for transportation, general working hours and
-      time to get authorization from local authorities before going to measure
-      the plots.")
+      p(strong("Box 2")),
+
+      p("Box 2 focuses on unit times for transportation, general working hours and
+        time to get authorization from local authorities before going to measure
+        the plots.")
 
     ),
+
+    br(),
 
 
 
@@ -58,142 +77,240 @@ mod_time_UI <- function(id){
     ## Inputs ###############################################################
     ##
 
-
     fluidRow(
+      column(6, h4("Nested plot unit times")),
+      column(6, h4("Other unit times"))
+    ),
 
-      ## + Nested plot inputs ===============================================
 
-      column(6, wellPanel(
-        id = ns("nested_plot"),
+    br(),
 
-        fluidRow(
+    ## Message if previous steps not completed
+    wellPanel(
+      id = ns("check_approach"),
 
-          ## + + Level 1 big trees --------------------------------------------
-          column(4, div(
+      p("First choose a CV model approach",
+        style = "color: #dc3545; font-style: italic; text-align: center;"),  ## Bootstrap danger color
 
-            h4("Level 1 subplot for big trees"),
+      p("If you selected approach 1, make sure you complete all the steps to
+        get an initial CV from the biomass maps.",
+        style = "color: #dc3545; font-style: italic; text-align: center;"),  ## Bootstrap danger color
 
-            numericInput(
+    ), ## End check_approach
+
+    shinyjs::hidden(div(
+      id = ns("unit_times"),
+
+      fluidRow(
+
+
+
+        ## + Nested plot inputs =============================================
+
+        column(6, wellPanel(
+          id = ns("nested_plot"),
+
+          ## + + Level 1 big trees ----------------------------------------
+          h4("Level 1 subplot for big trees"),
+
+          fluidRow(
+            column(4, p(strong("Tree minimum DBH (cm)"))),
+            column(4, p(strong("Tree density (#/ha)"))),
+            column(4, p(strong("Time to measure (min/tree)")))
+          ),
+
+          fluidRow(
+
+            column(4, numericInput(
               inputId = ns("lvl1_dbh"),
-              label = "DBH min. (cm)",
+              label = NULL,
               value = 30,
               min = 1,
               max = 100
-            ),
+            )),
 
-            numericInput(
+            column(4, numericInput(
               inputId = ns("lvl1_density"),
-              label = "Tree density for DBH range (# trees/ha)",
+              label = NULL,
               value = 300,
               min = 1,
               max = 10000
-            ),
+            )),
 
-            numericInput(
+            column(4, numericInput(
               inputId = ns("lvl1_time"),
-              label = "Unit time to measure 1 tree (min/tree)",
+              label = NULL,
               value = 3,
               min = 0.1,
               max = 10
-            )
+            ))
 
-          )),
+          ),
 
-          ## + + Level 2 small trees ----------------------------------------
-          column(4, div(
+          br(),
 
-            h4("Level 2 subplot for small and medium trees"),
+          ## + + Level 2 small trees --------------------------------------
+          h4("Level 2 subplot for small trees"),
 
-            numericInput(
+          fluidRow(
+            column(4, p(strong("Tree minimum DBH (cm)"))),
+            column(4, p(strong("Tree density (#/ha)"))),
+            column(4, p(strong("Time to measure (min/tree)")))
+          ),
+
+          fluidRow(
+
+            column(4, numericInput(
               inputId = ns("lvl2_dbh"),
-              label = "DBH min. (cm)",
+              label = NULL,
               value = 10,
               min = 1,
               max = 100
-            ),
+            )),
 
-            numericInput(
+            column(4, numericInput(
               inputId = ns("lvl2_density"),
-              label = "Tree density for DBH range (# trees/ha)",
+              label = NULL,
               value = 1000,
               min = 1,
               max = 10000
-            ),
+            )),
 
-            numericInput(
+            column(4, numericInput(
               inputId = ns("lvl2_time"),
-              label = "Unit time to measure 1 tree (min/tree)",
+              label = NULL,
               value = 2,
               min = 0.1,
               max = 5
-            )
+            ))
 
-          )),
+          ),
 
-          ## + + Level 3 seedlings ------------------------------------------
-          column(4, div(
+          br(),
 
-            h4("Level 3 subplot for seedlings"),
+          ## + + Level 3 seedlings ----------------------------------------
+          h4("Level 3 subplot for seedlings"),
 
-            numericInput(
+          fluidRow(
+            column(4, p(strong("Seedling minimum DBH (cm)"))),
+            column(4, p(strong("Seedling density (#/ha)"))),
+            column(4, p(strong("Seedling to measure (min/tree)")))
+          ),
+
+          fluidRow(
+
+            column(4, numericInput(
               inputId = ns("lvl3_dbh"),
-              label = "DBH min. (cm)",
+              label = NULL,
               value = 2,
               min = 1,
               max = 100
-            ),
+            )),
 
-            numericInput(
+            column(4, numericInput(
               inputId = ns("lvl3_density"),
-              label = "Tree density for DBH range (# seedlings/ha)",
+              label = NULL,
               value = 1500,
               min = 1,
               max = 10000
-            ),
+            )),
 
-            numericInput(
+            column(4, numericInput(
               inputId = ns("lvl3_time"),
-              label = "Unit time to measure 1 seedling (min/seedling)",
+              label = NULL,
               value = 0.5,
               min = 0.1,
               max = 3,
               step = 0.1
-            )
+            ))
 
-          ))
+          ),
 
-        ), ## END fluidRow nested plot
+          hr(),
 
-        hr(),
+          ## + + Default values check -------------------------------------
+          p("This table recaps where default
+            parameters are used."),
 
-        p("The default parameters come from a Forest Inventory in the tropics and
-        are intended for testing purposes only. The table below recaps where default
-          parameters are used."),
+          tableOutput(outputId = ns("nested_check"))
 
-        tableOutput(outputId = ns("nested_check")),
-
-      )),
-
-      ## + Other time inputs ================================================
-      column(6, wellPanel(
-        id = ns("other_time"),
+        )), ## END wellPanel nested plots
 
 
+        ## + Other time inputs ==============================================
+
+        column(6, wellPanel(
+          id = ns("other_time"),
+
+          sliderInput(
+            inputId = ns("drive_time"),
+            label = "Average driving time to plot area (hr)",
+            value = 0.5,
+            min = 0.1,
+            max = 3,
+            step = 0.1
+          ),
+
+          sliderInput(
+            inputId = ns("walk_time"),
+            label = "Average walking time to plot (hr)",
+            value = 1,
+            min = 0.1,
+            max = 3,
+            step = 0.1
+          ),
+
+          sliderInput(
+            inputId = ns("auth_time"),
+            label = "Time to get authorization for each plot (hr)",
+            value = 2,
+            min = 1,
+            max = 6,
+            step = 1
+          ),
+
+          sliderInput(
+            inputId = ns("working_hour"),
+            label = "Number of working hours per day",
+            value = 9,
+            min = 1,
+            max = 12,
+            step = 1
+          ),
+
+          sliderInput(
+            inputId = ns("working_day"),
+            label = "Number of working days per month",
+            value = 21,
+            min = 10,
+            max = 26,
+            step = 1
+          ),
+
+          hr(),
+
+          p("This table recaps where default
+            parameters are used."),
+
+          tableOutput(outputId = ns("other_check"))
+
+        )) ## END wellPanel other unit times
+
+      ) ## END fluidRow inputs
+
+    )), ## END div unit times
 
 
 
-      ))
-
-    ), ## END fluidRow inputs
-
-
+    ##
     ## Move to next section #################################################
+    ##
 
     shinyjs::hidden(div(
-      id = ns("box_cv_to_params"),
+      id = ns("box_time_to_params"),
 
       h4(icon("arrow-right"),
-         "Continue to Step 2:",
+         "Continue to Step 3:",
          HTML("&nbsp;"),
          actionButton(ns("btn_to_params"), "Optimization parameters")
       )
