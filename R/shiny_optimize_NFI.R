@@ -78,10 +78,11 @@ shiny_optimize_NFI <- function(...) {
 
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
-      tabPanel(title = "Home"      , value = "home"    , icon = icon("campground"), mod_home_UI("tab_home")    ),
-      tabPanel(title = "CV model"  , value = "cv_model", icon = icon("map")       , mod_CV_UI("tab_cv")        ),
-      tabPanel(title = "Unit time" , value = "time"    , icon = icon("table")     , mod_time_UI("tab_time")    ),
-      tabPanel(title = "Parameters", value = "params"  , icon = icon("table")     , mod_params_UI("tab_params"))
+      tabPanel(title = "Home"        , value = "home"    , icon = icon("campground"), mod_home_UI("tab_home")    ),
+      tabPanel(title = "CV model"    , value = "cv_model", icon = icon("map")       , mod_CV_UI("tab_cv")        ),
+      tabPanel(title = "Unit times"  , value = "time"    , icon = icon("table")     , mod_time_UI("tab_time")    ),
+      tabPanel(title = "Optimization", value = "params"  , icon = icon("toggle-on") , mod_params_UI("tab_params"))#,
+      #tabPanel(title = "Results"     , value = "results" , icon = icon("toggle-on") , mod_params_UI("tab_params"))
     ) ## END navbarPage
   ) ## END fluidPage
 
@@ -93,7 +94,8 @@ shiny_optimize_NFI <- function(...) {
     ## See https://rtask.thinkr.fr/communication-between-modules-and-its-whims/
     rv <- reactiveValues(
       cv_model = reactiveValues(),
-      params = reactiveValues()
+      time     = reactiveValues(),
+      params   = reactiveValues()
       )
 
 
@@ -110,8 +112,12 @@ shiny_optimize_NFI <- function(...) {
 
 
     ## + Trans modules events ===============================================
-    observeEvent(rv$to_CV, {
+    observeEvent(rv$to_cv, {
       updateTabsetPanel(session, "navbar", "cv_model")
+    })
+
+    observeEvent(rv$to_time, {
+      updateTabsetPanel(session, "navbar", "time")
     })
 
     observeEvent(rv$to_params, {
