@@ -18,35 +18,105 @@ mod_home_UI <- function(id){
 
     br(), br(),
 
-    ## + Introduction -------------------------------------------------------
-    fluidRow(
-      wellPanel(
-        h3("In a Nutshell, how the app works"),
-        h4("Forest inventory design..."),
-        p("... refers to creating a robust statistical design that will allow
-         us to measure forest characteritiscs in as few forest plots as possible
-         to get robust forest estimates with a known uncertainty. We need to estimate"),
-        HTML("<ol>
-          <li>How many forest plots are necessary to measure to get reliable
-              estimates, this is the <strong>sampling design</strong>.</li>
-          <li>What will the plots looks like (how many subplots, what distance
-              between them, what size), this is the <strong>plot design</strong>.</li>
-          <li>What statistical formulas are required to calculate our variable of
-              interest (for example, average biomass at national level), this is the
-              <strong>estimation design</strong>.</li>
-          </ol>"),
-        br(),
-        h4("The optimization tool..."),
-        p("... let you choose between optimizing forest inventory design for
-        forest aboveground biomass using pan-tropical biomass maps or a set of
+
+
+    ##
+    ## Introduction #########################################################
+    ##
+
+    wellPanel(
+      h3("Context"),
+
+      h4("Forest inventory design"),
+
+      p("Forest inventory design refers to creating a robust statistical design
+        that will allow us to measure forest characteritiscs in as few forest
+        plots as possible to get robust forest estimates with a known uncertainty.
+        We need to estimate:"),
+
+      HTML("<ol>
+        <li>How many forest plots are necessary to measure to get reliable
+            estimates and where are they located, this is the <strong>sampling
+            design</strong>.</li>
+        <li>What will the plots look like (how many subplots, what distance
+            between them, what size), this is the <strong>plot design</strong>.</li>
+        <li>What statistical formulas are required to calculate our variable of
+            interest (for example, average biomass at national level), this is the
+            <strong>estimation design</strong>.</li>
+        </ol>"),
+
+      br(),
+
+      h4("Sampling size"),
+
+      p("The forest inventory ", strong("sampling size"), ", i.e. the number
+        of plots to measure to get our forest statistics, can be estimated
+        with prior knowledge on at least one of the forest variables of interest."),
+
+      p("Although forest inventories and in particular National Forest inventories
+        are multi-purpose in nature, one of the variables (for example: biomass,
+        merchantable volume, forest area, etc.), one of these variables must be
+        chosen to estimate the optimal number of plots."),
+
+      p("For this variable of interest, we need a estimated average and standard
+        deviation. They can be obtained from a small scale preliminary inventory,
+        or in the absence of any ground data, it could be obtained from biomass
+        maps. With this information the number of plots to measure is (Stein
+        method 1945):"),
+
+      p(
+        "$$n = \\left( \\frac{ \\hat{CV_{i}} \\times t_{n_{i} - 1}^{1 - \\frac{\\alpha}{2}} }{ E } \\right)^{2}$$"
+        ),
+
+      p("With $n$ the number of plots, $\\hat{CV_{i}}$ the coefficient of
+        variation for the forest variable $i$ from a preliminary inventory,
+        $t_{n_{i} - 1}^{1 - \\frac{\\alpha}{2}}$ the student law for the
+        confidence level $(1 - \\alpha)$ and $E$ the allowable error"),
+
+      br(),
+
+      h4("Optimization"),
+
+      p("The above formula gives an initial sampling size, but doesn't take
+        into consideration the ",  strong(em("plot design")), ". In particular,
+        the ",  strong("number of subplots"), " and their ",  strong("size"),
+        " has an impact on both the forest variables' CV and the cost of the
+        forest inventory, as it impacts the number of plots to measure and
+        the time for measuring forest attributes. The ", strong("distance"),
+        " between subplots is also important due to the forest autocorrelation.
+        It means that spreading subplots further apart increases the chance to
+        capture more variability but also increases the costs of the forest
+        inventory."),
+
+      p("In this context, the optimization process aims to test various plot
+        designs, calculate their sampling size, coefficient of variation
+        and costs and select the best designs for either minimizing the CV,
+        the costs or finding a good trade-off between both."),
+
+      ),
+
+
+
+    ##
+    ## How the app works ####################################################
+    ##
+
+    wellPanel(
+
+      h3("How the app works"),
+
+      p("The optimization tool let you choose between optimizing forest inventory design for forest aboveground biomass using pan-tropical biomass maps or a set of
         user defined parameters. Additional screens prompt for other input parameters
         dealing with cost and forest conditions, then optimize sampling and plot designs
         for your area of interest. The optimization function aims to achieve either
         minimal variance, minimal cost or a balanced solution."),
-        br(),
-        h4("The application builds on four sets of user inputs described below."),
-        )
-    ), ## END fluidRow()
+
+      br(),
+
+      h4("The application builds on four sets of user inputs described below.")
+
+    ),
+
 
     ## + Description inputs -------------------------------------------------
     fluidRow(
