@@ -131,18 +131,18 @@ mod_home_UI <- function(id){
     ## Inputs description ###################################################
     ##
 
-    h4("User inputs"),
+    h3("User inputs"),
 
     fluidRow(
       column(4, wellPanel(
-        h3("1. Coefficient of variation"),
+        h4("1. Coefficient of variation"),
         br(),
         p("To be improved: this section presents the biomass maps and how they are used to
           calc CV.", align = "center"),
         class="bg1")),
 
       column(4, wellPanel(
-        h3("2. Unit times"),
+        h4("2. Unit times"),
         br(),
         p("To be improved: Unit times is divided into times for measuring trees,
           based on nested subplot levels and time for other operations such as
@@ -150,7 +150,7 @@ mod_home_UI <- function(id){
         class="bg2")),
 
       column(4, wellPanel(
-        h3("3. Optimization parameters"),
+        h4("3. Optimization parameters"),
         br(),
         p("To be improved: This is where users choose the different design
           paramters to be tested.", align = "center"),
@@ -158,7 +158,12 @@ mod_home_UI <- function(id){
 
     ), ## End fluidRow
 
-    ## + To next page button ------------------------------------------------
+
+
+    ##
+    ## To next page button ##################################################
+    ##
+
     fluidRow(
       h4(icon("arrow-right"), "Continue to Step 1:", HTML("&nbsp;"),
         actionButton(ns("btn_to_cv"), "CV model")
