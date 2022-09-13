@@ -12,30 +12,33 @@ usethis::create_package("D:/github-repos/oNFI")
 devtools::load_all()
 shiny_optimize_NFI()
 
-##
 ## Add dependencies
+## + Shiny
+usethis::use_package("shiny")
+usethis::use_package("shinyjs")
+usethis::use_package("shinyWidgets")
+usethis::use_package("shinyFiles")
+
 ## + Tidyverse
 usethis::use_package("dplyr")
 usethis::use_package("ggplot2")
 usethis::use_package("tibble")
 usethis::use_package("forcats")
 usethis::use_package("purrr")
+usethis::use_package("stringr")
 usethis::use_package("tidyverse", type = "depends")
 
 ## --- Geospatial
 usethis::use_package("sf")
-usethis::use_package("tmap")
+usethis::use_package("terra")
 usethis::use_package("units")
 
-## --- Tutos
-usethis::use_package("learnr")
-usethis::use_dev_package("gradethis")
-usethis::use_dev_package("eNFIrawdata")
+## --- Misc
 usethis::use_package("ggspatial")
-usethis::use_package("sysfonts")
+usethis::use_package("ggpubr")
 usethis::use_package("showtext")
-usethis::use_package("knitr")
-usethis::use_package("kableExtra")
+
+
 
 ## RAW DATA
 ## --- Created by R scripts in data-raw/
