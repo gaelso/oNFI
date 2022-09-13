@@ -105,52 +105,57 @@ mod_home_UI <- function(id){
 
       h3("How the app works"),
 
-      p("The optimization tool let you choose between optimizing forest inventory design for forest aboveground biomass using pan-tropical biomass maps or a set of
-        user defined parameters. Additional screens prompt for other input parameters
-        dealing with cost and forest conditions, then optimize sampling and plot designs
-        for your area of interest. The optimization function aims to achieve either
-        minimal variance, minimal cost or a balanced solution."),
+      p("The optimization tool requires two sets of user inputs: one for modelling
+        the coefficient of variation from your main forest variable, and one for
+        setting the unit times of the main forest inventory operations."),
 
-      br(),
+      p("Two approaches are available for modelling CV:"),
 
-      h4("The application builds on four sets of user inputs described below.")
+      p("(1) in the absence of an existing model, the tool downloads biomass raster data
+        maps and requires an area of interest spatial data file to clip the biomass
+        maps. Then a CV is calculated from the biomass , using the pixel size as plot
+        size. This step is slightly slower due to the spatial data analysis implemented
+        to get an initial CV, but doesn't require any prior knowledge on the forest."),
+
+      p("(2) With an exisitng model, users can simply enter the model parameters."),
+
+      p("Once user inputs are set, the optimization parameters can be filled in, then
+        the optimization process tests all the parameters' combinations returns the
+        optimal designs."),
 
     ),
 
 
-    ## + Description inputs -------------------------------------------------
+
+    ##
+    ## Inputs description ###################################################
+    ##
+
+    h4("User inputs"),
+
     fluidRow(
-      column(6, wellPanel(
-        h3("1. Biomass variability"),
+      column(4, wellPanel(
+        h3("1. Coefficient of variation"),
         br(),
-        p("!!! This section presents the biomass maps and how they are used to
-          calc CV !!!", align = "center"),
+        p("To be improved: this section presents the biomass maps and how they are used to
+          calc CV.", align = "center"),
         class="bg1")),
 
-      column(6, wellPanel(
-        h3("2. Nested plot conditions"),
+      column(4, wellPanel(
+        h3("2. Unit times"),
         br(),
-        p("!!! This section aims to characterize forest condfitions for different
-          tree diameter classes to optimize the respective size of 2 nested subplots for
-          small and big trees (seedling fixed to 2.5 m radius circle for now) !!!", align = "center"),
-        class="bg2"))
-    ), ## End fluidRow
+        p("To be improved: Unit times is divided into times for measuring trees,
+          based on nested subplot levels and time for other operations such as
+          transportation, requiring authorization, etc.", align = "center"),
+        class="bg2")),
 
-    ## + Description inputs cont. -------------------------------------------
-    fluidRow(
-      column(6, wellPanel(
-        h3("3. Unit times"),
+      column(4, wellPanel(
+        h3("3. Optimization parameters"),
         br(),
-        p("!!! This section deals with different unit times necessary to calculate
-          the total cost of forest measurements !!!", align = "center"),
+        p("To be improved: This is where users choose the different design
+          paramters to be tested.", align = "center"),
         class="bg3")),
 
-      column(6, wellPanel(
-        h3("4. Optimization parameters"),
-        br(),
-        p("!!! List of parameters to be tested, the more parameters the more
-          total number of designs need to be tested !!!", align = "center"),
-        class="bg4"))
     ), ## End fluidRow
 
     ## + To next page button ------------------------------------------------
