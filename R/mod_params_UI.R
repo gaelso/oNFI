@@ -84,52 +84,50 @@ mod_params_UI <- function(id){
 
     ), ## End check_approach
 
-    shinyjs::hidden(div(id = ns("params_setup"), fluidRow(
+    shinyjs::hidden(wellPanel(
+      id = ns("params_setup"),
 
+      ## plot design params #################################################
+      fluidRow(
 
-        ## + Step 2: Nested plot conditions =================================
-
-        column(width = 4, wellPanel(
-          h4("2. Nested plot conditions")
-
+        column(6, sliderInput(
+          inputId = ns("subplot_count"),
+          label = "Number of subplots",
+          value = c(1,5),
+          min = 1,
+          max = 9,
+          step = 2
           )),
 
-
-
-        ## + Step 3: Unit times =============================================
-
-        column(width = 4, wellPanel(
-          h4("3. Unit times")
+        column(6, sliderInput(
+          inputId = ns("distance_multiplier"),
+          label = "Distance between subplot centers (x subplot radius)",
+          value = c(2,4),
+          min = 2,
+          max = 8,
+          step = 1
         )),
 
+      )
 
-        ## + Step 4: Optimization parameters ================================
-        column(width = 4, wellPanel(
-          h4("4. Optimization parameters")
 
-        ))
-
-    ))), ## End params_setup
+    )), ## End params_setup
 
 
 
-    ## Show params quick consequences #######################################
+    ##
+    ## Show params as data format ###########################################
+    ##
 
-    shinyjs::hidden(
-      tabsetPanel(
-        id = ns("params_show"),
+    fluidRow(
 
-        tabPanel("CV"),
-        tabPanel("Nested plot"),
-        tabPanel("Unit times"),
-        tabPanel("Optimization")
+      column(6, verbatimTextOutput(outputId = ns("out_subplot_count"))),
 
-      ),
+      column(6, verbatimTextOutput(outputId = ns("out_distance_multiplier"))),
 
-      ## !!! TO BE REMOVED !!!
-      p("!!! Placeholder for showing info based on selected parameters !!!")
+    )
 
-    ) ## End params show
+
 
   ) ## END tagList
 
