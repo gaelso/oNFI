@@ -6,6 +6,7 @@ mod_params_server <- function(id, rv) {
     ns <- session$ns
 
 
+
     ##
     ## Introduction #########################################################
     ##
@@ -192,6 +193,18 @@ mod_params_server <- function(id, rv) {
 
 
 
+      ## + Calculate design indicators =========================================
+
+      rv$params$results <- map(1:nrow(rv$params$combi), function(x){
+
+
+
+      })
+
+
+
+
+
 
     })
 
@@ -201,13 +214,17 @@ mod_params_server <- function(id, rv) {
     ## Progress outputs #####################################################
     ##
 
-    observe({
+    output$nb_combi <- renderText({
 
       req(rv$params$combi)
 
-      output$nb_combi <- renderPrint({ nrow(rv$params$combi) })
+      paste0("number of combinations to test: ", nrow(rv$params$combi), ".")
 
     })
+
+
+
+
 
 
   }) ## END module server function

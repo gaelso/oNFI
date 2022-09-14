@@ -201,9 +201,9 @@ mod_params_UI <- function(id){
 
             p(strong("Optimization script progress")),
 
-            p("Number of combinations to be tested"),
+            textOutput(outputId = ns("nb_combi")),
 
-            verbatimTextOutput(outputId = ns("nb_combi")),
+            br(),
 
             shinyWidgets::progressBar(
               id = ns("prog_opti"),
