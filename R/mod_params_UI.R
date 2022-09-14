@@ -87,7 +87,7 @@ mod_params_UI <- function(id){
     shinyjs::hidden(wellPanel(
       id = ns("params_setup"),
 
-      ## plot design params #################################################
+      ## + plot design params ===============================================
       fluidRow(
 
         column(6, sliderInput(
@@ -95,7 +95,7 @@ mod_params_UI <- function(id){
           label = "Number of subplots",
           value = c(1,5),
           min = 1,
-          max = 9,
+          max = 12,
           step = 2
           )),
 
@@ -106,12 +106,53 @@ mod_params_UI <- function(id){
           min = 2,
           max = 8,
           step = 1
+        ))
+
+      ),
+
+      fluidRow(
+
+        column(6, sliderInput(
+          inputId = ns("nest1_radius"),
+          label = "Radius of the large subplot for big trees (m)",
+          value = c(15,20),
+          min = 10,
+          max = 30,
+          step = 1
         )),
+
+        column(6, sliderInput(
+          inputId = ns("nest2_radius"),
+          label = "Radius of the medium subplot for small trees (m)",
+          value = c(8,12),
+          min = 0,
+          max = 20,
+          step = 1
+        ))
+
+      ),
+
+      fluidRow(
+
+        column(6,   radioButtons(
+          inputId = ns("plot_shape"),
+          label = "Plot shape",
+          choices = c("L"), ## full list but not implemented yet c("C", "L", "P", "R", "S")
+          selected = "L",
+          inline = TRUE
+        )),
+
+        column(6,  checkboxGroupInput(
+          inputId = ns("allowable_error"),
+          label = "Allowable error (%)",
+          choices = c(1, 5, 10, 20),
+          selected = 10,
+          inline = TRUE
+        ))
 
       )
 
-
-    )), ## End params_setup
+    )), ## End wellPanel params_setup
 
 
 
@@ -120,14 +161,19 @@ mod_params_UI <- function(id){
     ##
 
     fluidRow(
-
       column(6, verbatimTextOutput(outputId = ns("out_subplot_count"))),
+      column(6, verbatimTextOutput(outputId = ns("out_distance_multiplier")))
+      ),
 
-      column(6, verbatimTextOutput(outputId = ns("out_distance_multiplier"))),
+    fluidRow(
+      column(6, verbatimTextOutput(outputId = ns("out_nest1_radius"))),
+      column(6, verbatimTextOutput(outputId = ns("out_nest2_radius")))
+      ),
 
-    )
-
-
+    fluidRow(
+      column(6, verbatimTextOutput(outputId = ns("out_plot_shape"))),
+      column(6, verbatimTextOutput(outputId = ns("out_allowable_error")))
+      )
 
   ) ## END tagList
 

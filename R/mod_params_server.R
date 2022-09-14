@@ -80,12 +80,31 @@ mod_params_server <- function(id, rv) {
 
 
     observe({
-      req(input$subplot_count, input$distance_multiplier)
 
-      rv$params$params <- list(
-        subplot_count       = seq(input$subplot_count[1], input$subplot_count[2], 2),
-        distance_multiplier = input$distance_multiplier[1]:input$distance_multiplier[2]
-      )
+      req(input$subplot_count, input$distance_multiplier,
+          input$nest1_radius, input$nest2_radius,
+          input$plot_shape, input$allowable_error)
+
+      rv$params$list_params <- list(
+        subplot_count       = input$subplot_count[1]:input$subplot_count[2],
+        distance_multiplier = input$distance_multiplier[1]:input$distance_multiplier[2],
+        nest1_radius        = input$nest1_radius[1]:input$nest1_radius[2],
+        nest2_radius        = input$nest2_radius[1]:input$nest2_radius[2],
+        plot_shape          = input$plot_shape,
+        allowable_error     = input$allowable_error
+        )
+
+    })
+
+    ## Adapt number of subplots to plot shape
+    observe({
+
+      req(rv$params$list_params)
+
+      if (rv$params$list_params$plot_shape == "L") {
+        ## For L shape only odd numbers allowed
+        rv$params$list_params$subplot_count <- rv$params$list_params$subplot_count[rv$params$list_params$subplot_count %% 2 == 1]
+      }
 
     })
 
@@ -95,11 +114,17 @@ mod_params_server <- function(id, rv) {
     ## tmp checks ###########################################################
     ##
 
-    output$out_subplot_count <- renderPrint(rv$params$params$subplot_count)
+    output$out_subplot_count <- renderPrint(rv$params$list_params$subplot_count)
 
-    output$out_distance_multiplier <- renderPrint(rv$params$params$distance_multiplier)
+    output$out_distance_multiplier <- renderPrint(rv$params$list_params$distance_multiplier)
 
+    output$out_nest1_radius <- renderPrint(rv$params$list_params$nest1_radius)
 
+    output$out_nest2_radius <- renderPrint(rv$params$list_params$nest2_radius)
+
+    output$out_plot_shape <- renderPrint(rv$params$list_params$plot_shape)
+
+    output$out_allowable_error <- renderPrint(rv$params$list_params$allowable_error)
 
 
   }) ## END module server function
