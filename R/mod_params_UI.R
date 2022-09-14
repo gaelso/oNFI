@@ -84,13 +84,17 @@ mod_params_UI <- function(id){
 
     ), ## End check_approach
 
-    ## + plot design params =================================================
+
+    ## if approach chosen, show the interface
     shinyjs::hidden(div(
       id = ns("params_setup"),
 
       sidebarLayout(
 
-        ## * * Parameter inputs ---------------------------------------------
+
+
+        ## + Parameter inputs ===============================================
+
         sidebarPanel(
 
           sliderInput(
@@ -99,7 +103,7 @@ mod_params_UI <- function(id){
             value = c(1,5),
             min = 1,
             max = 12,
-            step = 2
+            step = 1
           ),
 
           sliderInput(
@@ -147,14 +151,22 @@ mod_params_UI <- function(id){
 
           br(),
 
-          actionButton(inputId = ns("start_opti"), label = "Launch optimization script"),
+          p(id = ns("msg_shape_L"),
+            "Number of subplots selected not compatible with the plot shape chosen",
+            style = "color: #dc3545; font-style: italic;"),  ## Bootstrap danger color
+
+          actionButton(inputId = ns("calc_opti"), label = "Launch optimization script"),
 
           width = 4
         ), ## END sidebarPanel
 
-        ## * * Check testing parameters -------------------------------------
+
+
+        ## + Show progress and result overview ==============================
+
         mainPanel(
 
+          ## * * Show parameters in R format --------------------------------
           p(strong("Checking parameters in R format:")),
 
           fluidRow(
@@ -183,7 +195,7 @@ mod_params_UI <- function(id){
 
           br(),
 
-          ## * * Show optimizatio progress ----------------------------------
+          ## * * Show optimization progress ---------------------------------
           shinyjs::hidden(div(
             id = ns("opti_progress"),
 
@@ -191,7 +203,7 @@ mod_params_UI <- function(id){
 
             p("Number of combinations to be tested"),
 
-            verbatimTextOutput(outputId = ns("nb_combinations")),
+            verbatimTextOutput(outputId = ns("nb_combi")),
 
             shinyWidgets::progressBar(
               id = ns("prog_opti"),
@@ -202,6 +214,7 @@ mod_params_UI <- function(id){
 
           )),
 
+          ## * * Show preliminary results -----------------------------------
           shinyjs::hidden(div(
             id = ns("box_to_results"),
 
@@ -229,7 +242,7 @@ mod_params_UI <- function(id){
       ) ## END sidebar layout
 
 
-    )), ## END div params_setup
+    )) ## END div params_setup
 
 
 
