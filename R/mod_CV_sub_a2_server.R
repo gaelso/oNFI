@@ -16,10 +16,12 @@ mod_CV_sub_a2_server <- function(id, rv) {
 
       req(input$beta0, input$beta1, input$beta2, input$beta3)
 
-      rv$cv_model$beta0 <- input$beta0
-      rv$cv_model$beta1 <- input$beta1
-      rv$cv_model$beta2 <- input$beta2
-      rv$cv_model$beta3 <- input$beta3
+      rv$cv_model$cv_params <- tibble(
+        beta0 = input$beta0,
+        beta1 = input$beta1,
+        beta2 = input$beta2,
+        beta3 = input$beta3
+      )
 
     })
 
@@ -31,10 +33,10 @@ mod_CV_sub_a2_server <- function(id, rv) {
 
     test_cv <- reactive({
 
-      req(rv$cv_model$beta0, rv$cv_model$beta1, rv$cv_model$beta2, rv$cv_model$beta3)
+      req(rv$cv_model$cv_params)
 
       ## Calc CV for common plot design
-      round(rv$cv_model$beta0 * 5^rv$cv_model$beta1 * 80^rv$cv_model$beta2 * (pi * (18/100)^2)^rv$cv_model$beta3 * 100)
+      round(rv$cv_model$cv_params$beta0 * 5^rv$cv_model$cv_params$beta1 * 80^rv$cv_model$cv_params$beta2 * (pi * (18/100)^2)^rv$cv_model$cv_params$beta3 * 100)
 
     })
 
@@ -46,13 +48,13 @@ mod_CV_sub_a2_server <- function(id, rv) {
 
     output$a2_check <- renderTable({
 
-      req(rv$cv_model$beta0, rv$cv_model$beta1, rv$cv_model$beta2, rv$cv_model$beta3)
+      req(rv$cv_model$cv_params)
 
       tibble(
-        beta0 = if_else(rv$cv_model$beta0 == 1.02 , "Default value", "User defined"),
-        beta1 = if_else(rv$cv_model$beta1 == -0.15, "Default value", "User defined"),
-        beta2 = if_else(rv$cv_model$beta2 == 0.016, "Default value", "User defined"),
-        beta3 = if_else(rv$cv_model$beta3 == -0.12, "Default value", "User defined")
+        beta0 = if_else(rv$cv_model$cv_params$beta0 == 1.02 , "Default value", "User defined"),
+        beta1 = if_else(rv$cv_model$cv_params$beta1 == -0.15, "Default value", "User defined"),
+        beta2 = if_else(rv$cv_model$cv_params$beta2 == 0.016, "Default value", "User defined"),
+        beta3 = if_else(rv$cv_model$cv_params$beta3 == -0.12, "Default value", "User defined")
       )
 
     })
