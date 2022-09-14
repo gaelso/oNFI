@@ -84,75 +84,152 @@ mod_params_UI <- function(id){
 
     ), ## End check_approach
 
-    shinyjs::hidden(wellPanel(
+    ## + plot design params =================================================
+    shinyjs::hidden(div(
       id = ns("params_setup"),
 
-      ## + plot design params ===============================================
-      fluidRow(
+      sidebarLayout(
 
-        column(6, sliderInput(
-          inputId = ns("subplot_count"),
-          label = "Number of subplots",
-          value = c(1,5),
-          min = 1,
-          max = 12,
-          step = 2
+        ## * * Parameter inputs ---------------------------------------------
+        sidebarPanel(
+
+          sliderInput(
+            inputId = ns("subplot_count"),
+            label = "Number of subplots",
+            value = c(1,5),
+            min = 1,
+            max = 12,
+            step = 2
+          ),
+
+          sliderInput(
+            inputId = ns("distance_multiplier"),
+            label = "Distance between subplot centers (x subplot radius)",
+            value = c(2,4),
+            min = 2,
+            max = 8,
+            step = 1
+          ),
+
+          sliderInput(
+            inputId = ns("nest1_radius"),
+            label = "Radius of the large subplot for big trees (m)",
+            value = c(15,20),
+            min = 10,
+            max = 30,
+            step = 1
+          ),
+
+          sliderInput(
+            inputId = ns("nest2_radius"),
+            label = "Radius of the medium subplot for small trees (m)",
+            value = c(8,12),
+            min = 0,
+            max = 20,
+            step = 1
+          ),
+
+          radioButtons(
+            inputId = ns("plot_shape"),
+            label = "Plot shape",
+            choices = c("L"), ## full list but not implemented yet c("C", "L", "P", "R", "S")
+            selected = "L",
+            inline = TRUE
+          ),
+
+          checkboxGroupInput(
+            inputId = ns("allowable_error"),
+            label = "Allowable error (%)",
+            choices = c(1, 5, 10, 20),
+            selected = 10,
+            inline = TRUE
+          ),
+
+          br(),
+
+          actionButton(inputId = ns("start_opti"), label = "Launch optimization script"),
+
+          width = 4
+        ), ## END sidebarPanel
+
+        ## * * Check testing parameters -------------------------------------
+        mainPanel(
+
+          p(strong("Checking parameters in R format:")),
+
+          fluidRow(
+            column(4, p("Nb subplots:")),
+            column(4, p("distance between subplots")),
+            column(4, p("Radius large subplot")),
+          ),
+
+          fluidRow(
+            column(4, verbatimTextOutput(outputId = ns("out_subplot_count"))),
+            column(4, verbatimTextOutput(outputId = ns("out_distance_multiplier"))),
+            column(4, verbatimTextOutput(outputId = ns("out_nest1_radius"))),
+          ),
+
+          fluidRow(
+            column(4, p("Radius medium subplot")),
+            column(4, p("Plot shape")),
+            column(4, p("Allowable error")),
+          ),
+
+          fluidRow(
+            column(4, verbatimTextOutput(outputId = ns("out_nest2_radius"))),
+            column(4, verbatimTextOutput(outputId = ns("out_plot_shape"))),
+            column(4, verbatimTextOutput(outputId = ns("out_allowable_error")))
+          ),
+
+          br(),
+
+          ## * * Show optimizatio progress ----------------------------------
+          shinyjs::hidden(div(
+            id = ns("opti_progress"),
+
+            p(strong("Optimization script progress")),
+
+            p("Number of combinations to be tested"),
+
+            verbatimTextOutput(outputId = ns("nb_combinations")),
+
+            shinyWidgets::progressBar(
+              id = ns("prog_opti"),
+              value = 0,
+              title = "Check input",
+              display_pct = TRUE
+            ),
+
           )),
 
-        column(6, sliderInput(
-          inputId = ns("distance_multiplier"),
-          label = "Distance between subplot centers (x subplot radius)",
-          value = c(2,4),
-          min = 2,
-          max = 8,
-          step = 1
-        ))
+          shinyjs::hidden(div(
+            id = ns("box_to_results"),
 
-      ),
+            div(
+              plotOutput(outputId = ns("gr_cv_cost"), height = 200),
+              style = "padding: 0.375em; border: 1px solid #e3e3e3;
+            border-radius: 4px; width: 300px;
+            margin: 0px auto;"
+            ),
 
-      fluidRow(
+            h4(icon("arrow-right"),
+               "Continue to:",
+               HTML("&nbsp;"),
+               actionButton(ns("btn_to_results"), "Results")
+            )
 
-        column(6, sliderInput(
-          inputId = ns("nest1_radius"),
-          label = "Radius of the large subplot for big trees (m)",
-          value = c(15,20),
-          min = 10,
-          max = 30,
-          step = 1
-        )),
+          )),
 
-        column(6, sliderInput(
-          inputId = ns("nest2_radius"),
-          label = "Radius of the medium subplot for small trees (m)",
-          value = c(8,12),
-          min = 0,
-          max = 20,
-          step = 1
-        ))
 
-      ),
 
-      fluidRow(
+          width = 8
 
-        column(6,   radioButtons(
-          inputId = ns("plot_shape"),
-          label = "Plot shape",
-          choices = c("L"), ## full list but not implemented yet c("C", "L", "P", "R", "S")
-          selected = "L",
-          inline = TRUE
-        )),
+        )
 
-        column(6,  checkboxGroupInput(
-          inputId = ns("allowable_error"),
-          label = "Allowable error (%)",
-          choices = c(1, 5, 10, 20),
-          selected = 10,
-          inline = TRUE
-        ))
+      ) ## END sidebar layout
 
-      )
 
-    )), ## End wellPanel params_setup
+    )), ## END div params_setup
 
 
 
@@ -160,20 +237,7 @@ mod_params_UI <- function(id){
     ## Show params as data format ###########################################
     ##
 
-    fluidRow(
-      column(6, verbatimTextOutput(outputId = ns("out_subplot_count"))),
-      column(6, verbatimTextOutput(outputId = ns("out_distance_multiplier")))
-      ),
 
-    fluidRow(
-      column(6, verbatimTextOutput(outputId = ns("out_nest1_radius"))),
-      column(6, verbatimTextOutput(outputId = ns("out_nest2_radius")))
-      ),
-
-    fluidRow(
-      column(6, verbatimTextOutput(outputId = ns("out_plot_shape"))),
-      column(6, verbatimTextOutput(outputId = ns("out_allowable_error")))
-      )
 
   ) ## END tagList
 
