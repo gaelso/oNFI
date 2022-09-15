@@ -81,8 +81,8 @@ shiny_optimize_NFI <- function(...) {
       tabPanel(title = "Home"        , value = "home"    , icon = icon("campground"), mod_home_UI("tab_home")    ),
       tabPanel(title = "CV model"    , value = "cv_model", icon = icon("map")       , mod_CV_UI("tab_cv")        ),
       tabPanel(title = "Unit times"  , value = "time"    , icon = icon("table")     , mod_time_UI("tab_time")    ),
-      tabPanel(title = "Optimization", value = "params"  , icon = icon("toggle-on") , mod_params_UI("tab_params"))#,
-      #tabPanel(title = "Results"     , value = "results" , icon = icon("toggle-on") , mod_params_UI("tab_params"))
+      tabPanel(title = "Optimization", value = "params"  , icon = icon("toggle-on") , mod_params_UI("tab_params")),
+      tabPanel(title = "Results"     , value = "results" , icon = icon("chart-line") , mod_results_UI("tab_res"))
     ) ## END navbarPage
   ) ## END fluidPage
 
@@ -95,7 +95,8 @@ shiny_optimize_NFI <- function(...) {
     rv <- reactiveValues(
       cv_model = reactiveValues(),
       time     = reactiveValues(),
-      params   = reactiveValues()
+      params   = reactiveValues(),
+      results  = reactiveValues()
       )
 
 
@@ -108,6 +109,8 @@ shiny_optimize_NFI <- function(...) {
     mod_time_server("tab_time", rv = rv)
 
     mod_params_server("tab_params", rv = rv)
+
+    mod_results_server("tab_res", rv = rv)
 
 
 
@@ -122,6 +125,10 @@ shiny_optimize_NFI <- function(...) {
 
     observeEvent(rv$to_params, {
       updateTabsetPanel(session, "navbar", "params")
+    })
+
+    observeEvent(rv$to_results, {
+      updateTabsetPanel(session, "navbar", "results")
     })
 
   }
