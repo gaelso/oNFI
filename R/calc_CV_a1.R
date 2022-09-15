@@ -7,6 +7,6 @@ calc_CV_a1 <- function(cv_init, area_init, area_opti) {
 
   ## Lynch 2017 formula
   ## https://academic.oup.com/forestry/article/90/2/211/2605853
-  sqrt(cv_init^2 * (area_init_corr / area_opti)^0.5)
+  sqrt(cv_init^2 * (area_init_cor / area_opti)^0.5)
 
 }
