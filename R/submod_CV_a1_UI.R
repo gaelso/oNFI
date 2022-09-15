@@ -1,6 +1,6 @@
 
 
-mod_CV_sub_a1_UI <- function(id){
+submod_CV_a1_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html
   # `NS(id)` returns a namespace function, which was save as `ns` and will

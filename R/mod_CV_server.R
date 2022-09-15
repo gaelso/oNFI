@@ -14,7 +14,7 @@ mod_CV_server <- function(id, rv) {
     ## Introduction #########################################################
     ##
 
-    mod_CV_sub_intro_server("cv_intro", rv = rv)
+    submod_CV_intro_server("cv_intro", rv = rv)
 
 
 
@@ -70,7 +70,7 @@ mod_CV_server <- function(id, rv) {
     ## Panel A1 server ######################################################
     ##
 
-    mod_CV_sub_a1_server("cv_a1", rv = rv, rv_cv = rv_cv)
+    submod_CV_a1_server("cv_a1", rv = rv, rv_cv = rv_cv)
 
 
 
@@ -78,7 +78,7 @@ mod_CV_server <- function(id, rv) {
     ## Panel A2 server ######################################################
     ##
 
-    mod_CV_sub_a2_server("cv_a2", rv = rv)
+    submod_CV_a2_server("cv_a2", rv = rv)
 
 
 

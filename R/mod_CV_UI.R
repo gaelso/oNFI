@@ -18,7 +18,7 @@ mod_CV_UI <- function(id){
     ## Introduction #########################################################
     ##
 
-    mod_CV_sub_intro_UI(ns("cv_intro")),
+    submod_CV_intro_UI(ns("cv_intro")),
 
 
     ##
@@ -60,7 +60,7 @@ mod_CV_UI <- function(id){
     shinyjs::hidden(div(
       id = ns("layout_a1"),
 
-      mod_CV_sub_a1_UI(ns("cv_a1")),
+      submod_CV_a1_UI(ns("cv_a1")),
 
     )), ## End approach 1
 
@@ -73,7 +73,7 @@ mod_CV_UI <- function(id){
     shinyjs::hidden(div(
       id = ns("layout_a2"),
 
-      mod_CV_sub_a2_UI(ns("cv_a2")),
+      submod_CV_a2_UI(ns("cv_a2")),
 
     )), ## End approach 2
 

@@ -1,6 +1,6 @@
 
 
-mod_CV_sub_intro_server <- function(id, rv) {
+submod_CV_intro_server <- function(id, rv) {
 
   moduleServer(id, function(input, output, session) {
 

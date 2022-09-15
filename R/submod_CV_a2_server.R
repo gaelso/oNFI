@@ -2,7 +2,7 @@
 
 
 
-mod_CV_sub_a2_server <- function(id, rv) {
+submod_CV_a2_server <- function(id, rv) {
 
   moduleServer(id, function(input, output, session) {
 
