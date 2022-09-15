@@ -208,7 +208,7 @@ mod_params_UI <- function(id){
             shinyWidgets::progressBar(
               id = ns("prog_opti"),
               value = 0,
-              total = 100,
+              total = 10,
               title = "Optimization process",
               display_pct = TRUE
             ),
@@ -225,6 +225,12 @@ mod_params_UI <- function(id){
             border-radius: 4px; width: 600px;
             margin: 0px auto;"
             ),
+
+            br(),
+
+            downloadButton(outputId = ns("download_results"), label = 'Download the results'),
+
+            br(),
 
             h4(icon("arrow-right"),
                "Continue to:",
@@ -244,14 +250,6 @@ mod_params_UI <- function(id){
 
 
     )) ## END div params_setup
-
-
-
-    ##
-    ## Show params as data format ###########################################
-    ##
-
-
 
   ) ## END tagList
 

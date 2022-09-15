@@ -308,6 +308,21 @@ mod_params_server <- function(id, rv) {
       shinyjs::show("box_to_results")
     })
 
+    output$download_results <- downloadHandler(
+      filename <- function() { "oNFI-results.csv" },
+      content  <- function(file) { readr::write_csv(rv$params$results, file) }
+      )
+
+
+
+    ##
+    ## Change tab ###########################################################
+    ##
+
+    observeEvent(input$btn_to_results, {
+      rv$to_results <- input$btn_to_results
+    })
+
   }) ## END module server function
 
 }
