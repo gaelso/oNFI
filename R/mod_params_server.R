@@ -79,6 +79,10 @@ mod_params_server <- function(id, rv) {
     ## Pass inputs to rv ####################################################
     ##
 
+
+
+    ## + Add params to list =================================================
+
     observe({
 
       req(input$subplot_count, input$distance_multiplier,
@@ -96,7 +100,10 @@ mod_params_server <- function(id, rv) {
 
     })
 
-    ## Adapt number of subplots to plot shape
+
+
+    ## + Adapt number of subplots to plot shape =============================
+
     observe({
 
       req(rv$params$list_params)
@@ -110,9 +117,7 @@ mod_params_server <- function(id, rv) {
 
 
 
-    ##
-    ## disable calculations if incompatible params ##########################
-    ##
+    ## + Disable calculations if incompatible params ========================
 
     observe({
 
@@ -133,21 +138,56 @@ mod_params_server <- function(id, rv) {
 
 
 
-    ##
-    ## Display params #######################################################
-    ##
+    ## + Display params =====================================================
 
-    output$out_subplot_count <- renderPrint(rv$params$list_params$subplot_count)
+    output$out_subplot_count       <- renderPrint(rv$params$list_params$subplot_count)
 
     output$out_distance_multiplier <- renderPrint(rv$params$list_params$distance_multiplier)
 
-    output$out_nest1_radius <- renderPrint(rv$params$list_params$nest1_radius)
+    output$out_nest1_radius        <- renderPrint(rv$params$list_params$nest1_radius)
 
-    output$out_nest2_radius <- renderPrint(rv$params$list_params$nest2_radius)
+    output$out_nest2_radius        <- renderPrint(rv$params$list_params$nest2_radius)
 
-    output$out_plot_shape <- renderPrint(rv$params$list_params$plot_shape)
+    output$out_plot_shape          <- renderPrint(rv$params$list_params$plot_shape)
 
-    output$out_allowable_error <- renderPrint(rv$params$list_params$allowable_error)
+    output$out_allowable_error     <- renderPrint(rv$params$list_params$allowable_error)
+
+
+
+    ##
+    ## Make combinations ####################################################
+    ##
+
+    ## + Make a table with all the combinations =============================
+
+    observe({
+
+      rv$params$combi <- expand.grid(rv$params$list_params) %>%
+        as_tibble(.) %>%
+        mutate(across(where(is.double), as.integer)) %>%
+        mutate(across(where(is.factor), as.character)) %>%
+        mutate(id = 1:nrow(.)) %>%
+        select(id, everything()) %>%
+        mutate(
+          subplot_area     = round(pi * nest1_radius^2 /100^2, 3),
+          subplot_distance = distance_multiplier * nest1_radius,
+          subplot_avg_distance = case_when(
+            subplot_count == 1 ~ subplot_distance,
+            plot_shape == "L"  ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
+            TRUE ~ NA_integer_
+          )
+        )
+
+    })
+
+
+
+    ## + Show total number of combinations ==================================
+
+    output$nb_combi <- renderText({
+      req(rv$params$combi)
+      paste0("Number of combinations to test: ", nrow(rv$params$combi), ".")
+    })
 
 
 
@@ -168,43 +208,83 @@ mod_params_server <- function(id, rv) {
 
       updateProgressBar(session = session, id = "prog_opti", value = 0, status = "primary")
 
-      rv$params$combi   <- NULL
       rv$params$results <- NULL
 
 
 
-      ## + Make combinations ================================================
+      ## + Calculate design indicators ======================================
 
-      rv$params$combi <- expand.grid(rv$params$list_params) %>%
-        as_tibble(.) %>%
-        mutate(across(where(is.double), as.integer)) %>%
-        mutate(across(where(is.factor), as.character)) %>%
-        mutate(id = 1:nrow(.)) %>%
-        select(id, everything()) %>%
-        mutate(
-          subplot_area     = round(pi * nest1_radius^2 /100^2, 3),
-          subplot_distance = distance_multiplier * nest1_radius,
-          subplot_avg_distance = case_when(
-            subplot_count == 1 ~ subplot_distance,
-            plot_shape == "L"  ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
-            TRUE ~ NA_integer_
+      rv$params$results <- map_dfr(1:nrow(rv$params$combi), function(x){
+
+        #if (x == round(x/50)*50) print(paste("calculating combination ", x, "out of ", nrow(rv$params$combi)))
+
+        ## + + Update progress ----------------------------------------------
+        updateProgressBar(
+          session = session,
+          id      = "prog_opti",
+          value   = x,
+          total   = nrow(rv$params$combi)
           )
-        )
 
 
+        ## + + Get 1 set of parameters --------------------------------------
+        params <- rv$params$combi %>%
+          slice(x) %>%
+          mutate(
+            subplot_distance     = distance_multiplier * nest1_radius,
+            subplot_area         = pi * (nest1_radius / 100)^2,
+            plot_area            = subplot_area * subplot_count,
+            subplot_avg_distance = case_when(
+              subplot_count == 1   ~ subplot_distance,
+              plot_shape    == "L" ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
+              TRUE ~ subplot_distance
+              )
+            )
 
-      ## + Calculate design indicators =========================================
+        ## + + Calculate CV -------------------------------------------------
+        if (rv$cv_model$cv_approach == "a1") {
 
-      rv$params$results <- map(1:nrow(rv$params$combi), function(x){
+          cv <- calc_CV_a1(
+            cv_init   = rv$cv_model$cv_mixed$cv_init,
+            area_init = rv$cv_model$cv_mixed$area_init,
+            area_opti = params$plot_area
+            )
+
+        } else if (rv$cv_model$cv_approach == "a2") {
+
+          cv <- calc_CV_a2(
+            n = params$subplot_count,
+            d = params$subplot_distance,
+            a = params$subplot_area,
+            cv_params = rv$cv_model$cv_params
+          )
+
+        }
+
+        ## + + Number of plots ----------------------------------------------
+        n_plot <- ceiling((cv * qt(.95, df=Inf) / as.numeric(params$allowable_error))^2)
+
+        ## + + Calculate plot time ------------------------------------------
+        plot_time <- calc_time(
+          plot_design = params,
+          unit_times  = rv$time$unit_times,
+          nest_design = rv$time$nested_plot
+          ) %>%
+          mutate(id = params$id)
 
 
+        ## + + Calculate total time -----------------------------------------
+        total_time <- plot_time$time_plot * n_plot / (rv$time$unit_times$working_hour * rv$time$unit_times$working_day)
+
+        ## + + Output the parameters with the calculation results -----------
+        params %>%
+          mutate(cv = cv, n_plot = n_plot, total_time = total_time) %>%
+          #mutate(cv = cv, n_plot = n_plot) %>%
+          left_join(plot_time, by = "id")
 
       })
 
-
-
-
-
+      updateProgressBar(session = session, id = "prog_opti", value = nrow(rv$params$combi), status = "success")
 
     })
 
@@ -214,18 +294,19 @@ mod_params_server <- function(id, rv) {
     ## Progress outputs #####################################################
     ##
 
-    output$nb_combi <- renderText({
+    output$gr_cv_cost <- renderPlot({
+      req(rv$params$results)
 
-      req(rv$params$combi)
-
-      paste0("number of combinations to test: ", nrow(rv$params$combi), ".")
+      ggplot(rv$params$results) +
+        geom_point(aes(x = total_time, y = cv, color = n_plot, size = plot_area)) +
+        scale_color_viridis_c()
 
     })
 
-
-
-
-
+    observe({
+      req(rv$params$results)
+      shinyjs::show("box_to_results")
+    })
 
   }) ## END module server function
 

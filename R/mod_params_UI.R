@@ -170,8 +170,8 @@ mod_params_UI <- function(id){
           p(strong("Checking parameters in R format:")),
 
           fluidRow(
-            column(4, p("Nb subplots:")),
-            column(4, p("distance between subplots")),
+            column(4, p("Number of subplots")),
+            column(4, p("Distance between subplots")),
             column(4, p("Radius large subplot")),
           ),
 
@@ -195,20 +195,21 @@ mod_params_UI <- function(id){
 
           br(),
 
+          textOutput(outputId = ns("nb_combi")),
+
+          br(),
+
           ## * * Show optimization progress ---------------------------------
           shinyjs::hidden(div(
             id = ns("opti_progress"),
 
             p(strong("Optimization script progress")),
 
-            textOutput(outputId = ns("nb_combi")),
-
-            br(),
-
             shinyWidgets::progressBar(
               id = ns("prog_opti"),
               value = 0,
-              title = "Check input",
+              total = 100,
+              title = "Optimization process",
               display_pct = TRUE
             ),
 
@@ -219,9 +220,9 @@ mod_params_UI <- function(id){
             id = ns("box_to_results"),
 
             div(
-              plotOutput(outputId = ns("gr_cv_cost"), height = 200),
+              plotOutput(outputId = ns("gr_cv_cost"), height = 400),
               style = "padding: 0.375em; border: 1px solid #e3e3e3;
-            border-radius: 4px; width: 300px;
+            border-radius: 4px; width: 600px;
             margin: 0px auto;"
             ),
 
