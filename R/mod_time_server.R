@@ -99,13 +99,14 @@ mod_time_server <- function(id, rv) {
 
     observe({
       req(
-        input$drive_time, input$walk_time, input$auth_time,
-        input$working_hour, input$working_day
+        input$drive_time, input$walk_time, input$march_speed,
+        input$auth_time, input$working_hour, input$working_day
       )
 
       rv$time$unit_times <- tibble(
         drive_time   = input$drive_time,
         walk_time    = input$walk_time,
+        march_speed  = input$march_speed,
         auth_time    = input$auth_time,
         working_hour = input$working_hour,
         working_day  = input$working_day
@@ -167,6 +168,7 @@ mod_time_server <- function(id, rv) {
         mutate(
           drive_time   = if_else(drive_time   == 0.5, 1, 0),
           walk_time    = if_else(walk_time    ==   1, 1, 0),
+          march_speed  = if_else(march_speed  ==   2, 1, 0),
           auth_time    = if_else(auth_time    ==   2, 1, 0),
           working_hour = if_else(working_hour ==   9, 1, 0),
           working_day  = if_else(working_day  ==  21, 1, 0)
@@ -177,7 +179,7 @@ mod_time_server <- function(id, rv) {
       rv_time$check_time_vec <- as.character(rv_time$check_time)
 
       rv$time$check_time_default <- if_else(
-        all.equal(rv_time$check_time_vec, rep("Default value", 5)),
+        all.equal(rv_time$check_time_vec, rep("Default value", 6)),
         "All default values",
         "At least some user inputs"
       )
@@ -191,22 +193,19 @@ mod_time_server <- function(id, rv) {
     ##
 
     output$nested_check <- renderTable({
-
       req(rv_time$check_nested)
-
       rv_time$check_nested
-
       })
 
-
-    output$other_check <- renderTable({
-
+    output$other_check1 <- renderTable({
       req(rv_time$check_time)
-
-      rv_time$check_time
-
+      rv_time$check_time %>% dplyr::select(drive_time, walk_time, march_speed)
     })
 
+    output$other_check2 <- renderTable({
+      req(rv_time$check_time)
+      rv_time$check_time %>% dplyr::select(auth_time, working_hour, working_day)
+    })
 
 
     ##

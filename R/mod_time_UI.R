@@ -261,6 +261,15 @@ mod_time_UI <- function(id){
           ),
 
           sliderInput(
+            inputId = ns("march_speed"),
+            label = "March speed between subplots (km/hr)",
+            value = 2,
+            min = 0.5,
+            max = 6,
+            step = 0.5
+          ),
+
+          sliderInput(
             inputId = ns("auth_time"),
             label = "Time to get authorization for each plot (hr)",
             value = 2,
@@ -292,7 +301,9 @@ mod_time_UI <- function(id){
           p("This table recaps where default
             parameters are used."),
 
-          tableOutput(outputId = ns("other_check"))
+          tableOutput(outputId = ns("other_check1")),
+
+          tableOutput(outputId = ns("other_check2"))
 
         )) ## END wellPanel other unit times
 
