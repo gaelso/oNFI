@@ -18,7 +18,7 @@ calc_time <- function(unit_times, plot_design, nest_design, progress_id = NULL, 
   plot_design$nest3_radius <- 2
 
   ## Time travel to plot
-  time_travel  <- unit_times$drive_time + unit_times$walk_time
+  time_travel  <- (unit_times$drive_time + unit_times$walk_time) * 2
 
   ## Time to get authorization
   time_auth <- unit_times$auth_time
@@ -28,11 +28,11 @@ calc_time <- function(unit_times, plot_design, nest_design, progress_id = NULL, 
   lvl2 <- nest_design %>% filter(nested_level == "lvl2")
   lvl3 <- nest_design %>% filter(nested_level == "lvl3")
 
-  time_measure_lvl1 <- pi * (plot_design$nest1_radius / 100)^2 * lvl1$tree_density * lvl1$time_measure
-  time_measure_lvl2 <- pi * (plot_design$nest2_radius / 100)^2 * lvl2$tree_density * lvl2$time_measure
-  time_measure_lvl3 <- pi * (plot_design$nest3_radius / 100)^2 * lvl3$tree_density * lvl3$time_measure
+  time_measure_lvl1 <- pi * (plot_design$nest1_radius / 100)^2 * lvl1$tree_density * lvl1$time_measure / 60
+  time_measure_lvl2 <- pi * (plot_design$nest2_radius / 100)^2 * lvl2$tree_density * lvl2$time_measure / 60
+  time_measure_lvl3 <- pi * (plot_design$nest3_radius / 100)^2 * lvl3$tree_density * lvl3$time_measure / 60
 
-  time_measure <- time_measure_lvl1 + time_measure_lvl2 + time_measure_lvl3
+  time_measure <- (time_measure_lvl1 + time_measure_lvl2 + time_measure_lvl3) * plot_design$subplot_count
 
   ## Time travel subplots
   time_walk <- plot_design$subplot_avg_distance * plot_design$subplot_count / (unit_times$march_speed * 1000)
