@@ -111,6 +111,15 @@ mod_params_server <- function(id, rv) {
       if (rv$params$list_params$plot_shape == "L") {
         ## For L shape only odd numbers allowed
         rv$params$list_params$subplot_count <- rv$params$list_params$subplot_count[rv$params$list_params$subplot_count %% 2 == 1]
+
+        rv$params$step <- 2
+
+        updateSliderInput(
+          session = session,
+          inputId = "subplot_count",
+          step = rv$params$step
+        )
+
       }
 
     })
