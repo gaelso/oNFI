@@ -19,8 +19,7 @@ shinyApp(
       val <- input$control
       # Control the value, min, max, and step.
       # Step size is 2 when input value is even; 1 when value is odd.
-      updateSliderInput(session, "receive", value = val,
-                        min = floor(val/2), max = val+4, step = (val+1)%%2 + 1)
+      updateSliderInput(session, "receive", step = 4)
     })
   }
 )
