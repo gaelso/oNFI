@@ -152,7 +152,7 @@ mod_time_server <- function(id, rv) {
                                     rv_time$check_nested$check_time)
 
       rv$time$check_nested_default <- if_else(
-        all.equal(rv_time$check_nested_vec, rep("Default value", 9)),
+        identical(rv_time$check_nested_vec, rep("Default value", 9)),
         "All default values",
         "At least some user inputs"
       )
@@ -179,7 +179,7 @@ mod_time_server <- function(id, rv) {
       rv_time$check_time_vec <- as.character(rv_time$check_time)
 
       rv$time$check_time_default <- if_else(
-        all.equal(rv_time$check_time_vec, rep("Default value", 6)),
+        identical(rv_time$check_time_vec, rep("Default value", 6)),
         "All default values",
         "At least some user inputs"
       )

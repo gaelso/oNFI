@@ -15,27 +15,27 @@ mod_results_UI <- function(id){
 
 
 
-    ##
-    ## Check messages #######################################################
-    ##
-
-    hr(),
-
-    textOutput(outputId = ns("test_approach")),
-
-    tableOutput(outputId = ns("test_cv")),
-
-    br(),
-
-    textOutput(outputId = ns("test_nested")),
-
-    textOutput(outputId = ns("test_time")),
-
-    br(),
-
-    textOutput(outputId = ns("test_combi")),
-
-    hr(),
+    # ##
+    # ## Check messages #######################################################
+    # ##
+    #
+    # hr(),
+    #
+    # textOutput(outputId = ns("test_approach")),
+    #
+    # tableOutput(outputId = ns("test_cv")),
+    #
+    # br(),
+    #
+    # textOutput(outputId = ns("test_nested")),
+    #
+    # textOutput(outputId = ns("test_time")),
+    #
+    # br(),
+    #
+    # textOutput(outputId = ns("test_combi")),
+    #
+    # hr(),
 
 
 
@@ -43,95 +43,181 @@ mod_results_UI <- function(id){
     ## Results graphs #######################################################
     ##
 
-    h4("Expected coefficient of variation vs measurement time"),
+    h4("Select final plot design parameters"),
 
-    br(),
+    #br(),
 
-    sidebarLayout(
+    ## + User chosen parameter for filtering ================================
 
+    wellPanel(
 
-
-      ## + User chosen parameter for filtering ================================
-
-      sidebarPanel(
-
-        h5(strong("Select final parameters")),
-
-        sliderInput(
+      fluidRow(
+        column(6, sliderInput(
           inputId = ns("subplot_count"),
           label = "Number of subplots",
           value = 3,
           min = 1,
           max = 12,
           step = 1
-        ),
-
-        sliderInput(
+        )),
+        column(6, sliderInput(
           inputId = ns("distance_multiplier"),
           label = "Distance between subplot centers (x subplot radius)",
           value = 3,
           min = 2,
           max = 8,
           step = 1
-        ),
+        ))
+      ),
 
-        sliderInput(
+      fluidRow(
+        column(6, sliderInput(
           inputId = ns("nest1_radius"),
           label = "Radius of the large subplot for big trees (m)",
           value = 18,
           min = 10,
           max = 30,
           step = 1
-        ),
-
-        sliderInput(
+        )),
+        column(6, sliderInput(
           inputId = ns("nest2_radius"),
           label = "Radius of the medium subplot for small trees (m)",
           value = 10,
           min = 0,
           max = 20,
           step = 1
-        ),
-
-        width = 4
-
-      ),
-
-
-
-      # + graphs ============================================================
-
-      mainPanel(
-
-        # fluidRow(
-        #   column(6, div(
-        #     plotOutput(outputId = ns("gr_subplot_count"), height = 300),
-        #     style = "padding: 0.375em; border: 1px solid #e3e3e3;
-        # border-radius: 4px; width: 450px; margin: 0px auto;"
-        #   )),
-        #
-        #   column(6, div(
-        #     plotOutput(outputId = ns("gr_subplot_distance"), height = 300),
-        #     style = "padding: 0.375em; border: 1px solid #e3e3e3;
-        #     border-radius: 4px; width: 450px; margin: 0px auto;"
-        #   ))
-        # )
-        fluidRow(
-          column(6, plotOutput(outputId = ns("gr_subplot_count"))),
-          column(6, plotOutput(outputId = ns("gr_subplot_distance")))
-        ),
-        fluidRow(
-          column(6, plotOutput(outputId = ns("gr_nest1_radius"))),
-          column(6, plotOutput(outputId = ns("gr_nest2_radius")))
-        )
+        ))
       )
+    ), ## End wellPanel
+
+    br(),
+
+    ## + graphs ============================================================
+
+    h4("CV and inventory time for each parameter"),
+
+    p("In each figure, one parameter variation is shown and all the parameters are
+      fixed to the selected value."),
+
+    fluidRow(
+      column(6, plotOutput(outputId = ns("gr_subplot_count"))),
+      column(6, plotOutput(outputId = ns("gr_subplot_distance")))
     ),
+
+    fluidRow(
+      column(6, plotOutput(outputId = ns("gr_nest1_radius"))),
+      column(6, plotOutput(outputId = ns("gr_nest2_radius")))
+    ),
+
+
+    # h4("Expected coefficient of variation vs measurement time"),
+    #
+    # br(),
+    #
+    # sidebarLayout(
+    #
+    #
+    #
+    #   ## + User chosen parameter for filtering ================================
+    #
+    #   sidebarPanel(
+    #
+    #     h5(strong("Select final parameters")),
+    #
+    #     sliderInput(
+    #       inputId = ns("subplot_count"),
+    #       label = "Number of subplots",
+    #       value = 3,
+    #       min = 1,
+    #       max = 12,
+    #       step = 1
+    #     ),
+    #
+    #     sliderInput(
+    #       inputId = ns("distance_multiplier"),
+    #       label = "Distance between subplot centers (x subplot radius)",
+    #       value = 3,
+    #       min = 2,
+    #       max = 8,
+    #       step = 1
+    #     ),
+    #
+    #     sliderInput(
+    #       inputId = ns("nest1_radius"),
+    #       label = "Radius of the large subplot for big trees (m)",
+    #       value = 18,
+    #       min = 10,
+    #       max = 30,
+    #       step = 1
+    #     ),
+    #
+    #     sliderInput(
+    #       inputId = ns("nest2_radius"),
+    #       label = "Radius of the medium subplot for small trees (m)",
+    #       value = 10,
+    #       min = 0,
+    #       max = 20,
+    #       step = 1
+    #     ),
+    #
+    #     width = 4
+    #
+    #   ),
+    #
+    #
+    #
+    #   # + graphs ============================================================
+    #
+    #   mainPanel(
+    #
+    #     fluidRow(
+    #       column(6, div(
+    #         plotOutput(outputId = ns("gr_subplot_count"), height = 300),
+    #         style = "padding: 0.375em; border: 1px solid #e3e3e3;
+    #     border-radius: 4px; width: 300px; margin: 0px auto;"
+    #       )),
+    #
+    #       column(6, div(
+    #         plotOutput(outputId = ns("gr_subplot_distance"), height = 300),
+    #         style = "padding: 0.375em; border: 1px solid #e3e3e3;
+    #         border-radius: 4px; width: 300px; margin: 0px auto;"
+    #       ))
+    #     ),
+    #
+    #     # fluidRow(
+    #     #   column(6, plotOutput(outputId = ns("gr_subplot_count"))),
+    #     #   column(6, plotOutput(outputId = ns("gr_subplot_distance")))
+    #     # ),
+    #
+    #     fluidRow(
+    #       column(6, plotOutput(outputId = ns("gr_nest1_radius"))),
+    #       column(6, plotOutput(outputId = ns("gr_nest2_radius")))
+    #     )
+    #   )
+    # ),
+
+
+
+    ##
+    ## Measurement time of the selected design ###############################
+    ##
+
+    h4("Detailed inventory time for the selected design"),
+
 
 
 
     ##
     ## Show table of lowest CV, time and compromise #########################
     ##
+
+    h4("10 selected plot designs options for minimal variance or minimal time")
+
+    tableOutput(outputId = ns(table_opti))
+
+
+
+
 
 
 

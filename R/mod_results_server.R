@@ -8,27 +8,27 @@ mod_results_server <- function(id, rv) {
 
 
 
-    ##
-    ## checks from other modules ############################################
-    ##
-
-    output$test_approach <- renderText({
-
-      if (is.null(rv$cv_model$cv_approach)) {
-        "Approach selected: None."
-      } else {
-        paste0("Approach selected: ", rv$cv_model$cv_approach, ".")
-      }
-
-    })
-
-    output$test_cv <- renderTable({ rv$cv_model$cv_mixed })
-
-    output$test_nested <- renderText({ paste0("Nested plot input: ", rv$time$check_nested_default) })
-
-    output$test_time <- renderText({ paste0("Unit time input: ", rv$time$check_time_default) })
-
-    output$test_combi <- renderText({ paste0("Number of combinations to test: ", nrow(rv$params$combi), ".") })
+    # ##
+    # ## checks from other modules ############################################
+    # ##
+    #
+    # output$test_approach <- renderText({
+    #
+    #   if (is.null(rv$cv_model$cv_approach)) {
+    #     "Approach selected: None."
+    #   } else {
+    #     paste0("Approach selected: ", rv$cv_model$cv_approach, ".")
+    #   }
+    #
+    # })
+    #
+    # output$test_cv <- renderTable({ rv$cv_model$cv_mixed })
+    #
+    # output$test_nested <- renderText({ paste0("Nested plot input: ", rv$time$check_nested_default) })
+    #
+    # output$test_time <- renderText({ paste0("Unit time input: ", rv$time$check_time_default) })
+    #
+    # output$test_combi <- renderText({ paste0("Number of combinations to test: ", nrow(rv$params$combi), ".") })
 
 
     ##
@@ -114,10 +114,10 @@ mod_results_server <- function(id, rv) {
     observe({
 
       rv$results$selected <- tibble(
-        subplot_count = input$subplot_count,
+        subplot_count       = input$subplot_count,
         distance_multiplier = input$distance_multiplier,
-        nest1_radius = input$nest1_radius,
-        nest2_radius = input$nest2_radius
+        nest1_radius        = input$nest1_radius,
+        nest2_radius        = input$nest2_radius
       )
 
     })

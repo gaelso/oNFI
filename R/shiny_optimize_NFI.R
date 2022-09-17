@@ -65,7 +65,7 @@ shiny_optimize_NFI <- function(...) {
     ## Set max width
     tags$head(tags$style(HTML("
                                body {
-                                  max-width: 1200px !important;
+                                  max-width: 1600px !important;
                                   margin: 0 auto;
                                }
 
