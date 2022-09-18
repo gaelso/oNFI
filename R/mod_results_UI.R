@@ -109,6 +109,8 @@ mod_results_UI <- function(id){
       column(6, plotOutput(outputId = ns("gr_nest2_radius")))
     ),
 
+    br(),
+
 
     # h4("Expected coefficient of variation vs measurement time"),
     #
@@ -204,6 +206,9 @@ mod_results_UI <- function(id){
 
     h4("Detailed inventory time for the selected design"),
 
+    tableOutput(outputId = ns("table_time")),
+
+    br(),
 
 
 
@@ -211,9 +216,9 @@ mod_results_UI <- function(id){
     ## Show table of lowest CV, time and compromise #########################
     ##
 
-    h4("10 selected plot designs options for minimal variance or minimal time")
+    h4("10 selected plot designs options for minimal variance or minimal time"),
 
-    tableOutput(outputId = ns(table_opti))
+    tableOutput(outputId = ns("table_opti"))
 
 
 
