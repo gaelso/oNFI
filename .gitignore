@@ -2,8 +2,7 @@
 data/
 fonts/
 inst/assets/scott-webb-2OPTOJNNY2Y-unsplash.jpg
-#inst/
-#www/
+results/
 
 # History files
 .Rhistory
