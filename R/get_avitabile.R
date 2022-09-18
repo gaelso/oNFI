@@ -1,7 +1,8 @@
 
 
 
-get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL, url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
+get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL,
+                          url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
 
 
   ## Check AOI CRS
@@ -18,7 +19,7 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
   ## Get file name from URL
   server_filename <- str_remove(url, ".*/")
   file_ext        <- str_sub(server_filename, start = -4, end = -1)
-  sans_ext         <- str_remove(server_filename, file_ext)
+  sans_ext        <- str_remove(server_filename, file_ext)
 
   ## Check if the data is already downloaded
   check1 <- sans_ext %in% list.files(path_data)

@@ -117,7 +117,8 @@ download_santoro <- function(path_data, url){
 ## Main function to get tiles, download if necessary and crop to AOI ########
 ##
 
-get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL, tile_name = "N00E140_agb.zip", url = "globbiomass.org/wp-content/uploads/GB_Maps/"){
+get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL,
+                        tile_name = "N00E140_agb.zip", url = "globbiomass.org/wp-content/uploads/GB_Maps/"){
 
   ## + Checks ----
   ## Check inputs
