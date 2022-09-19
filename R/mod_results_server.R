@@ -258,7 +258,7 @@ mod_results_server <- function(id, rv) {
           nest2_radius        == rv$results$selected$nest2_radius,
           allowable_error     == "10"
         ) %>%
-        dplyr::select(id, total_time, n, time_plot, time_travel, time_auth, time_measure, time_walk)
+        dplyr::select(id, total_time, n_plot, time_plot, time_travel, time_auth, time_measure, time_walk)
 
     })
 
@@ -268,20 +268,36 @@ mod_results_server <- function(id, rv) {
     ## Best models #############################################################
     ##
 
-    # output$table_opti <- renderTable({
-    #
-    #   best_cv <- rv$params$results %>%
-    #     arrange(cv) %>%
-    #     slice_head(5)
-    #
-    #   best_time <- rv$params$results %>%
-    #     arrange(total_time) %>%
-    #     slice_head(5)
-    #
-    #   middle_range <- rv$params$results %>%
-    #     filter()
-    #
-    # })
+    output$table_opti <- renderTable({
+
+
+      best_cv <- rv$params$results %>%
+        arrange(cv) %>%
+        slice_head(5)
+
+      best_time <- rv$params$results %>%
+        arrange(total_time) %>%
+        slice_head(5)
+
+      med_cv   <- median(rv$params$results$cv)
+      med_time <- median(rv$params$results$total_time)
+
+      mid_cv <- rv$params$results %>%
+        mutate(dev_cv = abs((cv - med_cv) / med_cv)) %>%
+        arrange(med_cv) %>%
+        slice_head(5)
+
+      mid_time <- rv$params$results %>%
+        mutate(dev_time = abs((total_time - med_time) / med_time)) %>%
+        arrange(med_time) %>%
+        slice_head(5)
+
+      best_cv %>%
+        bind_rows(best_time) %>%
+        bind_rows(mid_cv) %>%
+        bind_rows(mid_time)
+
+    })
 
 
 
