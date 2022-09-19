@@ -99,6 +99,9 @@ mod_results_UI <- function(id){
     p("In each figure, one parameter variation is shown and all the parameters are
       fixed to the selected value."),
 
+    p("Warning: two y-axis graphs are misleading in nature as the 'relation' between
+    the y-axis is not proved.", style = "color: #ffc107; font-style: italic;"),
+
     fluidRow(
       column(6, plotOutput(outputId = ns("gr_subplot_count"))),
       column(6, plotOutput(outputId = ns("gr_nest1_radius")))
