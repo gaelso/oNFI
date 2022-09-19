@@ -97,6 +97,13 @@ mod_params_UI <- function(id){
 
         sidebarPanel(
 
+          shinyjs::hidden(div(
+            id = ns("msg_a1"),
+            "When approach 1 is selected, level 2 nested radius and subplot distance
+            have no effect on CV, just on costs. They are not be used for optimizing.",
+            style = "color: #17a2b8; font-style: italic;" ## Bootstrap info
+          )),
+
           sliderInput(
             inputId = ns("subplot_count"),
             label = "Number of subplots",

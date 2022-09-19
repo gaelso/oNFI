@@ -51,9 +51,11 @@ mod_params_server <- function(id, rv) {
       if (rv$cv_model$cv_approach == "a2") {
         shinyjs::hide("check_approach")
         shinyjs::show("params_setup")
+        shinyjs::hide("msg_a1")
       } else {
         shinyjs::show("check_approach")
         shinyjs::hide("params_setup")
+        shinyjs::hide("msg_a1")
       }
 
     })
@@ -66,9 +68,11 @@ mod_params_server <- function(id, rv) {
       if (rv$cv_model$cv_approach == "a1") {
         shinyjs::hide("check_approach")
         shinyjs::show("params_setup")
+        shinyjs::show("msg_a1")
       } else {
         shinyjs::show("check_approach")
         shinyjs::hide("params_setup")
+        shinyjs::hide("msg_a1")
       }
 
     })
@@ -179,6 +183,7 @@ mod_params_server <- function(id, rv) {
         select(id, everything()) %>%
         mutate(
           subplot_area     = round(pi * nest1_radius^2 /100^2, 3),
+          subplot_area2    = round(pi * nest2_radius^2 /100^2, 3),
           subplot_distance = distance_multiplier * nest1_radius,
           subplot_avg_distance = case_when(
             subplot_count == 1 ~ subplot_distance,
@@ -264,7 +269,8 @@ mod_params_server <- function(id, rv) {
           cv <- calc_CV_a2(
             n = params$subplot_count,
             d = params$subplot_distance,
-            a = params$subplot_area,
+            a1 = params$subplot_area,
+            a2 = params$subplot_area2,
             cv_params = rv$cv_model$cv_params
           )
 
@@ -324,8 +330,24 @@ mod_params_server <- function(id, rv) {
       }
 
       ggplot(tt) +
-        geom_point(aes(x = total_time, y = cv, color = n_plot, size = plot_area)) +
-        scale_color_viridis_c()
+        geom_point(aes(
+          color = n_plot,
+          fill = n_plot,
+          shape = as.character(subplot_count),
+          size = nest1_radius
+        )) +
+        scale_color_viridis_c(alpha = 0.8) +
+        scale_fill_viridis_c(alpha = 0.8) +
+        scale_shape_manual(values = c(21, 22, 23, 24, 25, 8, 9, 7)) +
+        theme_bw() +
+        labs(
+          x = "Time (months)",
+          y = "CV (%)",
+          color = "Number of plots",
+          fill = "Number of plots",
+          shape = "Number of subplots",
+          size = "subplot level 1 radius (m)"
+          )
 
     })
 
