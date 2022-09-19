@@ -306,7 +306,24 @@ mod_params_server <- function(id, rv) {
     output$gr_cv_cost <- renderPlot({
       req(rv$params$results)
 
-      ggplot(rv$params$results) +
+      if (rv$cv_model_cv_approach == "a1") {
+
+        med_nest2 <- round(median(rv$params$results$nest2_radius))
+        med_dist  <- round(median(rv$params$results$distance_multiplier))
+
+        tt <- rv$params$results %>%
+          filter(
+            rv$params$results$nest2_radius == med_nest2,
+            rv$params$results$distance_multiplier == med_dist,
+          )
+
+      } else {
+
+        tt <- rv$params$results
+
+      }
+
+      ggplot(tt) +
         geom_point(aes(x = total_time, y = cv, color = n_plot, size = plot_area)) +
         scale_color_viridis_c()
 
