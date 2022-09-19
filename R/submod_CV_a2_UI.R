@@ -12,11 +12,11 @@ submod_CV_a2_UI <- function(id){
 
     h4(strong("Input parameters for approach 2:")),
 
-    h4("$$CV_{opti} = \\beta_{0} \\times n^{\\beta_{1}} \\times d^{\\beta_{2}} \\times a^{\\beta_{3}}$$"),
+    h4("$$CV_{opti} = \\beta_{0} \\times n^{\\beta_{1}} \\times d^{\\beta_{2}} \\times a_{1}^{\\beta_{3}} \\times a_{2}^{\\beta_{4}}$$"),
 
     p("With: $n$ the number of subplots, $d$ the distance between subplots,
-        $a$ the subplot size in ha and $\\beta_{0}$, $\\beta_{1}$, $\\beta_{2}$,
-        $\\beta_{3}$ the model's parameters."),
+        $a_{1}$ and $a_{2}$ the subplot size in ha for level 1 and 2 of nested subplots,
+        and $\\beta_{0} ... \\beta_{4}$ the model's parameters."),
 
     sidebarLayout(
 
@@ -35,17 +35,20 @@ submod_CV_a2_UI <- function(id){
 
         fluidRow(
 
-          column(3, numericInput(inputId = ns("beta0"), label = "$\\beta_{0}$",
+          column(2, numericInput(inputId = ns("beta0"), label = "$\\beta_{0}$",
                                  value = 1.02, min = 0, max = 10, step = 0.001)),
 
-          column(3, numericInput(inputId = ns("beta1"), label = "$\\beta_{1}$",
+          column(2, numericInput(inputId = ns("beta1"), label = "$\\beta_{1}$",
                                  value = -0.15, min = -1, max = 1, step = 0.001)),
 
-          column(3, numericInput(inputId = ns("beta2"), label = "$\\beta_{2}$",
+          column(2, numericInput(inputId = ns("beta2"), label = "$\\beta_{2}$",
                                  value = 0.016, min = -0.1, max = 0.1, step = 0.001)),
 
           column(3, numericInput(inputId = ns("beta3"), label = "$\\beta_{3}$",
-                                 value = -0.12, min = -1, max = 1, step = 0.001))
+                                 value = -0.12, min = -1, max = 1, step = 0.001)),
+
+          column(3, numericInput(inputId = ns("beta4"), label = "$\\beta_{4}$",
+                                 value = 0, min = -1, max = 1, step = 0.001))
 
         ),
 

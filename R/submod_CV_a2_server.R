@@ -14,13 +14,14 @@ submod_CV_a2_server <- function(id, rv) {
 
     observe({
 
-      req(input$beta0, input$beta1, input$beta2, input$beta3)
+      req(input$beta0, input$beta1, input$beta2, input$beta3, input$beta4)
 
       rv$cv_model$cv_params <- tibble(
         beta0 = input$beta0,
         beta1 = input$beta1,
         beta2 = input$beta2,
-        beta3 = input$beta3
+        beta3 = input$beta3,
+        beta4 = input$beta4
       )
 
     })
@@ -36,7 +37,13 @@ submod_CV_a2_server <- function(id, rv) {
       req(rv$cv_model$cv_params)
 
       ## Calc CV for common plot design
-      round(rv$cv_model$cv_params$beta0 * 5^rv$cv_model$cv_params$beta1 * 80^rv$cv_model$cv_params$beta2 * (pi * (18/100)^2)^rv$cv_model$cv_params$beta3 * 100)
+      round(rv$cv_model$cv_params$beta0 *
+              5^rv$cv_model$cv_params$beta1 *
+              80^rv$cv_model$cv_params$beta2 *
+              (pi * (18/100)^2)^rv$cv_model$cv_params$beta3 *
+              (pi * (12/100)^2)^rv$cv_model$cv_params$beta4 *
+              100
+            )
 
     })
 
@@ -54,7 +61,8 @@ submod_CV_a2_server <- function(id, rv) {
         beta0 = if_else(rv$cv_model$cv_params$beta0 == 1.02 , "Default value", "User defined"),
         beta1 = if_else(rv$cv_model$cv_params$beta1 == -0.15, "Default value", "User defined"),
         beta2 = if_else(rv$cv_model$cv_params$beta2 == 0.016, "Default value", "User defined"),
-        beta3 = if_else(rv$cv_model$cv_params$beta3 == -0.12, "Default value", "User defined")
+        beta3 = if_else(rv$cv_model$cv_params$beta3 == -0.12, "Default value", "User defined"),
+        beta4 = if_else(rv$cv_model$cv_params$beta4 == 0    , "Default value", "User defined")
       )
 
     })
@@ -64,8 +72,9 @@ submod_CV_a2_server <- function(id, rv) {
 
       req(test_cv())
 
-     paste0("With common plot design of 5 subplots of 18 m radius, 80 m appart,
-            the model gives a CV equal to ", test_cv(), "%.")
+     paste0("With common plot design of 5 subplots of 18 and 12 m radius for big
+            and small trees respectiveley, 80 m appart, the model gives a CV equal
+            to ", test_cv(), "%.")
 
     })
 
