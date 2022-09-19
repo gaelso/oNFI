@@ -312,7 +312,7 @@ mod_params_server <- function(id, rv) {
     output$gr_cv_cost <- renderPlot({
       req(rv$params$results)
 
-      if (rv$cv_model_cv_approach == "a1") {
+      if (rv$cv_model$cv_approach == "a1") {
 
         med_nest2 <- round(median(rv$params$results$nest2_radius))
         med_dist  <- round(median(rv$params$results$distance_multiplier))
@@ -329,7 +329,7 @@ mod_params_server <- function(id, rv) {
 
       }
 
-      ggplot(tt) +
+      ggplot(tt, aes(x = total_time, y = cv)) +
         geom_point(aes(
           color = n_plot,
           fill = n_plot,
