@@ -111,6 +111,9 @@ devtools::check()
 ## Convert Roxygen data and function description to .Rd files in man/
 devtools::document()
 
+## Add license
+usethis::use_mit_license()
+
 ## Install
 devtools::install()
 

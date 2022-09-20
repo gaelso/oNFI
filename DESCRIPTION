@@ -1,12 +1,20 @@
 Package: oNFI
-Title: What the Package Does (One Line, Title Case)
+Title: Optimization Tool for (National) Forest Inventories
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    c(person(
+        given  = "Gael", 
+        family = "Sola", 
+        email  = c("gael.sola@fao.org", "gaelsola@hotmail.fr"), 
+        role   = c("aut", "cre")
+      )
+    )
+Description: oNFI contains functions to download and analyze biomass maps to get 
+    forest coefficient of variation when no preliminary data exist. It also  contains 
+    a Shiny application: 'shiny_optimize_NFI()', that guide users through the different 
+    steps to optimize a forest inventory sampling design based on measurement unit times, 
+    forest characteristics and plot design parameters.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
