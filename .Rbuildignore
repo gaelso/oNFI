@@ -1,8 +1,12 @@
 ^oNFI\.Rproj$
 ^\.Rproj\.user$
 
-data/
-fonts/
-results/
-test/
+^data\
+^fonts\
+^results\
+^test\.R$
+
 ^LICENSE\.md$
+
+^offline_use.md
+
