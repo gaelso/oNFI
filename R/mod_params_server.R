@@ -333,7 +333,7 @@ mod_params_server <- function(id, rv) {
         geom_point(aes(
           color = n_plot,
           fill = n_plot,
-          shape = as.character(subplot_count),
+          shape = as.factor(subplot_count),
           size = nest1_radius
         )) +
         scale_color_viridis_c(alpha = 0.8) +
