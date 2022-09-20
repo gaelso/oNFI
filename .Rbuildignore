@@ -1,2 +1,7 @@
 ^oNFI\.Rproj$
 ^\.Rproj\.user$
+
+data/
+fonts/
+results/
+test/
