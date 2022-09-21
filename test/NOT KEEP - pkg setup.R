@@ -124,6 +124,8 @@ learnr::run_tutorial("eNFI-lesson2.1", "eNFI")
 ## Add github actions
 usethis::use_github_action_check_standard()
 
+## Install from github
+remotes::install_github("gaelso/oNFI")
 
 ## Shiny app as package, example:
 # monthFeedbackUI <- function(id) {
