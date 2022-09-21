@@ -1,5 +1,14 @@
 
 
+#' Title
+#'
+#' @param df
+#' @param agb_min
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_CV_AGB <- function(df, agb_min = 20){
 
   ## Checks

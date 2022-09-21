@@ -3,6 +3,14 @@
 ## Helper function to get the tiles before downloading ######################
 ##
 
+#' Get tile names for downloading Santoro 2018 biomass raster data
+#'
+#' @param sf_aoi
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_santoro_tiles <- function(sf_aoi){
 
   ## Check input
@@ -66,6 +74,15 @@ get_santoro_tiles <- function(sf_aoi){
 ## Helper function to download tiles ########################################
 ##
 
+#' Download Santoro 2018 tiles
+#'
+#' @param path_data
+#' @param url
+#'
+#' @return
+#' @export
+#'
+#' @examples
 download_santoro <- function(path_data, url){
 
   ## Get file name from URL
@@ -117,6 +134,19 @@ download_santoro <- function(path_data, url){
 ## Main function to get tiles, download if necessary and crop to AOI ########
 ##
 
+#' Download Santoro 2018 tiles based on users' area of interest
+#'
+#' @param path_data
+#' @param progress_id
+#' @param session
+#' @param sf_aoi
+#' @param tile_name
+#' @param url
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL,
                         tile_name = "N00E140_agb.zip", url = "globbiomass.org/wp-content/uploads/GB_Maps/"){
 

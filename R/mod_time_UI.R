@@ -1,6 +1,14 @@
 
 
 
+#' Inventory unit time module UI function
+#'
+#' @param id
+#'
+#' @return
+#' @export
+#'
+#' @examples
 mod_time_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

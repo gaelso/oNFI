@@ -1,5 +1,13 @@
 
 
+#' CV intro submodule UI function
+#'
+#' @param id
+#'
+#' @return
+#' @export
+#'
+#' @examples
 submod_CV_intro_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

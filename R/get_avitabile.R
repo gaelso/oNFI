@@ -1,6 +1,18 @@
 
 
 
+#' Download Avitabile raster biomass data
+#'
+#' @param path_data
+#' @param progress_id
+#' @param session
+#' @param sf_aoi
+#' @param url
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL,
                           url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
 

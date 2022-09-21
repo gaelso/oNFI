@@ -1,6 +1,15 @@
 
 
 
+#' Inventory unit time module server function
+#'
+#' @param id
+#' @param rv
+#'
+#' @return
+#' @export
+#'
+#' @examples
 mod_time_server <- function(id, rv) {
   moduleServer(id, function(input, output, session) {
 

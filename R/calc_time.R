@@ -11,6 +11,19 @@
 ##  - time_travel_plot = sqrt(area_country / n_plot) / car_speed ## Formula to convert nb of plots to grid spacing.
 ##    + Can be improved with average transportation from lodging to plot + transportation from office to lodging every week or two.
 ##  - time_authorization = time to get authorization from local village and recruit workers if necessary
+
+#' Calculate unit plot time based on plot design
+#'
+#' @param unit_times
+#' @param plot_design
+#' @param nest_design
+#' @param progress_id
+#' @param session
+#'
+#' @return
+#' @export
+#'
+#' @examples
 calc_time <- function(unit_times, plot_design, nest_design, progress_id = NULL, session = NULL) {
 
 
@@ -50,3 +63,4 @@ calc_time <- function(unit_times, plot_design, nest_design, progress_id = NULL, 
   )
 
 } ## End function calc_time()
+

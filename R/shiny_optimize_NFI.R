@@ -1,6 +1,14 @@
 
 
 
+#' Optimization tool Shiny app
+#'
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 shiny_optimize_NFI <- function(...) {
 
   ## GLOBAL #################################################################

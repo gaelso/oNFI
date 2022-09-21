@@ -1,6 +1,16 @@
 
 
 ## Download font and make it available for R --------------------------------
+#' Download google font
+#'
+#' @param path_data
+#' @param font_name
+#' @param font_url
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_font <- function(path_data, font_name = "Lora", font_url = "https://fonts.google.com/download?family=Lora"){
 
   dir.create(file.path(path_data, "fonts"), showWarnings = F)
@@ -24,6 +34,14 @@ add_font <- function(path_data, font_name = "Lora", font_url = "https://fonts.go
 
 
 ## Add map features to ggplot -----------------------------------------------
+#' Add map features to ggplot
+#'
+#' @param font
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_ggspatial <- function(font = "LoraIt"){
 
   list(theme(text = element_text(family = font)),

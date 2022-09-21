@@ -1,4 +1,12 @@
 
+#' Optimization results module server function
+#'
+#' @param id
+#'
+#' @return
+#' @export
+#'
+#' @examples
 mod_results_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

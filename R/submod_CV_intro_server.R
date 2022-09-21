@@ -1,5 +1,14 @@
 
 
+#' CV introduction submodule server function
+#'
+#' @param id
+#' @param rv
+#'
+#' @return
+#' @export
+#'
+#' @examples
 submod_CV_intro_server <- function(id, rv) {
 
   moduleServer(id, function(input, output, session) {

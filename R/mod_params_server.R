@@ -1,5 +1,14 @@
 
 
+#' Optimization parameters module server function
+#'
+#' @param id
+#' @param rv
+#'
+#' @return
+#' @export
+#'
+#' @examples
 mod_params_server <- function(id, rv) {
   moduleServer(id, function(input, output, session) {
 

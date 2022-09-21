@@ -1,5 +1,13 @@
 
 
+#' Home module UI function
+#'
+#' @param id
+#'
+#' @return
+#' @export
+#'
+#' @examples
 mod_home_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

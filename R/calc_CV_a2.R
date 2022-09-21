@@ -1,4 +1,16 @@
 
+#' Calculate CV based on CV model (approach 2)
+#'
+#' @param n
+#' @param d
+#' @param a1
+#' @param a2
+#' @param cv_params
+#'
+#' @return
+#' @export
+#'
+#' @examples
 
 calc_CV_a2 <- function(n, d, a1, a2, cv_params){
 

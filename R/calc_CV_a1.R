@@ -1,4 +1,15 @@
 
+#' Calculate CV based on plot design and initial CV for approach 1
+#'
+#' @param cv_init
+#' @param area_init
+#' @param area_opti
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
 calc_CV_a1 <- function(cv_init, area_init, area_opti) {
 
   ## If initial unit area > 1 ha, consider it 1 ha as
