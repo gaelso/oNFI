@@ -1,13 +1,14 @@
 ^oNFI\.Rproj$
 ^\.Rproj\.user$
 
-^data\
-^fonts\
-^results\
-^test\.R$
+^data$
+^fonts$
+^results$
+^test$
 
 ^LICENSE\.md$
 
 ^offline_use.md
 
 ^\.github$
+
