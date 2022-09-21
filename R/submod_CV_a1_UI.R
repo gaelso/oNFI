@@ -149,6 +149,11 @@ submod_CV_a1_UI <- function(id){
           "Minimum AGB set!",
           style = "color: #28a745; font-style: italic;")),  ## Bootstrap success color
 
+        shinyjs::hidden(p(id = ns("msg_step_agb_min_missing"),
+          "A minimum AGB value is required to launch the calculations",
+          style = "color: #dc3545; font-style: italic;")),  ## Bootstrap danger color
+
+
         shinyjs::disabled(actionButton(inputId = ns("calc_cv"), label = "Calculate CV")),
 
 

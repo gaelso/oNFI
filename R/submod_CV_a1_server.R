@@ -83,10 +83,17 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
 
     ## + Loading AOI ========================================================
 
-    observe({
+    observeEvent(input$AOI, {
+
       req(input$AOI)
+
       rv_cv$sf_aoi <- st_read(input$AOI$datapath)
+
+      shinyjs::hide("msg_step_aoi_file")
+      shinyjs::show("msg_step_aoi_file_ok")
+
       })
+
 
     output$map_aoi <- renderPlot({
 
@@ -102,17 +109,23 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
 
     ## + Checking AGB min value =============================================
 
-    observe({
+    observeEvent(input$agb_min, {
 
-      rv_cv$agb_min <- input$agb_min
-
-      if (rv_cv$agb_min == 0) {
+      if (is.na(input$agb_min)) {
+        shinyjs::hide("msg_step_agb_min")
+        shinyjs::hide("msg_step_agb_min_ok")
+        shinyjs::show("msg_step_agb_min_missing")
+      } else if (input$agb_min == 0) {
         shinyjs::show("msg_step_agb_min")
         shinyjs::hide("msg_step_agb_min_ok")
+        shinyjs::hide("msg_step_agb_min_missing")
       } else {
         shinyjs::hide("msg_step_agb_min")
         shinyjs::show("msg_step_agb_min_ok")
+        shinyjs::hide("msg_step_agb_min_missing")
       }
+
+      rv_cv$agb_min <- input$agb_min
 
     })
 
@@ -122,9 +135,13 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
 
     observe({
       req(rv_cv$sf_aoi)
-      shinyjs::enable("calc_cv")
-      shinyjs::hide("msg_step_aoi_file")
-      shinyjs::show("msg_step_aoi_file_ok")
+
+      if(!is.na(input$agb_min)) {
+        shinyjs::enable("calc_cv")
+      } else {
+        shinyjs::disable("calc_cv")
+      }
+
     })
 
 
