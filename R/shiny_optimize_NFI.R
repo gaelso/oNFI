@@ -1,14 +1,16 @@
-
-
-
-#' Optimization tool Shiny app
+#' Shiny application: Optimization tool for (National) Forest Inventory design
 #'
-#' @param ...
+#' @description Starts a Shiny application that guide users through optimizing Forest
+#'              inventory design for cost and precision based on different approaches to forest
+#'              coefficient of variation for a key variable, user defined unit times for forest
+#'              operations and a range of plot design parameters.
 #'
-#' @return
+#' @param ... arguments to pass to shinyApp
+#'
+#' @inheritParams shiny::shinyApp
+#'
 #' @export
-#'
-#' @examples
+#' @importFrom shiny shinyApp
 shiny_optimize_NFI <- function(...) {
 
   ## GLOBAL #################################################################
@@ -57,7 +59,7 @@ shiny_optimize_NFI <- function(...) {
 
     shinyjs::useShinyjs(),  # Include shinyjs
 
-    withMathJax(),
+    shiny::withMathJax(),
 
     ## section below allows in-line LaTeX via $ in mathjax.
     ## See https://stackoverflow.com/questions/54876731/inline-latex-equations-in-shiny-app-with-mathjax

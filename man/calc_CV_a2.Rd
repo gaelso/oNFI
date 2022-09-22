@@ -7,8 +7,33 @@
 calc_CV_a2(n, d, a1, a2, cv_params)
 }
 \arguments{
-\item{cv_params}{}
+\item{n}{number of subplots.}
+
+\item{d}{distance between subplot in m.}
+
+\item{a1}{subplot outer boundaries size in ha.}
+
+\item{a2}{subplot internal nested boundaries for small trees in ha.}
+
+\item{cv_params}{a table with columns beta0, ..., beta4 and a row with the parameters values.}
+}
+\value{
+Numeric value
 }
 \description{
-Calculate CV based on CV model (approach 2)
+Calculate a Coefficient of Variation based on a CV model with plot
+design characteristics as input variables.
+}
+\examples{
+
+params <- data.frame(
+  beta0 = 1.02 ,
+  beta1 = -0.15,
+  beta2 = 0.016,
+  beta3 = -0.12,
+  beta4 = 0
+)
+
+calc_CV_a2(n = 5, d = 80, a1 = (pi * (18/100)^2), a2 = (pi * (18/100)^2), cv_params = params)
+
 }

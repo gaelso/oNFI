@@ -2,13 +2,16 @@
 % Please edit documentation in R/shiny_optimize_NFI.R
 \name{shiny_optimize_NFI}
 \alias{shiny_optimize_NFI}
-\title{Optimization tool Shiny app}
+\title{Shiny application: Optimization tool for (National) Forest Inventory design}
 \usage{
 shiny_optimize_NFI(...)
 }
 \arguments{
-\item{...}{}
+\item{...}{arguments to pass to shinyApp}
 }
 \description{
-Optimization tool Shiny app
+Starts a Shiny application that guide users through optimizing Forest
+inventory design for cost and precision based on different approaches to forest
+coefficient of variation for a key variable, user defined unit times for forest
+operations and a range of plot design parameters.
 }

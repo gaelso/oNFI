@@ -7,8 +7,20 @@
 calc_CV_a1(cv_init, area_init, area_opti)
 }
 \arguments{
-\item{area_opti}{}
+\item{cv_init}{An initial coefficient of variation in \%.}
+
+\item{area_init}{The unit area size in ha of the sampling unit used to calculate the initial CV.}
+
+\item{area_opti}{The unit area size in ha of the sampling unit used for the CV to calculate.}
+}
+\value{
+Numeric value
 }
 \description{
-Calculate CV based on plot design and initial CV for approach 1
+Calculate a Coefficient of Variation based on an initial CV value,
+the unit area used for data collection of the initial and final CVs.
+}
+\examples{
+calc_CV_a1(cv_init = 94, area_init = 0.9, area_opti = 0.1)
+
 }

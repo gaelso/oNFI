@@ -14,17 +14,61 @@
 
 #' Calculate unit plot time based on plot design
 #'
-#' @param unit_times
-#' @param plot_design
-#' @param nest_design
-#' @param progress_id
-#' @param session
+#' @description Calculate the time for the different forest operations to measure one forest plot.
+#'              Based on Sylla and Picard 2007: Guide methodologique des evaluations rapides de
+#'              bois energie and Scott 1993: Optimal design of a plot cluster for monitoring.
+#'              Optimized for shiny_NFI_optimize() Shiny application. See the example for the exact
+#'              column names in each input.
+#'
+#' @param unit_times A table with unit times in hours for different forest measurement operations.
+#' @param plot_design Plot design variables, i.e. number of subplots, distance between them, subplot radius, etc.
+#' @param nest_design Unit time to measure trees in nested subplots for various tree sizes.
 #'
 #' @return
-#' @export
 #'
 #' @examples
-calc_time <- function(unit_times, plot_design, nest_design, progress_id = NULL, session = NULL) {
+#' time_input <- data.frame(
+#'   drive_time    = 1,  ## h
+#'   walk_time     = 1,  ## h
+#'   auth_time     = 1,  ## h
+#'  march_speed   = 2,  ## km/h
+#'  working_hours = 9,  ## h/day
+#'   working_days  = 21  ## days/month
+#' )
+#'
+#' params_input <- data.frame(
+#'   subplot_count       = 5,
+#'   distance_multiplier = 2, ## multiplier of plot radius as input for subplot distance
+#'   nest1_radius        = 18,
+#'   nest2_radius        = 10,
+#'   plot_shape          = "L",
+#'   allowable_error     = 10
+#' )
+#'
+#' nest_input <- data.frame(
+#'   nested_level = c("lvl1", "lvl2", "lvl3"),
+#'   dbh_min      = c(30, 10, 2),
+#'   tree_density = c(300, 1000, 1500), ## nb trees / ha
+#'   time_measure = c(3, 2, 0.5)  ## in nb min /tree
+#' )
+#'
+#' calc_time(unit_times = time_input, plot_design = params_input, nest_design = nest_input)
+#'
+#' @export
+calc_time <- function(unit_times, plot_design, nest_design) {
+
+  ## Add variables to plot_design
+  ## Subplot average distance
+  plot_design <- plot_design %>%
+    mutate(
+      subplot_distance     = distance_multiplier * nest1_radius,
+      subplot_avg_distance = dplyr::case_when(
+        subplot_count == 1   ~ as.integer(subplot_distance),
+        plot_shape    == "L" ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
+        TRUE ~ as.integer(subplot_distance)
+      )
+    )
+
 
 
   ## Fix lvl3 radius to 2 m
@@ -47,14 +91,14 @@ calc_time <- function(unit_times, plot_design, nest_design, progress_id = NULL, 
 
   time_measure <- (time_measure_lvl1 + time_measure_lvl2 + time_measure_lvl3) * plot_design$subplot_count
 
-  ## Time travel subplots
+  ## Time travel subplots.
   time_walk <- plot_design$subplot_avg_distance * plot_design$subplot_count / (unit_times$march_speed * 1000)
 
 
   ## Total plot time
   time_plot <- time_travel + time_auth + time_measure + time_walk
 
-  tibble(
+  dplyr::tibble(
     time_plot    = time_plot,
     time_travel  = time_travel,
     time_auth    = time_auth,

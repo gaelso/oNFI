@@ -3,16 +3,31 @@
 
 #' Download Avitabile raster biomass data
 #'
-#' @param path_data
-#' @param progress_id
-#' @param session
-#' @param sf_aoi
-#' @param url
+#' @description This function makes the biomass map from Avitabile et al. 2016
+#'              (An integrated pan-tropical biomass map using multiple reference
+#'              datasets) available to use in R. It requires a directory path, checks
+#'              if the data is already there, if not download the data, and load in
+#'              the R environement as a terra::rast object. Additionally if the user
+#'              provide a spatial area boundaries (as simple feature object, see sf)
+#'              the raster biomass data is clipped to the sf object extent.
+#'
+#' @param path_data a path to download or load the biomass map.
+#' @param progress_id,session in a Shiny context, links to a shinyWidgets::progressBar() object
+#' @param sf_aoi a simple feature object to clip the raster data
+#' @param url url for downloading the map. Defaults to:
+#'            http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip
 #'
 #' @return
-#' @export
 #'
 #' @examples
+#' path_data <- tempdir(dir.create("data", showWarnings = F))
+#'
+#' rs_avitabile <- get_avitabile(path_data = path_data)
+#' plot(rs_avitabile)
+#'
+#' unlink(path_data)
+#'
+#' @export
 get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL,
                           url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
 

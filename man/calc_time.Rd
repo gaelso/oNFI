@@ -4,17 +4,48 @@
 \alias{calc_time}
 \title{Calculate unit plot time based on plot design}
 \usage{
-calc_time(
-  unit_times,
-  plot_design,
-  nest_design,
-  progress_id = NULL,
-  session = NULL
-)
+calc_time(unit_times, plot_design, nest_design)
 }
 \arguments{
-\item{session}{}
+\item{unit_times}{A table with unit times in hours for different forest measurement operations.}
+
+\item{plot_design}{Plot design variables, i.e. number of subplots, distance between them, subplot radius, etc.}
+
+\item{nest_design}{Unit time to measure trees in nested subplots for various tree sizes.}
 }
 \description{
-Calculate unit plot time based on plot design
+Calculate the time for the different forest operations to measure one forest plot.
+Based on Sylla and Picard 2007: Guide methodologique des evaluations rapides de
+bois energie and Scott 1993: Optimal design of a plot cluster for monitoring.
+Optimized for shiny_NFI_optimize() Shiny application. See the example for the exact
+column names in each input.
+}
+\examples{
+time_input <- data.frame(
+  drive_time    = 1,  ## h
+  walk_time     = 1,  ## h
+  auth_time     = 1,  ## h
+ march_speed   = 2,  ## km/h
+ working_hours = 9,  ## h/day
+  working_days  = 21  ## days/month
+)
+
+params_input <- data.frame(
+  subplot_count       = 5,
+  distance_multiplier = 2, ## multiplier of plot radius as input for subplot distance
+  nest1_radius        = 18,
+  nest2_radius        = 10,
+  plot_shape          = "L",
+  allowable_error     = 10
+)
+
+nest_input <- data.frame(
+  nested_level = c("lvl1", "lvl2", "lvl3"),
+  dbh_min      = c(30, 10, 2),
+  tree_density = c(300, 1000, 1500), ## nb trees / ha
+  time_measure = c(3, 2, 0.5)  ## in nb min /tree
+)
+
+calc_time(unit_times = time_input, plot_design = params_input, nest_design = nest_input)
+
 }
