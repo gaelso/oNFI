@@ -1,13 +1,12 @@
-
-
 #' CV approach 1 submodule UI function
 #'
-#' @param id
+#' @description Shiny sub-module to assess forest coefficient of variation from existing biomass maps.
 #'
-#' @return
-#' @export
+#' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @examples
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
 submod_CV_a1_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

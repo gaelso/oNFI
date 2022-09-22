@@ -1,13 +1,12 @@
-
-
 #' CV approach 2 submodule UI function
 #'
-#' @param id
+#' @description Shiny sub-module to assess forest coefficient of variation from a model.
 #'
-#' @return
-#' @export
+#' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @examples
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
 submod_CV_a2_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

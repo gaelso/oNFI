@@ -1,15 +1,6 @@
-
-
 #' CV approach 1 submodule server function
 #'
-#' @param id
-#' @param rv
-#' @param rv_cv
-#'
-#' @return
-#' @export
-#'
-#' @examples
+#' @noRd
 submod_CV_a1_server <- function(id, rv, rv_cv) {
 
   moduleServer(id, function(input, output, session) {

@@ -1,12 +1,12 @@
-
 #' CV module UI function
 #'
-#' @param id
+#' @description Shiny module to setup a forest coefficient of variation model.
 #'
-#' @return
-#' @export
+#' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @examples
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
 mod_CV_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

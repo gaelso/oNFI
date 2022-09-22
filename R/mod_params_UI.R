@@ -1,12 +1,12 @@
-
 #' Optimization parameters module UI function
 #'
-#' @param id
+#' @description Shiny module to set forest plot design parameters range for optimization.
 #'
-#' @return
-#' @export
+#' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @examples
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
 mod_params_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

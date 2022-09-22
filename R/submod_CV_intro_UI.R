@@ -1,13 +1,12 @@
-
-
 #' CV intro submodule UI function
 #'
-#' @param id
+#' @description Shiny sub-module to introduce the CV module.
 #'
-#' @return
-#' @export
+#' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @examples
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
 submod_CV_intro_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

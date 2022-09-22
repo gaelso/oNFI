@@ -1,14 +1,12 @@
-
-
-
 #' Inventory unit time module UI function
 #'
-#' @param id
+#' @description Shiny module to set unit times for forest inventory operations.
 #'
-#' @return
-#' @export
+#' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @examples
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
 mod_time_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

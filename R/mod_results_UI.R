@@ -1,12 +1,12 @@
-
 #' Optimization results module server function
 #'
-#' @param id
+#' @description Shiny module to show optimization results and finalize design.
 #'
-#' @return
-#' @export
+#' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @examples
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
 mod_results_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

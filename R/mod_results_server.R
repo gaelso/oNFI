@@ -1,13 +1,6 @@
-
 #' Optimization results module server function
 #'
-#' @param id
-#' @param rv
-#'
-#' @return
-#' @export
-#'
-#' @examples
+#' @noRd
 mod_results_server <- function(id, rv) {
   moduleServer(id, function(input, output, session) {
 

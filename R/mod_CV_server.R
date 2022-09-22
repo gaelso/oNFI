@@ -1,14 +1,6 @@
-
-
 #' CV module server function
 #'
-#' @param id
-#' @param rv
-#'
-#' @return
-#' @export
-#'
-#' @examples
+#' @noRd
 mod_CV_server <- function(id, rv) {
 
   moduleServer(id, function(input, output, session) {
