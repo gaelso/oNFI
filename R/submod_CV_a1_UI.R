@@ -6,7 +6,11 @@
 #'
 #' @noRd
 #'
+#' @import ggplot2
 #' @importFrom shiny NS tagList
+#' @importFrom terra mask as.data.frame rast crop vect project ext intersect
+#' @importFrom sf st_read st_area st_transform st_crs st_bbox
+#' @importFrom stringr str_sub
 submod_CV_a1_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html

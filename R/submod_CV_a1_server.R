@@ -78,7 +78,7 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
 
       req(input$AOI)
 
-      rv_cv$sf_aoi <- st_read(input$AOI$datapath)
+      rv_cv$sf_aoi <- sf::st_read(input$AOI$datapath)
 
       shinyjs::hide("msg_step_aoi_file")
       shinyjs::show("msg_step_aoi_file_ok")
@@ -204,37 +204,37 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
 
       rv_cv$df_santoro <- terra::mask(rv_cv$rs_santoro, terra::vect(rv_cv$sf_aoi)) %>%
         terra::as.data.frame(rv_cv$rs_santoro, xy = TRUE) %>%
-        as_tibble() %>%
-        na.omit()
+        dplyr::as_tibble() %>%
+        stats::na.omit()
 
-      updateProgressBar(session = session, id = "prog_sant", value = 100, status = "success")
+      shinyWidgets::updateProgressBar(session = session, id = "prog_sant", value = 100, status = "success")
 
 
 
       ## + Calculate CV =====================================================
 
       rv_cv$cv_avitabile <- get_CV_AGB(df = rv_cv$df_avitabile, agb_min = input$agb_min) %>%
-        mutate(
+        dplyr::mutate(
           area_init = terra::res(rv_cv$rs_avitabile)[1]^2 / 100^2,
           source    = "Avitabile et al. 2016"
           )
 
       rv_cv$cv_santoro <- get_CV_AGB(df = rv_cv$df_santoro, agb_min = input$agb_min) %>%
-        mutate(
+        dplyr::mutate(
           area_init = terra::res(rv_cv$rs_santoro)[1]^2 / 100^2,
           source    = "Santoro et al. 2018"
         )
 
       ## Pass cv_mixed and area_aoi to global reactive Value
-      rv$cv_model$cv_mixed <- tibble(
+      rv$cv_model$cv_mixed <- dplyr::tibble(
         cv_init   = mean(c(rv_cv$cv_santoro$cv_init, rv_cv$cv_avitabile$cv_init)),
         area_init = max(c(rv_cv$cv_santoro$area_init, rv_cv$cv_avitabile$area_init)),
         source = "Average CV"
       )
 
-      rv$cv_model$area_aoi <- round(as.numeric(st_area(rv_cv$sf_aoi)) / 1000^2)
+      rv$cv_model$area_aoi <- round(as.numeric(sf::st_area(rv_cv$sf_aoi)) / 1000^2)
 
-      updateProgressBar(session = session, id = "prog_cv", value = 100, status = "success")
+      shinyWidgets::updateProgressBar(session = session, id = "prog_cv", value = 100, status = "success")
 
       }) ## END observeEvent spatial analysis
 
@@ -249,7 +249,7 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
       req(rv_cv$sf_aoi, rv_cv$df_avitabile, rv_cv$df_santoro)
 
       gr1 <- ggplot() +
-        geom_tile(data = rv_cv$df_avitabile, aes(x = x, y = y, fill = agb_avitabile)) +
+        geom_tile(data = rv_cv$df_avitabile, aes(x = .data$x, y = .data$y, fill = .data$agb_avitabile)) +
         scale_fill_viridis_c(direction = -1) +
         geom_sf(data = rv_cv$sf_aoi, fill = NA, col = "darkred", size = 1) +
         theme_bw() +
@@ -258,7 +258,7 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
         labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
 
       gr2 <- ggplot() +
-        geom_tile(data = rv_cv$df_santoro, aes(x = x, y = y, fill = agb_santoro)) +
+        geom_tile(data = rv_cv$df_santoro, aes(x = .data$x, y = .data$y, fill = .data$agb_santoro)) +
         scale_fill_viridis_c(direction = -1) +
         geom_sf(data = rv_cv$sf_aoi, fill = NA, col = "darkred", size = 1) +
         theme_bw() +
@@ -276,8 +276,8 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
       req(rv_cv$cv_avitabile, rv_cv$cv_santoro, rv$cv_model$cv_mixed)
 
       rv_cv$cv_avitabile %>%
-        bind_rows(rv_cv$cv_santoro) %>%
-        bind_rows(rv$cv_model$cv_mixed)
+        dplyr::bind_rows(rv_cv$cv_santoro) %>%
+        dplyr::bind_rows(rv$cv_model$cv_mixed)
 
     })
 

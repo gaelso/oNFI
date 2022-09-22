@@ -24,7 +24,10 @@
 #' @param plot_design Plot design variables, i.e. number of subplots, distance between them, subplot radius, etc.
 #' @param nest_design Unit time to measure trees in nested subplots for various tree sizes.
 #'
-#' @return
+#' @return a dataframe with total time and specific time for different operations
+#'
+#' @importFrom dplyr mutate case_when filter tibble
+#' @importFrom rlang .data
 #'
 #' @examples
 #' time_input <- data.frame(
@@ -60,8 +63,8 @@ calc_time <- function(unit_times, plot_design, nest_design) {
   ## Add variables to plot_design
   ## Subplot average distance
   plot_design <- plot_design %>%
-    mutate(
-      subplot_distance     = distance_multiplier * nest1_radius,
+    dplyr::mutate(
+      subplot_distance = .data$distance_multiplier * .data$nest1_radius,
       subplot_avg_distance = dplyr::case_when(
         subplot_count == 1   ~ as.integer(subplot_distance),
         plot_shape    == "L" ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
@@ -81,9 +84,9 @@ calc_time <- function(unit_times, plot_design, nest_design) {
   time_auth <- unit_times$auth_time
 
   ## Time to measure trees = subplot_count * subplot_area (ha) * tree_density (tree/ha) * time_measure (min/tree)
-  lvl1 <- nest_design %>% filter(nested_level == "lvl1")
-  lvl2 <- nest_design %>% filter(nested_level == "lvl2")
-  lvl3 <- nest_design %>% filter(nested_level == "lvl3")
+  lvl1 <- dplyr::filter(nest_design, .data$nested_level == "lvl1")
+  lvl2 <- dplyr::filter(nest_design, .data$nested_level == "lvl2")
+  lvl3 <- dplyr::filter(nest_design, .data$nested_level == "lvl3")
 
   time_measure_lvl1 <- pi * (plot_design$nest1_radius / 100)^2 * lvl1$tree_density * lvl1$time_measure / 60
   time_measure_lvl2 <- pi * (plot_design$nest2_radius / 100)^2 * lvl2$tree_density * lvl2$time_measure / 60

@@ -7,25 +7,30 @@
 #'              (An integrated pan-tropical biomass map using multiple reference
 #'              datasets) available to use in R. It requires a directory path, checks
 #'              if the data is already there, if not download the data, and load in
-#'              the R environement as a terra::rast object. Additionally if the user
+#'              the R environment as a terra::rast object. Additionally if the user
 #'              provide a spatial area boundaries (as simple feature object, see sf)
 #'              the raster biomass data is clipped to the sf object extent.
 #'
 #' @param path_data a path to download or load the biomass map.
 #' @param progress_id,session in a Shiny context, links to a shinyWidgets::progressBar() object
 #' @param sf_aoi a simple feature object to clip the raster data
-#' @param url url for downloading the map. Defaults to:
+#' @param url URL for downloading the map. Defaults to:
 #'            http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip
+
 #'
-#' @return
+#' @return a raster object of type terra::rast()
+#'
+#' @importFrom shinyWidgets updateProgressBar
 #'
 #' @examples
+#' \dontrun{
 #' path_data <- tempdir(dir.create("data", showWarnings = F))
 #'
 #' rs_avitabile <- get_avitabile(path_data = path_data)
 #' plot(rs_avitabile)
 #'
 #' unlink(path_data)
+#'}
 #'
 #' @export
 get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL,
@@ -35,7 +40,7 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
   ## Check AOI CRS
   if(!is.null(sf_aoi)){
 
-    epsg_value <- st_crs(sf_aoi)$srid %>% str_remove("EPSG:") %>% as.numeric()
+    epsg_value <- sf::st_crs(sf_aoi)$srid %>% stringr::str_remove("EPSG:") %>% as.numeric()
     if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric unit and WGS 84 UTM zone")
 
   }
@@ -44,9 +49,9 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
 
   ## + Download if necessary ----
   ## Get file name from URL
-  server_filename <- str_remove(url, ".*/")
-  file_ext        <- str_sub(server_filename, start = -4, end = -1)
-  sans_ext        <- str_remove(server_filename, file_ext)
+  server_filename <- stringr::str_remove(url, ".*/")
+  file_ext        <- stringr::str_sub(server_filename, start = -4, end = -1)
+  sans_ext        <- stringr::str_remove(server_filename, file_ext)
 
   ## Check if the data is already downloaded
   check1 <- sans_ext %in% list.files(path_data)
@@ -80,7 +85,7 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
   }
 
   ## Update progress
-  if (!is.null(progress_id)) updateProgressBar(session = session, id = progress_id, value = 50)
+  if (!is.null(progress_id)) shinyWidgets::updateProgressBar(session = session, id = progress_id, value = 50)
 
 
 
@@ -94,13 +99,13 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
   ## + Crop to AOI
   if (!is.null(sf_aoi)){
 
-    sf_aoi_wgs84 <- sf_aoi %>% st_transform(crs = 4326)
+    sf_aoi_wgs84 <- sf_aoi %>% sf::st_transform(crs = 4326)
 
     #sf_aoi2 <- sf_aoi %>% st_buffer(dist = 1)
 
     rs_out <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
 
-    rs_out_proj <- terra::project(rs_out, st_crs(sf_aoi)$srid, method = "near")
+    rs_out_proj <- terra::project(rs_out, sf::st_crs(sf_aoi)$srid, method = "near")
 
   } else {
 

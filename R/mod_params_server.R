@@ -1,6 +1,7 @@
 #' Optimization parameters module server function
 #'
 #' @noRd
+utils::globalVariables("where")
 mod_params_server <- function(id, rv) {
   moduleServer(id, function(input, output, session) {
 
@@ -177,17 +178,17 @@ mod_params_server <- function(id, rv) {
     observe({
 
       rv$params$combi <- expand.grid(rv$params$list_params) %>%
-        as_tibble(.) %>%
-        mutate(across(where(is.double), as.integer)) %>%
-        mutate(across(where(is.factor), as.character)) %>%
-        mutate(id = 1:nrow(.)) %>%
-        select(id, everything()) %>%
-        mutate(
-          subplot_area     = round(pi * nest1_radius^2 /100^2, 3),
-          subplot_area2    = round(pi * nest2_radius^2 /100^2, 3),
-          subplot_distance = distance_multiplier * nest1_radius,
-          subplot_avg_distance = case_when(
-            subplot_count == 1 ~ subplot_distance,
+        dplyr::as_tibble(.data) %>%
+        dplyr::mutate(dplyr::across(where(is.double), as.integer)) %>%
+        dplyr::mutate(dplyr::across(where(is.factor), as.character)) %>%
+        dplyr::mutate(id = 1:nrow(.data)) %>%
+        dplyr::select(id, dplyr::everything()) %>%
+        dplyr::mutate(
+          subplot_area     = round(pi * .data$nest1_radius^2 /100^2, 3),
+          subplot_area2    = round(pi * .data$nest2_radius^2 /100^2, 3),
+          subplot_distance = .data$distance_multiplier * .data$nest1_radius,
+          subplot_avg_distance = dplyr::case_when(
+            subplot_count == 1 ~ as.integer(subplot_distance),
             plot_shape == "L"  ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
             TRUE ~ NA_integer_
           )
@@ -221,7 +222,7 @@ mod_params_server <- function(id, rv) {
       shinyjs::show("opti_progress")
       shinyjs::hide("box_to_results")
 
-      updateProgressBar(session = session, id = "prog_opti", value = 0, status = "primary")
+      shinyWidgets::updateProgressBar(session = session, id = "prog_opti", value = 0, status = "primary")
 
       rv$params$results <- NULL
 
@@ -229,12 +230,12 @@ mod_params_server <- function(id, rv) {
 
       ## + Calculate design indicators ======================================
 
-      rv$params$results <- map_dfr(1:nrow(rv$params$combi), function(x){
+      rv$params$results <- purrr::map_dfr(1:nrow(rv$params$combi), function(x){
 
         #if (x == round(x/50)*50) print(paste("calculating combination ", x, "out of ", nrow(rv$params$combi)))
 
         ## + + Update progress ----------------------------------------------
-        updateProgressBar(
+        shinyWidgets::updateProgressBar(
           session = session,
           id      = "prog_opti",
           value   = x,
@@ -244,17 +245,17 @@ mod_params_server <- function(id, rv) {
 
         ## + + Get 1 set of parameters --------------------------------------
         params <- rv$params$combi %>%
-          slice(x) %>%
-          mutate(
-            subplot_distance     = distance_multiplier * nest1_radius,
-            subplot_area         = pi * (nest1_radius / 100)^2,
-            plot_area            = subplot_area * subplot_count,
-            subplot_avg_distance = case_when(
-              subplot_count == 1   ~ subplot_distance,
-              plot_shape    == "L" ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
-              TRUE ~ subplot_distance
-              )
-            )
+          dplyr::slice(x) %>%
+          # dplyr::mutate(
+          #   subplot_distance     = distance_multiplier * nest1_radius,
+          #   subplot_area         = pi * (nest1_radius / 100)^2,
+          #   plot_area            = subplot_area * subplot_count,
+          #   subplot_avg_distance = dplyr::case_when(
+          #     subplot_count == 1   ~ as.interger(subplot_distance),
+          #     plot_shape    == "L" ~ as.integer(subplot_distance * (subplot_count - 1) * 2 / subplot_count),
+          #     TRUE ~ subplot_distance
+          #     )
+          #   )
 
         ## + + Calculate CV -------------------------------------------------
         if (rv$cv_model$cv_approach == "a1") {
@@ -278,7 +279,7 @@ mod_params_server <- function(id, rv) {
         }
 
         ## + + Number of plots ----------------------------------------------
-        n_plot <- ceiling((cv * qt(.95, df=Inf) / as.numeric(params$allowable_error))^2)
+        n_plot <- ceiling((cv * stats::qt(.95, df=Inf) / as.numeric(params$allowable_error))^2)
 
         ## + + Calculate plot time ------------------------------------------
         plot_time <- calc_time(
@@ -286,7 +287,7 @@ mod_params_server <- function(id, rv) {
           unit_times  = rv$time$unit_times,
           nest_design = rv$time$nested_plot
           ) %>%
-          mutate(id = params$id)
+          dplyr::mutate(id = params$id)
 
 
         ## + + Calculate total time -----------------------------------------
@@ -294,13 +295,13 @@ mod_params_server <- function(id, rv) {
 
         ## + + Output the parameters with the calculation results -----------
         params %>%
-          mutate(cv = cv, n_plot = n_plot, total_time = total_time) %>%
+          dplyr::mutate(cv = cv, n_plot = n_plot, total_time = total_time) %>%
           #mutate(cv = cv, n_plot = n_plot) %>%
-          left_join(plot_time, by = "id")
+          dplyr::left_join(plot_time, by = "id")
 
       })
 
-      updateProgressBar(session = session, id = "prog_opti", value = nrow(rv$params$combi), status = "success")
+      shinyWidgets::updateProgressBar(session = session, id = "prog_opti", value = nrow(rv$params$combi), status = "success")
 
     })
 
@@ -315,11 +316,11 @@ mod_params_server <- function(id, rv) {
 
       if (rv$cv_model$cv_approach == "a1") {
 
-        med_nest2 <- round(median(rv$params$results$nest2_radius))
-        med_dist  <- round(median(rv$params$results$distance_multiplier))
+        med_nest2 <- round(stats::median(rv$params$results$nest2_radius))
+        med_dist  <- round(stats::median(rv$params$results$distance_multiplier))
 
         tt <- rv$params$results %>%
-          filter(
+          dplyr::filter(
             rv$params$results$nest2_radius == med_nest2,
             rv$params$results$distance_multiplier == med_dist,
           )
@@ -330,24 +331,24 @@ mod_params_server <- function(id, rv) {
 
       }
 
-      ggplot(tt, aes(x = total_time, y = cv)) +
+      ggplot(tt, aes(x = .data$total_time, y = .data$cv)) +
         geom_point(aes(
-          color = n_plot,
-          fill = n_plot,
-          shape = as.factor(subplot_count),
-          size = nest1_radius
+          color = .data$n_plot,
+          fill  = .data$n_plot,
+          shape = as.factor(.data$subplot_count),
+          size  = .data$nest1_radius
         )) +
         scale_color_viridis_c(alpha = 0.8) +
         scale_fill_viridis_c(alpha = 0.8) +
         scale_shape_manual(values = c(21, 22, 23, 24, 25, 8, 9, 7)) +
         theme_bw() +
         labs(
-          x = "Time (months)",
-          y = "CV (%)",
+          x     = "Time (months)",
+          y     = "CV (%)",
           color = "Number of plots",
-          fill = "Number of plots",
+          fill  = "Number of plots",
           shape = "Number of subplots",
-          size = "subplot level 1 radius (m)"
+          size  = "subplot level 1 radius (m)"
           )
 
     })

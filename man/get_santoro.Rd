@@ -9,13 +9,47 @@ get_santoro(
   progress_id = NULL,
   session = NULL,
   sf_aoi = NULL,
-  tile_name = "N00E140_agb.zip",
+  tile_name = "N00E140_agb",
   url = "globbiomass.org/wp-content/uploads/GB_Maps/"
 )
 }
 \arguments{
-\item{url}{}
+\item{path_data}{a path to download or load the biomass map.}
+
+\item{progress_id, session}{in a Shiny context, links to a shinyWidgets::progressBar() object}
+
+\item{sf_aoi}{a simple feature object with the boundaries of the area of interest. if NULL, a
+tile name is expected.}
+
+\item{tile_name}{In the absence of AOI spatial data (sf_aoi = NULL), a tile name should be specified. See
+https://globbiomass.org/wp-content/uploads/GB_Maps/Globbiomass_global_dataset.html.
+The tile_name is with the form "NxxExx_agb.zip" with xx the longitude and latitude
+tile breaks}
+
+\item{url}{URL for downloading the map. Defaults to: globbiomass.org/wp-content/uploads/GB_Maps/.
+The url is missing the tile_name that comes from either the AOI data or the tile_name.}
+}
+\value{
+a raster object of type terra::rast()
 }
 \description{
-Download Santoro 2018 tiles based on users' area of interest
+This function makes the biomass map from Santoro et al. 2018
+(GlobBiomass global above-ground biomass and growing stock volume datasets)
+available to use in R. It requires a directory path, checks
+if the data is already there, if not download the data, and load in
+the R environment as a terra::rast object. As the data is split into tiles,
+a spatial area boundaries object (as simple feature object, see sf) is required
+to determine which tiles to download. The raster biomass data is
+clipped to the sf object extent. Alternatively users can specify a tile name.
+}
+\examples{
+\dontrun{
+path_data <- tempdir(dir.create("data", showWarnings = F))
+
+rs_santoro <- get_santoro(path_data = path_data, tile_name = "N00E100_agb")
+plot(rs_santoro)
+
+unlink(path_data)
+}
+
 }

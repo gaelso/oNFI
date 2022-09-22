@@ -20,24 +20,29 @@ get_avitabile(
 
 \item{sf_aoi}{a simple feature object to clip the raster data}
 
-\item{url}{url for downloading the map. Defaults to:
+\item{url}{URL for downloading the map. Defaults to:
 http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip}
+}
+\value{
+a raster object of type terra::rast()
 }
 \description{
 This function makes the biomass map from Avitabile et al. 2016
 (An integrated pan-tropical biomass map using multiple reference
 datasets) available to use in R. It requires a directory path, checks
 if the data is already there, if not download the data, and load in
-the R environement as a terra::rast object. Additionally if the user
+the R environment as a terra::rast object. Additionally if the user
 provide a spatial area boundaries (as simple feature object, see sf)
 the raster biomass data is clipped to the sf object extent.
 }
 \examples{
+\dontrun{
 path_data <- tempdir(dir.create("data", showWarnings = F))
 
 rs_avitabile <- get_avitabile(path_data = path_data)
 plot(rs_avitabile)
 
 unlink(path_data)
+}
 
 }

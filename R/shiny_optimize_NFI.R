@@ -7,31 +7,50 @@
 #'
 #' @param ... arguments to pass to shinyApp
 #'
-#' @inheritParams shiny::shinyApp
+#' @import shiny
+#'
+#' @importFrom shiny shinyApp
+#' @importFrom stringr str_remove
+#' @importFrom sysfonts font_add
+#' @importFrom showtext showtext_auto
+#' @importFrom magrittr %>%
+#' @importFrom dplyr mutate filter slice case_when across as_tibble select left_join bind_rows arrange
+#' @importFrom tidyselect everything starts_with
+#' @importFrom purrr map_dfr
+#' @importFrom readr write_csv
+#' @importFrom utils globalVariables
+#' @importFrom stats median na.omit
+#' @importFrom rlang .data
+#'
+#' @examples
+#' if (interactive()) {
+#'
+#' shiny_optimize_NFI()
+#'
+#' }
 #'
 #' @export
-#' @importFrom shiny shinyApp
 shiny_optimize_NFI <- function(...) {
 
   ## GLOBAL #################################################################
 
   ## + Libraries
-  library(shiny)
-  library(shinyjs)
-  library(shinyWidgets)
-  library(shinyFiles)
-  library(sf)
-  library(terra)
-  library(extrafont)
-  library(tidyverse)
-  library(stringr)
-  library(ggspatial)
-  library(ggpubr)
-  library(showtext)
+  # library(shiny)
+  # library(shinyjs)
+  # library(shinyWidgets)
+  # library(shinyFiles)
+  # library(sf)
+  # library(terra)
+  # library(extrafont)
+  # library(tidyverse)
+  # library(stringr)
+  # library(ggspatial)
+  # library(ggpubr)
+  # library(showtext)
 
   if ("fonts" %in% list.files()) {
 
-    font_files <- list.files("fonts", recursive = TRUE) %>% str_remove(".*/")
+    font_files <- list.files("fonts", recursive = TRUE) %>% stringr::str_remove(".*/")
 
     if ("Lora-Italic.ttf" %in% font_files) {
       path_lora <- list.files("fonts", recursive = TRUE, full.names = TRUE, pattern = "Lora-Italic.ttf")

@@ -13,6 +13,9 @@ calc_time(unit_times, plot_design, nest_design)
 
 \item{nest_design}{Unit time to measure trees in nested subplots for various tree sizes.}
 }
+\value{
+a dataframe with total time and specific time for different operations
+}
 \description{
 Calculate the time for the different forest operations to measure one forest plot.
 Based on Sylla and Picard 2007: Guide methodologique des evaluations rapides de

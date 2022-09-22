@@ -1,14 +1,15 @@
 
 
-#' Title
+#' Coefficient of variation and additional info from raster file
 #'
-#' @param df
-#' @param agb_min
+#' @param df a raster data in data frame format (using for ex. terra::as.data.frame())
+#' @param agb_min a minimum value for the data to be included in the calculations
 #'
-#' @return
-#' @export
+#' @importFrom dplyr pull if_else summarise
+#' @importFrom rlang .data
+#' @importFrom stats sd
 #'
-#' @examples
+#' @noRd
 get_CV_AGB <- function(df, agb_min = 20){
 
   ## Checks
@@ -22,15 +23,15 @@ get_CV_AGB <- function(df, agb_min = 20){
   names(df)[3] <- "agb"
 
   df %>%
-    mutate(agb = if_else(is.na(agb), 0, agb)) %>%
-    filter(agb >= agb_min) %>%
+    mutate(agb = if_else(is.na(.data$agb), 0, .data$agb)) %>%
+    filter(.data$agb >= agb_min) %>%
     summarise(
-      n_pix = n(),
-      agb_mean = round(mean(agb), 2),
-      agb_sd = round(sd(agb), 2),
+      n_pix = dplyr::n(),
+      agb_mean = round(mean(.data$agb), 2),
+      agb_sd = round(stats::sd(.data$agb), 2),
     ) %>%
     mutate(
-      cv_init = round(agb_sd / agb_mean * 100, 1)
+      cv_init = round(.data$agb_sd / .data$agb_mean * 100, 1)
     )
 
   }

@@ -143,15 +143,15 @@ mod_time_server <- function(id, rv) {
             TRUE ~ 0
           )
         ) %>%
-        dplyr::select(starts_with("check")) %>%
-        mutate(across(.fns = ~replace(., . == 1, "Default value"))) %>%
-        mutate(across(.fns = ~replace(., . == 0 , "User defined")))
+        dplyr::select(tidyselect::starts_with("check")) %>%
+        dplyr::mutate(dplyr::across(.fns = ~replace(., . == 1, "Default value"))) %>%
+        dplyr::mutate(dplyr::across(.fns = ~replace(., . == 0 , "User defined")))
 
       rv_time$check_nested_vec <- c(rv_time$check_nested$check_dbh,
                                     rv_time$check_nested$check_density,
                                     rv_time$check_nested$check_time)
 
-      rv$time$check_nested_default <- if_else(
+      rv$time$check_nested_default <- dplyr::if_else(
         identical(rv_time$check_nested_vec, rep("Default value", 9)),
         "All default values",
         "At least some user inputs"
@@ -165,20 +165,20 @@ mod_time_server <- function(id, rv) {
       req(rv$time$unit_times)
 
       rv_time$check_time <- rv$time$unit_times %>%
-        mutate(
-          drive_time   = if_else(drive_time   == 0.5, 1, 0),
-          walk_time    = if_else(walk_time    ==   1, 1, 0),
-          march_speed  = if_else(march_speed  ==   2, 1, 0),
-          auth_time    = if_else(auth_time    ==   2, 1, 0),
-          working_hour = if_else(working_hour ==   9, 1, 0),
-          working_day  = if_else(working_day  ==  21, 1, 0)
+        dplyr::mutate(
+          drive_time   = dplyr::if_else(.data$drive_time   == 0.5, 1, 0),
+          walk_time    = dplyr::if_else(.data$walk_time    ==   1, 1, 0),
+          march_speed  = dplyr::if_else(.data$march_speed  ==   2, 1, 0),
+          auth_time    = dplyr::if_else(.data$auth_time    ==   2, 1, 0),
+          working_hour = dplyr::if_else(.data$working_hour ==   9, 1, 0),
+          working_day  = dplyr::if_else(.data$working_day  ==  21, 1, 0)
         ) %>%
-        mutate(across(.fns = ~replace(., . == 1, "Default value"))) %>%
-        mutate(across(.fns = ~replace(., . == 0 , "User defined")))
+        dplyr::mutate(dplyr::across(.fns = ~replace(., . == 1, "Default value"))) %>%
+        dplyr::mutate(dplyr::across(.fns = ~replace(., . == 0 , "User defined")))
 
       rv_time$check_time_vec <- as.character(rv_time$check_time)
 
-      rv$time$check_time_default <- if_else(
+      rv$time$check_time_default <- dplyr::if_else(
         identical(rv_time$check_time_vec, rep("Default value", 6)),
         "All default values",
         "At least some user inputs"
@@ -199,12 +199,12 @@ mod_time_server <- function(id, rv) {
 
     output$other_check1 <- renderTable({
       req(rv_time$check_time)
-      rv_time$check_time %>% dplyr::select(drive_time, walk_time, march_speed)
+      rv_time$check_time %>% dplyr::select(.data$drive_time, .data$walk_time, .data$march_speed)
     })
 
     output$other_check2 <- renderTable({
       req(rv_time$check_time)
-      rv_time$check_time %>% dplyr::select(auth_time, working_hour, working_day)
+      rv_time$check_time %>% dplyr::select(.data$auth_time, .data$working_hour, .data$working_day)
     })
 
 

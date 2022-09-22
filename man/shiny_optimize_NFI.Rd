@@ -15,3 +15,11 @@ inventory design for cost and precision based on different approaches to forest
 coefficient of variation for a key variable, user defined unit times for forest
 operations and a range of plot design parameters.
 }
+\examples{
+if (interactive()) {
+
+shiny_optimize_NFI()
+
+}
+
+}
