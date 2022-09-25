@@ -8,7 +8,8 @@
 
 ^LICENSE\.md$
 
-^offline_use.md
+^offline_use.md$
 
 ^\.github$
 
+^.R$
