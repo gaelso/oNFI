@@ -49,46 +49,17 @@ mod_time_server <- function(id, rv) {
         shinyjs::show("require_cv")
         shinyjs::hide("content_time")
       } else if (rv$cv_model$cv_approach == "a1" & is.null(rv$cv_model$cv_mixed)) {
-        shinyjs::show("set_cv")
-        shinyjs::hide("require_time")
-      } else if (rv$cv_model$cv_approach == "a1" & !is.null(rv$cv_model$cv_mixed)) {
-        shinyjs::hide("set_cv")
-        shinyjs::show("require_time")
-        shinyjs::show("msg_a1")
-      } else if (rv$cv_model$cv_approach == "a2") {
-        shinyjs::hide("set_cv")
-        shinyjs::show("require_time")
-        shinyjs::hide("msg_a1")
-      }
-      req(rv$cv_model$cv_approach)
-
-      if (rv$cv_model$cv_approach == "a2") {
-        shinyjs::hide("require_cv")
-        shinyjs::show("content_time")
-        shinyjs::show("box_time_to_opti")
-      } else {
         shinyjs::show("require_cv")
         shinyjs::hide("content_time")
-        shinyjs::hide("box_time_to_opti")
+      } else if (rv$cv_model$cv_approach == "a1" & !is.null(rv$cv_model$cv_mixed)) {
+        shinyjs::hide("require_cv")
+        shinyjs::show("content_time")
+        shinyjs::show("msg_a1")
+      } else if (rv$cv_model$cv_approach == "a2") {
+        shinyjs::hide("require_cv")
+        shinyjs::show("content_time")
+        shinyjs::hide("msg_a1")
       }
-
-    })
-
-    observe({
-
-      req(rv$cv_model$cv_approach)
-      req(rv$cv_model$cv_mixed)
-
-      if (rv$cv_model$cv_approach == "a1") {
-        shinyjs::hide("check_approach")
-        shinyjs::show("unit_times")
-        shinyjs::show("box_time_to_opti")
-      } else {
-        shinyjs::show("check_approach")
-        shinyjs::hide("unit_times")
-        shinyjs::hide("box_time_to_opti")
-      }
-
     })
 
 
