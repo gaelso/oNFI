@@ -51,7 +51,7 @@ submod_opti_calc_server <- function(id, rv) {
           cv <- calc_CV_a1(
             cv_init   = rv$cv_model$cv_mixed$cv_init,
             area_init = rv$cv_model$cv_mixed$area_init,
-            area_opti = round(pi * (params$nest1_radius / 100)^2) * params$subplot_count
+            area_opti = round(pi * (params$nest1_radius / 100)^2, 3) * params$subplot_count
             )
 
         } else if (rv$cv_model$cv_approach == "a2") {
