@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_params_UI <- function(id){
+mod_opti_UI <- function(id){
 
   ## From https://shiny.rstudio.com/articles/modules.html
   # `NS(id)` returns a namespace function, which was save as `ns` and will
@@ -57,7 +57,7 @@ mod_params_UI <- function(id){
     ),
 
     wellPanel(
-      id = ns("params_intro"),
+      id = ns("opti_intro"),
 
       p(strong("Overview")),
 
@@ -75,13 +75,13 @@ mod_params_UI <- function(id){
     ## Parameters interface #################################################
     ##
 
-    h4("Parameters to be tested"),
+    h4("Plot design parameters to optimize"),
 
     br(),
 
     ## Message if previous steps not completed
     wellPanel(
-      id = ns("check_approach"),
+      id = ns("require_cv"),
 
       p("First choose a CV model approach",
         style = "color: #dc3545; font-style: italic; text-align: center;"),  ## Bootstrap danger color
@@ -95,10 +95,9 @@ mod_params_UI <- function(id){
 
     ## if approach chosen, show the interface
     shinyjs::hidden(div(
-      id = ns("params_setup"),
+      id = ns("content_opti"),
 
       sidebarLayout(
-
 
 
         ## + Parameter inputs ===============================================
@@ -164,17 +163,15 @@ mod_params_UI <- function(id){
             inline = TRUE
           ),
 
-          br(),
-
-          p(id = ns("msg_shape_L"),
-            "Number of subplots selected not compatible with the plot shape chosen",
-            style = "color: #dc3545; font-style: italic;"),  ## Bootstrap danger color
-
-          actionButton(inputId = ns("calc_opti"), label = "Launch optimization script"),
+          ## When more plot shape available, need add controls and messages
+          # br(),
+          #
+          # p(id = ns("msg_shape_L"),
+          #   "Number of subplots selected not compatible with the plot shape chosen",
+          #   style = "color: #dc3545; font-style: italic;"),  ## Bootstrap danger color
 
           width = 4
         ), ## END sidebarPanel
-
 
 
         ## + Show progress and result overview ==============================
@@ -214,58 +211,72 @@ mod_params_UI <- function(id){
 
           br(),
 
-          ## * * Show optimization progress ---------------------------------
-          shinyjs::hidden(div(
-            id = ns("opti_progress"),
+          ## * * Show Progresss and results ----------------------------------
+          submod_opti_calc_UI(ns("box_opti_calc")),
 
-            p(strong("Optimization script progress")),
+          #   p(strong("Optimization script progress")),
+          #
+          #   shinyWidgets::progressBar(
+          #     id = ns("prog_opti"),
+          #     value = 0,
+          #     total = 10,
+          #     title = "Optimization process",
+          #     display_pct = TRUE
+          #   ),
+          #
+          # )),
+          #
+          # ## * * Show preliminary results -----------------------------------
+          # shinyjs::hidden(div(
+          #   id = ns("box_to_results"),
+          #
+          #   div(
+          #     plotOutput(outputId = ns("gr_cv_cost"), height = 400),
+          #     style = "padding: 0.375em; border: 1px solid #e3e3e3;
+          #   border-radius: 4px; width: 600px;
+          #   margin: 0px auto;"
+          #   ),
+          #
+          #   br(),
+          #
+          #   downloadButton(outputId = ns("download_results"), label = 'Download the results'),
+          #
+          #   br(),
+          #
+          #   h4(icon("arrow-right"),
+          #      "Continue to:",
+          #      HTML("&nbsp;"),
+          #      actionButton(ns("btn_to_results"), "Results")
+          #   )
 
-            shinyWidgets::progressBar(
-              id = ns("prog_opti"),
-              value = 0,
-              total = 10,
-              title = "Optimization process",
-              display_pct = TRUE
-            ),
-
-          )),
-
-          ## * * Show preliminary results -----------------------------------
-          shinyjs::hidden(div(
-            id = ns("box_to_results"),
-
-            div(
-              plotOutput(outputId = ns("gr_cv_cost"), height = 400),
-              style = "padding: 0.375em; border: 1px solid #e3e3e3;
-            border-radius: 4px; width: 600px;
-            margin: 0px auto;"
-            ),
-
-            br(),
-
-            downloadButton(outputId = ns("download_results"), label = 'Download the results'),
-
-            br(),
-
-            h4(icon("arrow-right"),
-               "Continue to:",
-               HTML("&nbsp;"),
-               actionButton(ns("btn_to_results"), "Results")
-            )
-
-          )),
-
-
+          #)),
 
           width = 8
 
         )
 
-      ) ## END sidebar layout
+      ), ## END sidebar layout
+
+      br(),
+
+      ##
+      ## Button to next tab ##################################################
+      ##
+
+      shinyjs::hidden(div(
+        id = ns("box_opti_to_results"),
+
+        h4(icon("arrow-right"),
+           "Continue to:",
+           HTML("&nbsp;"),
+           actionButton(ns("btn_to_results"), "Results")
+        )
+
+      ))
 
 
-    )) ## END div params_setup
+    )) ## END div content_opti
 
   ) ## END tagList
 
-} ## END function params_UI()
+}

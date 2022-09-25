@@ -28,7 +28,7 @@ mod_results_server <- function(id, rv) {
     #
     # output$test_time <- renderText({ paste0("Unit time input: ", rv$time$check_time_default) })
     #
-    # output$test_combi <- renderText({ paste0("Number of combinations to test: ", nrow(rv$params$combi), ".") })
+    # output$test_combi <- renderText({ paste0("Number of combinations to test: ", nrow(rv$opti$combi), ".") })
 
 
     ##
@@ -39,25 +39,25 @@ mod_results_server <- function(id, rv) {
 
     observe({
 
-      req(rv$params$results)
+      req(rv$opti$results)
 
       rv$results$mean <- tibble(
-        subplot_count       = round(mean(rv$params$results$subplot_count)),
-        distance_multiplier = round(mean(rv$params$results$distance_multiplier)),
-        nest1_radius        = round(mean(rv$params$results$nest1_radius)),
-        nest2_radius        = round(mean(rv$params$results$nest2_radius))
+        subplot_count       = round(mean(rv$opti$results$subplot_count)),
+        distance_multiplier = round(mean(rv$opti$results$distance_multiplier)),
+        nest1_radius        = round(mean(rv$opti$results$nest1_radius)),
+        nest2_radius        = round(mean(rv$opti$results$nest2_radius))
       ) %>%
         mutate(
           subplot_count = if_else(
-            condition = rv$params$list_params$plot_shape == "L" & .data$subplot_count %% 2 == 0,
+            condition = rv$opti$list_params$plot_shape == "L" & .data$subplot_count %% 2 == 0,
             true      = .data$subplot_count + 1,
             false     = .data$subplot_count
             )
         )
 
       # rv$results$cv_limit <- tibble(
-      #   min = min(rv$params$results$cv),
-      #   max = max(rv$params$results$cv)
+      #   min = min(rv$opti$results$cv),
+      #   max = max(rv$opti$results$cv)
       # )
 
     })
@@ -67,23 +67,23 @@ mod_results_server <- function(id, rv) {
     ## + Update sliderInputs with average from input parameters =============
 
     observe({
-      req(rv$params$results, rv$results$mean)
+      req(rv$opti$results, rv$results$mean)
 
       updateSliderInput(
         session = session,
         inputId = "subplot_count",
         value   = rv$results$mean$subplot_count,
-        min     = min(rv$params$results$subplot_count),
-        max     = max(rv$params$results$subplot_count),
-        step    = unique(rv$params$step)
+        min     = min(rv$opti$results$subplot_count),
+        max     = max(rv$opti$results$subplot_count),
+        step    = unique(rv$opti$step)
         )
 
       updateSliderInput(
         session = session,
         inputId = "distance_multiplier",
         value   = rv$results$mean$distance_multiplier,
-        min     = min(rv$params$results$distance_multiplier),
-        max     = max(rv$params$results$distance_multiplier),
+        min     = min(rv$opti$results$distance_multiplier),
+        max     = max(rv$opti$results$distance_multiplier),
         step    = 1
       )
 
@@ -91,8 +91,8 @@ mod_results_server <- function(id, rv) {
         session = session,
         inputId = "nest1_radius",
         value   = rv$results$mean$nest1_radius,
-        min     = min(rv$params$results$nest1_radius),
-        max     = max(rv$params$results$nest1_radius),
+        min     = min(rv$opti$results$nest1_radius),
+        max     = max(rv$opti$results$nest1_radius),
         step    = 1
       )
 
@@ -100,8 +100,8 @@ mod_results_server <- function(id, rv) {
         session = session,
         inputId = "nest2_radius",
         value   = rv$results$mean$nest2_radius,
-        min     = min(rv$params$results$nest2_radius),
-        max     = max(rv$params$results$nest2_radius),
+        min     = min(rv$opti$results$nest2_radius),
+        max     = max(rv$opti$results$nest2_radius),
         step    = 1
       )
 
@@ -129,72 +129,78 @@ mod_results_server <- function(id, rv) {
     ## + + CV and time for Subplot count ------------------------------------
     output$gr_subplot_count <- renderPlot({
 
-      req(rv$params$results, rv$results$selected)
+      req(rv$opti$results, rv$results$selected)
 
-      tt<- rv$params$results %>%
-        dplyr::filter(
-          .data$distance_multiplier == rv$results$selected$distance_multiplier,
-          .data$nest1_radius        == rv$results$selected$nest1_radius,
-          .data$nest2_radius        == rv$results$selected$nest2_radius,
-          .data$allowable_error     == "10"
+      if (length(unique(rv$opti$results$subplot_count)) > 1) {
+
+        tt<- rv$opti$results %>%
+          dplyr::filter(
+            .data$distance_multiplier == rv$results$selected$distance_multiplier,
+            .data$nest1_radius        == rv$results$selected$nest1_radius,
+            .data$nest2_radius        == rv$results$selected$nest2_radius,
+            .data$allowable_error     == "10"
           )
 
 
-      axis_coeff1 <- (max(tt$cv) - min(tt$cv)) / (max(tt$total_time) - min(tt$total_time))
-      axis_coeff2 <- max(tt$cv) - axis_coeff1 * max(tt$total_time)
+        axis_coeff1 <- (max(tt$cv) - min(tt$cv)) / (max(tt$total_time) - min(tt$total_time))
+        axis_coeff2 <- max(tt$cv) - axis_coeff1 * max(tt$total_time)
 
-      ggplot(tt, aes(x = .data$subplot_count)) +
-        geom_line(aes(y = .data$cv)) +
-        geom_line(aes(y = .data$total_time * axis_coeff1 + axis_coeff2), linetype = "dashed") +
-        scale_y_continuous(
-          name = "----- CV (%)",
-          #limits = c(rv$results$cv_limit$min, rv$results$cv_limit$max),
-          sec.axis = sec_axis(~ (.data - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
+        ggplot(tt, aes(x = .data$subplot_count)) +
+          geom_line(aes(y = .data$cv)) +
+          geom_line(aes(y = .data$total_time * axis_coeff1 + axis_coeff2), linetype = "dashed") +
+          scale_y_continuous(
+            name = "----- CV (%)",
+            #limits = c(rv$results$cv_limit$min, rv$results$cv_limit$max),
+            sec.axis = sec_axis(~ (. - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
           ) +
-        labs(x = "Number of subplots") +
-        theme_bw()
+          labs(x = "Number of subplots") +
+          theme_bw()
+
+      }
 
     })
 
     ## + + CV and time for nest radius level 1 ------------------------------
     output$gr_nest1_radius <- renderPlot({
 
-      req(rv$params$results, rv$results$selected)
+      req(rv$opti$results, rv$results$selected)
 
-      tt <- rv$params$results %>%
-        dplyr::filter(
-          .data$subplot_count       == rv$results$selected$subplot_count,
-          .data$distance_multiplier == rv$results$selected$distance_multiplier,
-          .data$nest2_radius        == rv$results$selected$nest2_radius,
-          .data$allowable_error     == "10"
-        )
+      if (length(unique(rv$opti$results$nest1_radius)) > 1) {
 
-      axis_coeff1 <- (max(tt$cv) - min(tt$cv)) / (max(tt$total_time) - min(tt$total_time))
-      axis_coeff2 <- max(tt$cv) - axis_coeff1 * max(tt$total_time)
+        tt <- rv$opti$results %>%
+          dplyr::filter(
+            .data$subplot_count       == rv$results$selected$subplot_count,
+            .data$distance_multiplier == rv$results$selected$distance_multiplier,
+            .data$nest2_radius        == rv$results$selected$nest2_radius,
+            .data$allowable_error     == "10"
+          )
 
-      ggplot(tt, aes(x = .data$nest1_radius)) +
-        geom_line(aes(y = .data$cv)) +
-        geom_line(aes(y = .data$total_time * axis_coeff1 +  axis_coeff2), linetype = "dashed") +
-        scale_y_continuous(
-          name = "----- CV (%)",
-          #limits = c(rv$results$cv_limit$min, rv$results$cv_limit$max),
-          sec.axis = sec_axis(~ (.data - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
-        ) +
-        labs(x = "Radius of suplot for large trees (m)") +
-        theme_bw()
+        axis_coeff1 <- (max(tt$cv) - min(tt$cv)) / (max(tt$total_time) - min(tt$total_time))
+        axis_coeff2 <- max(tt$cv) - axis_coeff1 * max(tt$total_time)
+
+        ggplot(tt, aes(x = .data$nest1_radius)) +
+          geom_line(aes(y = .data$cv)) +
+          geom_line(aes(y = .data$total_time * axis_coeff1 +  axis_coeff2), linetype = "dashed") +
+          scale_y_continuous(
+            name = "----- CV (%)",
+            sec.axis = sec_axis(~ (. - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
+          ) +
+          labs(x = "Radius of suplot for large trees (m)") +
+          theme_bw()
+
+      }
 
     })
 
     ## + + CV and time for subplot distance ---------------------------------
     output$gr_subplot_distance <- renderPlot({
 
-      req(rv$cv_model$cv_approach)
+      req(rv$cv_model$cv_approach, rv$opti$results, rv$results$selected)
 
-      if (rv$cv_model$cv_approach == "a2") {
+      if (rv$cv_model$cv_approach == "a2" &
+          length(unique(rv$opti$results$distance_multiplier)) > 1) {
 
-        req(rv$params$results, rv$results$selected)
-
-        tt <- rv$params$results %>%
+        tt <- rv$opti$results %>%
           dplyr::filter(
             .data$subplot_count   == rv$results$selected$subplot_count,
             .data$nest1_radius    == rv$results$selected$nest1_radius,
@@ -210,8 +216,7 @@ mod_results_server <- function(id, rv) {
           geom_line(aes(y = .data$total_time * axis_coeff1 + axis_coeff2), linetype = "dashed") +
           scale_y_continuous(
             name = "----- CV (%)",
-            #limits = c(rv$results$cv_limit$min, rv$results$cv_limit$max),
-            sec.axis = sec_axis(~(.data - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
+            sec.axis = sec_axis(~(. - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
           ) +
           labs(x = "Distance between subplot centers (m)") +
           theme_bw()
@@ -223,13 +228,12 @@ mod_results_server <- function(id, rv) {
     ## + + CV and time for nest radius level 2 ------------------------------
     output$gr_nest2_radius <- renderPlot({
 
-      req(rv$cv_model$cv_approach)
+      req(rv$cv_model$cv_approach, rv$opti$results, rv$results$selected)
 
-      if (rv$cv_model$cv_approach == "a2") {
+      if (rv$cv_model$cv_approach == "a2" &
+          length(unique(rv$opti$results$nest2_radius)) > 1 ) {
 
-        req(rv$params$results, rv$results$selected)
-
-        tt <- rv$params$results %>%
+        tt <- rv$opti$results %>%
           dplyr::filter(
             .data$subplot_count       == rv$results$selected$subplot_count,
             .data$distance_multiplier == rv$results$selected$distance_multiplier,
@@ -245,8 +249,7 @@ mod_results_server <- function(id, rv) {
           geom_line(aes(y = .data$total_time * axis_coeff1 + axis_coeff2), linetype = "dashed") +
           scale_y_continuous(
             name = "----- CV (%)",
-            #limits = c(rv$results$cv_limit$min, rv$results$cv_limit$max),
-            sec.axis = sec_axis(~(.data - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
+            sec.axis = sec_axis(~(. - axis_coeff2) / axis_coeff1, name = "- - - Time (months)")
           ) +
           labs(x = "Radius of suplot for small trees (m)") +
           theme_bw()
@@ -262,7 +265,7 @@ mod_results_server <- function(id, rv) {
 
     output$table_time <- renderTable({
 
-      rv$params$results %>%
+      rv$opti$results %>%
         dplyr::filter(
           .data$subplot_count       == rv$results$selected$subplot_count,
           .data$distance_multiplier == rv$results$selected$distance_multiplier,
@@ -285,37 +288,37 @@ mod_results_server <- function(id, rv) {
     output$table_opti <- renderTable({
 
 
-      best_cv <- rv$params$results %>%
+      best_cv <- rv$opti$results %>%
         dplyr::arrange(.data$cv) %>%
         dplyr::slice_head(n = 5) %>%
         dplyr::mutate(category = "Lowest CV")
 
-      best_time <- rv$params$results %>%
+      best_time <- rv$opti$results %>%
         dplyr::arrange(.data$total_time) %>%
         dplyr::slice_head(n = 5) %>%
         dplyr::mutate(category = "Lowest time")
 
-      med_cv   <- median(rv$params$results$cv)
-      med_time <- median(rv$params$results$total_time)
+      med_cv   <- median(rv$opti$results$cv)
+      med_time <- median(rv$opti$results$total_time)
 
-      mid_cv <- rv$params$results %>%
+      mid_cv <- rv$opti$results %>%
         dplyr::mutate(dev_cv = abs((.data$cv - med_cv) / med_cv)) %>%
-        dplyr::arrange(med_cv) %>%
+        dplyr::arrange(.data$dev_cv) %>%
         dplyr::slice_head(n = 5) %>%
         dplyr::mutate(category = "median CV")
 
-
-      mid_time <- rv$params$results %>%
+      mid_time <- rv$opti$results %>%
         dplyr::mutate(dev_time = abs((.data$total_time - med_time) / med_time)) %>%
-        dplyr::arrange(.data$med_time) %>%
+        dplyr::arrange(.data$dev_time) %>%
         dplyr::slice_head(n = 5) %>%
         dplyr::mutate(category = "Median time")
-
 
       best_cv %>%
         dplyr::bind_rows(best_time) %>%
         dplyr::bind_rows(mid_cv) %>%
-        dplyr::bind_rows(mid_time)
+        dplyr::bind_rows(mid_time) %>%
+        dplyr::select(-.data$dev_cv, -.data$dev_time) %>%
+        dplyr::select(.data$category, tidyselect::everything())
 
     })
 

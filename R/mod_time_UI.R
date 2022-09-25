@@ -79,9 +79,7 @@ mod_time_UI <- function(id){
 
 
 
-    ##
-    ## Inputs ###############################################################
-    ##
+    ## + Section titles ======================================================
 
     fluidRow(
       column(6, h4("Nested plot unit times")),
@@ -91,9 +89,14 @@ mod_time_UI <- function(id){
 
     br(),
 
-    ## Message if previous steps not completed
+
+
+    ##
+    ## Message if CV not done ################################################
+    ##
+
     wellPanel(
-      id = ns("check_approach"),
+      id = ns("require_cv"),
 
       p("First choose a CV model approach",
         style = "color: #dc3545; font-style: italic; text-align: center;"),  ## Bootstrap danger color
@@ -104,11 +107,16 @@ mod_time_UI <- function(id){
 
     ), ## End check_approach
 
+
+
+    ##
+    ## Time units to set #####################################################
+    ##
+
     shinyjs::hidden(div(
-      id = ns("unit_times"),
+      id = ns("content_time"),
 
       fluidRow(
-
 
 
         ## + Nested plot inputs =============================================
@@ -313,26 +321,21 @@ mod_time_UI <- function(id){
 
         )) ## END wellPanel other unit times
 
-      ) ## END fluidRow inputs
-
-    )), ## END div unit times
+      ), ## END fluidRow inputs
 
 
 
-    ##
-    ## Move to next section #################################################
-    ##
-
-    shinyjs::hidden(div(
-      id = ns("box_time_to_opti"),
+      ##
+      ## Move to next section #################################################
+      ##
 
       h4(icon("arrow-right"),
          "Continue to Step 3:",
          HTML("&nbsp;"),
          actionButton(ns("btn_to_opti"), "Optimization parameters")
-      )
+         )
 
-    ))
+    )) ## END div content_time
 
   ) ## END tagList
 

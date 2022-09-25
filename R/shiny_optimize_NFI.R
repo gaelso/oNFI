@@ -124,7 +124,7 @@ shiny_optimize_NFI <- function(...) {
     rv <- reactiveValues(
       cv_model = reactiveValues(),
       time     = reactiveValues(),
-      params   = reactiveValues(),
+      opti     = reactiveValues(),
       results  = reactiveValues()
       )
 
@@ -153,7 +153,7 @@ shiny_optimize_NFI <- function(...) {
     })
 
     observeEvent(rv$to_opti, {
-      updateTabsetPanel(session, "navbar", "params")
+      updateTabsetPanel(session, "navbar", "opti")
     })
 
     observeEvent(rv$to_results, {
