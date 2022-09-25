@@ -50,11 +50,11 @@ mod_time_server <- function(id, rv) {
       if (rv$cv_model$cv_approach == "a2") {
         shinyjs::hide("check_approach")
         shinyjs::show("unit_times")
-        shinyjs::show("box_time_to_params")
+        shinyjs::show("box_time_to_opti")
       } else {
         shinyjs::show("check_approach")
         shinyjs::hide("unit_times")
-        shinyjs::hide("box_time_to_params")
+        shinyjs::hide("box_time_to_opti")
       }
 
     })
@@ -67,11 +67,11 @@ mod_time_server <- function(id, rv) {
       if (rv$cv_model$cv_approach == "a1") {
         shinyjs::hide("check_approach")
         shinyjs::show("unit_times")
-        shinyjs::show("box_time_to_params")
+        shinyjs::show("box_time_to_opti")
       } else {
         shinyjs::show("check_approach")
         shinyjs::hide("unit_times")
-        shinyjs::hide("box_time_to_params")
+        shinyjs::hide("box_time_to_opti")
       }
 
     })
@@ -212,8 +212,8 @@ mod_time_server <- function(id, rv) {
     ## Change tab ###########################################################
     ##
 
-    observeEvent(input$btn_to_params, {
-      rv$to_params <- input$btn_to_params
+    observeEvent(input$btn_to_opti, {
+      rv$to_opti <- input$btn_to_opti
     })
 
 

@@ -324,12 +324,12 @@ mod_time_UI <- function(id){
     ##
 
     shinyjs::hidden(div(
-      id = ns("box_time_to_params"),
+      id = ns("box_time_to_opti"),
 
       h4(icon("arrow-right"),
          "Continue to Step 3:",
          HTML("&nbsp;"),
-         actionButton(ns("btn_to_params"), "Optimization parameters")
+         actionButton(ns("btn_to_opti"), "Optimization parameters")
       )
 
     ))

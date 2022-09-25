@@ -107,11 +107,11 @@ shiny_optimize_NFI <- function(...) {
 
     navbarPage(
       id = "navbar", title = NULL, selected = "home",
-      tabPanel(title = "Home"        , value = "home"    , icon = icon("campground"), mod_home_UI("tab_home")    ),
-      tabPanel(title = "CV model"    , value = "cv_model", icon = icon("map")       , mod_CV_UI("tab_cv")        ),
-      tabPanel(title = "Unit times"  , value = "time"    , icon = icon("table")     , mod_time_UI("tab_time")    ),
-      tabPanel(title = "Optimization", value = "params"  , icon = icon("toggle-on") , mod_params_UI("tab_params")),
-      tabPanel(title = "Results"     , value = "results" , icon = icon("chart-line") , mod_results_UI("tab_res"))
+      tabPanel(title = "Home"        , value = "home"    , icon = icon("campground"), mod_home_UI("tab_home")  ),
+      tabPanel(title = "CV model"    , value = "cv_model", icon = icon("map")       , mod_CV_UI("tab_cv")      ),
+      tabPanel(title = "Unit times"  , value = "time"    , icon = icon("table")     , mod_time_UI("tab_time")  ),
+      tabPanel(title = "Optimization", value = "opti"    , icon = icon("toggle-on") , mod_opti_UI("tab_opti")  ),
+      tabPanel(title = "Results"     , value = "results" , icon = icon("chart-line"), mod_results_UI("tab_res"))
     ) ## END navbarPage
   ) ## END fluidPage
 
@@ -137,7 +137,7 @@ shiny_optimize_NFI <- function(...) {
 
     mod_time_server("tab_time", rv = rv)
 
-    mod_params_server("tab_params", rv = rv)
+    mod_opti_server("tab_opti", rv = rv)
 
     mod_results_server("tab_res", rv = rv)
 
@@ -152,7 +152,7 @@ shiny_optimize_NFI <- function(...) {
       updateTabsetPanel(session, "navbar", "time")
     })
 
-    observeEvent(rv$to_params, {
+    observeEvent(rv$to_opti, {
       updateTabsetPanel(session, "navbar", "params")
     })
 

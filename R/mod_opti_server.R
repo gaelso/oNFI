@@ -2,7 +2,7 @@
 #'
 #' @noRd
 utils::globalVariables("where")
-mod_params_server <- function(id, rv) {
+mod_opti_server <- function(id, rv) {
   moduleServer(id, function(input, output, session) {
 
     ns <- session$ns
@@ -178,11 +178,9 @@ mod_params_server <- function(id, rv) {
     observe({
 
       rv$params$combi <- expand.grid(rv$params$list_params) %>%
-        dplyr::as_tibble(.data) %>%
+        dplyr::as_tibble() %>%
         dplyr::mutate(dplyr::across(where(is.double), as.integer)) %>%
         dplyr::mutate(dplyr::across(where(is.factor), as.character)) %>%
-        dplyr::mutate(id = 1:nrow(.data)) %>%
-        dplyr::select(id, dplyr::everything()) %>%
         dplyr::mutate(
           subplot_area     = round(pi * .data$nest1_radius^2 /100^2, 3),
           subplot_area2    = round(pi * .data$nest2_radius^2 /100^2, 3),
@@ -193,6 +191,11 @@ mod_params_server <- function(id, rv) {
             TRUE ~ NA_integer_
           )
         )
+
+      rv$params$combi$id <- 1:nrow(rv$params$combi)
+
+      rv$params$combi <- rv$params$combi %>%
+        dplyr::select(.data$id, dplyr::everything())
 
     })
 
