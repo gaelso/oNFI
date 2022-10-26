@@ -83,7 +83,7 @@ submod_CV_a1_UI <- function(id){
             inputId  = ns("AOI"),
             label    = NULL,
             multiple = F,
-            accept   = c(".geoJSON", ".GPKG")
+            accept   = c(".geoJSON", ".json", ".GPKG")
             ),
 
           div(
