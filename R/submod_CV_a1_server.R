@@ -255,7 +255,8 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
         theme_bw() +
         theme(legend.key.height = unit(2, "cm")) +
         add_ggspatial(font = "LoraIt") +
-        labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass")
+        labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Avitabile et al. 2016 aboveground biomass") +
+        coord_sf(crs = 4326)
 
       gr2 <- ggplot() +
         geom_tile(data = rv_cv$df_santoro, aes(x = .data$x, y = .data$y, fill = .data$agb_santoro)) +
@@ -264,7 +265,8 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
         theme_bw() +
         theme(legend.key.height = unit(2, "cm")) +
         add_ggspatial(font = "LoraIt") +
-        labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass")
+        labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass") +
+        coord_sf(crs = 4326)
 
       ggpubr::ggarrange(gr1, gr2, ncol = 1, nrow = 2, common.legend = TRUE, legend = "right")
 

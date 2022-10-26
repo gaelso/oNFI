@@ -5,6 +5,7 @@
 ^fonts$
 ^results$
 ^test$
+^rsconnect$
 
 ^LICENSE\.md$
 
@@ -12,3 +13,4 @@
 
 ^\.github$
 
+^app.R$

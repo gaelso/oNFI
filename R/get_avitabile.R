@@ -37,13 +37,22 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
                           url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
 
 
-  ## Check AOI CRS
+  ## Convert CRS to metric equal area
   if(!is.null(sf_aoi)){
 
     epsg_value <- sf::st_crs(sf_aoi)$srid %>% stringr::str_remove("EPSG:") %>% as.numeric()
     if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric unit and WGS 84 UTM zone")
 
   }
+
+
+  # ## Check AOI CRS
+  # if(!is.null(sf_aoi)){
+  #
+  #   epsg_value <- sf::st_crs(sf_aoi)$srid %>% stringr::str_remove("EPSG:") %>% as.numeric()
+  #   if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric unit and WGS 84 UTM zone")
+  #
+  # }
 
 
 
@@ -105,7 +114,7 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
 
     rs_out <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
 
-    rs_out_proj <- terra::project(rs_out, sf::st_crs(sf_aoi)$srid, method = "near")
+    rs_out_metric <- terra::project(rs_out, "ESRI:54017", method = "near")
 
   } else {
 

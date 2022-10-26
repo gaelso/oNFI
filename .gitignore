@@ -3,6 +3,7 @@ data/
 fonts/
 inst/assets/scott-webb-2OPTOJNNY2Y-unsplash.jpg
 results/
+rsconnect/
 
 # History files
 .Rhistory

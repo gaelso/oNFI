@@ -119,7 +119,7 @@ get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = 
 
   if (!is.null(sf_aoi)) {
 
-    rs_out_proj <- terra::project(rs_out, sf::st_crs(sf_aoi)$srid, method = "near")
+    rs_out_proj <- terra::project(rs_out, "ESRI:54017", method = "near")
 
   } else {
 

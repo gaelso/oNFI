@@ -275,7 +275,7 @@ mod_results_server <- function(id, rv) {
         ) %>%
         dplyr::select(.data$id, .data$total_time, .data$n_plot, .data$time_plot,
                       .data$time_travel, .data$time_auth, .data$time_measure,
-                      .data$time_walk)
+                      .data$time_walk, .data$cv)
 
     })
 
