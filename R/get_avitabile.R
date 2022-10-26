@@ -37,25 +37,6 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
                           url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
 
 
-  ## Convert CRS to metric equal area
-  if(!is.null(sf_aoi)){
-
-    epsg_value <- sf::st_crs(sf_aoi)$srid %>% stringr::str_remove("EPSG:") %>% as.numeric()
-    if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric unit and WGS 84 UTM zone")
-
-  }
-
-
-  # ## Check AOI CRS
-  # if(!is.null(sf_aoi)){
-  #
-  #   epsg_value <- sf::st_crs(sf_aoi)$srid %>% stringr::str_remove("EPSG:") %>% as.numeric()
-  #   if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric unit and WGS 84 UTM zone")
-  #
-  # }
-
-
-
   ## + Download if necessary ----
   ## Get file name from URL
   server_filename <- stringr::str_remove(url, ".*/")
