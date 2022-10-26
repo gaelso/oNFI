@@ -95,7 +95,7 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
 
     rs_out <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
 
-    rs_out_metric <- terra::project(rs_out, "ESRI:54017", method = "near")
+    rs_out_proj <- terra::project(rs_out, "ESRI:54017", method = "near")
 
   } else {
 
