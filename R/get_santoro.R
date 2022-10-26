@@ -47,14 +47,6 @@ get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = 
   ## Check inputs
   if (is.null(sf_aoi) & is.null(tile_name)) stop("Need either an AOI boundary simple feature or a tile name")
 
-  ## Check CRS
-  if(!is.null(sf_aoi)){
-
-    epsg_value <- sf::st_crs(sf_aoi)$srid %>% stringr::str_remove("EPSG:") %>% as.numeric()
-    if (!(epsg_value %in% 32600:32800)) stop("AOI CRS should be in metric units and WGS 84 UTM zone")
-
-  }
-
   ## + Get tiles ----
   ## Transform CRS to get tiles
   if(!is.null(sf_aoi)) sf_aoi_wgs84 <- sf::st_transform(sf_aoi, crs = 4326)
