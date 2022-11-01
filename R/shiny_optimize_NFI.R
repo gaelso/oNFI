@@ -72,6 +72,7 @@ shiny_optimize_NFI <- function(...) {
   showtext::showtext_auto()
 
   options(shiny.maxRequestSize = 10*1024^2)
+  options(timeout = max(300, getOption("timeout")))
 
   ## UI #####################################################################
   ui <- fluidPage(

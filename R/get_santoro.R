@@ -52,7 +52,7 @@ get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = 
   if(!is.null(sf_aoi)) sf_aoi_wgs84 <- sf::st_transform(sf_aoi, crs = 4326)
 
   ## Get tile names
-  santoro_tiles <- ifelse(is.null(sf_aoi), tile_name,  get_santoro_tiles(sf_aoi = sf_aoi_wgs84))
+  if (is.null(sf_aoi)) santoro_tiles <- tile_name else santoro_tiles <- get_santoro_tiles(sf_aoi = sf_aoi_wgs84)
 
   ## Update Progress
   if (!is.null(progress_id)) shinyWidgets::updateProgressBar(session = session, id = progress_id, value = 20)
@@ -84,42 +84,26 @@ get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = 
 
   })
 
-  rs_list <- rs_list[!sapply(rs_list, is.null)]
+  if (!is.null(progress_id)) shinyWidgets::updateProgressBar(session = session, id = progress_id, value = 70)
 
-  ## Update Progress
-  if (!is.null(progress_id)) shinyWidgets::updateProgressBar(session = session, id = progress_id, value = 80)
+  if (length(rs_list) > 1) {
 
-  ## + Prepare final raster object ----
-  ## Merging elements
-  if (length(rs_list) == 1) {
-    rs_out <- rs_list[[1]]
-  } else if (length(rs_list) == 2) {
-    rs_out <- terra::merge(rs_list[[1]], rs_list[[2]])
-  } else if (length(rs_list) == 3) {
-    rs_tmp <- terra::merge(rs_list[[1]], rs_list[[2]])
-    rs_out <- terra::merge(rs_tmp, rs_list[[3]])
-    rs_tmp <- NULL
-  } else if (length(rs_list) == 4) {
-    rs_tmp1 <- terra::merge(rs_list[[1]], rs_list[[2]])
-    rs_tmp2 <- terra::merge(rs_list[[3]], rs_list[[4]])
-    rs_out  <- terra::merge(rs_tmp1, rs_tmp2)
-    rs_tmp1 <- NULL
-    rs_tmp2 <- NULL
+    rs_coll <- terra::sprc(rs_list)
+    rs_out <- terra::merge(rs_coll)
+
+    rm(rs_list, rs_coll)
+
+  } else {
+
+    rs_out <- rs_list
+
+    rm(rs_list)
+
   }
 
   names(rs_out) <- "agb_santoro"
 
-  if (!is.null(sf_aoi)) {
-
-    rs_out_proj <- terra::project(rs_out, "ESRI:54017", method = "near")
-
-  } else {
-
-    rs_out_proj <- rs_out
-
-  }
-
-  rs_out_proj
+  rs_out
 
 } ## END function get_santoro()
 
@@ -136,58 +120,38 @@ get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = 
 #' @noRd
 get_santoro_tiles <- function(sf_aoi){
 
-  ## Check input
-  if(sf::st_crs(sf_aoi)$input != "EPSG:4326") stop("AOI CRS should be 4326 to get tiles")
-
-  url1 <- NULL
-  url2 <- NULL
-  url3 <- NULL
-  url4 <- NULL
-
   aoi_bbox <- sf_aoi %>%
     sf::st_transform(crs = 4326) %>%
     sf::st_bbox()
 
-  x1 <- floor(aoi_bbox$xmin / 40) * 40 - 20
-  y1 <- ceiling(aoi_bbox$ymax / 40) * 40
-  x_chr <- if_else(x1 == 0, "00", as.character(abs(x1)))
-  y_chr <- if_else(y1 == 0, "00", as.character(abs(y1)))
-  x_dir <- if_else(x1 < 0, "W", "E")
-  y_dir <- if_else(y1 < 0, "S", "N")
+  x_start <- as.numeric(floor((aoi_bbox$xmin - 20) / 40) * 40 + 20)
+  x_end   <- as.numeric(floor((aoi_bbox$xmax - 20) / 40) * 40 + 20)
 
-  url1 <- paste0(y_dir, y_chr, x_dir, x_chr, "_agb")
+  y_start <- as.numeric(ceiling(aoi_bbox$ymax / 40) * 40)
+  y_end   <- as.numeric(ceiling(aoi_bbox$ymin / 40) * 40)
 
-  x2 <- floor(aoi_bbox$xmax / 40) * 40 - 20
-  y2 <- ceiling(aoi_bbox$ymin / 40) * 40
-  x_chr <- if_else(x2 == 0, "00", as.character(abs(x2)))
-  y_chr <- if_else(y2 == 0, "00", as.character(abs(y2)))
-  x_dir <- if_else(x2 < 0, "W", "E")
-  y_dir <- if_else(y2 < 0, "S", "N")
+  nb_hz <- (abs(x_end - x_start) / 40 + 1)
+  nb_vt <- (abs(y_end - y_start) / 40 + 1)
 
-  url2 <- paste0(y_dir, y_chr, x_dir, x_chr, "_agb")
+  tile_names <- matrix("", ncol = nb_vt, nrow = nb_hz)
 
-  if (url1 == url2) url2 <- NULL
+  for (i in 1:nb_hz) {
+    for (j in 1:nb_vt) {
 
-  if (x1 != x2 & y1 != y2) {
+      x1 <- x_start + 40 * (i - 1)
+      y1 <- y_start + 40 * (j - 2)
 
-    x_chr <- if_else(x1 == 0, "00", as.character(abs(x1)))
-    y_chr <- if_else(y2 == 0, "00", as.character(abs(y2)))
-    x_dir <- if_else(x1 < 0, "W", "E")
-    y_dir <- if_else(y2 < 0, "S", "N")
+      x_chr <- if_else(x1 == 0, "00", if_else(x1 < 100, paste0("0", as.character(abs(x1))), as.character(abs(x1))))
+      y_chr <- if_else(y1 == 0, "00", as.character(abs(y1)))
+      x_dir <- if_else(x1 < 0, "W", "E")
+      y_dir <- if_else(y1 < 0, "S", "N")
 
-    url3 <- paste0(y_dir, y_chr, x_dir, x_chr, "_agb")
+      tile_names[i, j] <- paste0(y_dir, y_chr, x_dir, x_chr, "_agb")
 
-    x_chr <- if_else(x2 == 0, "00", as.character(abs(x2)))
-    y_chr <- if_else(y1 == 0, "00", as.character(abs(y1)))
-    x_dir <- if_else(x2 < 0, "W", "E")
-    y_dir <- if_else(y1 < 0, "S", "N")
-
-    url4 <- paste0(y_dir, y_chr, x_dir, x_chr, "_agb")
-
+    }
   }
 
-  ## Output
-  c(url1, url2, url3, url4)
+  c(tile_names)
 
 } ## END function get_santoro_tiles()
 

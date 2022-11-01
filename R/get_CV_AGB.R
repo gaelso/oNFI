@@ -2,36 +2,58 @@
 
 #' Coefficient of variation and additional info from raster file
 #'
-#' @param df a raster data in data frame format (using for ex. terra::as.data.frame())
+#' @param rs a SpatRaster object
 #' @param agb_min a minimum value for the data to be included in the calculations
 #'
-#' @importFrom dplyr pull if_else summarise
-#' @importFrom rlang .data
-#' @importFrom stats sd
+#' @importFrom terra ncell, clamp, global, ext, crop, project, res
+#' @importFrom dplyr tibble
 #'
 #' @noRd
-get_CV_AGB <- function(df, agb_min = 20){
+get_CV_AGB <- function(rs, agb_min = 0){
 
-  ## Checks
-  if(!is.numeric(pull(df[3]))) stop("'df' doesn't contain AGB as numerical values in column 3")
+  ## Change name
+  #names(rs) <- "agb"
 
-  if(names(df)[1] != "x" | !is.numeric(pull(df[1]))) stop("'df' doesn't contain x coordinates in column 1, wrong column name or wrong data format")
+  ## stats
+  pix_count <- terra::ncell(rs)
 
-  if(names(df)[2] != "y" | !is.numeric(pull(df[2]))) stop("'df' doesn't contain y coordinates in column 2, wrong column name or wrong data format")
+  if (agb_min > 0) {
 
-  ## Calc CV
-  names(df)[3] <- "agb"
+    rs_clamp <- terra::clamp(rs, lower = agb_min, value=FALSE)
 
-  df %>%
-    mutate(agb = if_else(is.na(.data$agb), 0, .data$agb)) %>%
-    filter(.data$agb >= agb_min) %>%
-    summarise(
-      n_pix = dplyr::n(),
-      agb_mean = round(mean(.data$agb), 2),
-      agb_sd = round(stats::sd(.data$agb), 2),
-    ) %>%
-    mutate(
-      cv_init = round(.data$agb_sd / .data$agb_mean * 100, 1)
+    agb_mean <- terra::global(rs_clamp, fun = "mean", na.rm = TRUE)
+    agb_sd   <- terra::global(rs_clamp, fun = "sd"  , na.rm = TRUE)
+
+  } else {
+
+    agb_mean <- terra::global(rs_out, fun = "mean", na.rm = TRUE)
+    agb_sd   <- terra::global(rs_out, fun = "sd"  , na.rm = TRUE)
+
+  }
+
+  # rs_proj  <- terra::project(rs, "ESRI:54017", method = "near")
+  # pix_area <- terra::res(rs_proj)[1]^2 / 100^2
+
+  ## Get pixel area from a sample of the data in the center region of the raster +/- 1 deg
+  rs_ext <- terra::ext(rs)
+  rs_ext2 <- c(
+    (rs_ext[1] + rs_ext[2]) / 2 - 1,
+    (rs_ext[1] + rs_ext[2]) / 2 + 1,
+    (rs_ext[3] + rs_ext[4]) / 2 - 1,
+    (rs_ext[3] + rs_ext[4]) / 2 + 1
     )
+
+  test <- terra::crop(rs, rs_ext2)
+
+  rs_proj  <- terra::project(test, "ESRI:54017", method = "near")
+  area_init <- terra::res(rs_proj)[1]^2 / 100^2
+
+  dplyr::tibble(
+      pix_count = pix_count,
+      area_init = area_init,
+      agb_mean  = as.numeric(agb_mean),
+      agb_sd    = as.numeric(agb_sd),
+      cv_init   = round(agb_sd / agb_mean * 100, 1)
+      )
 
   }

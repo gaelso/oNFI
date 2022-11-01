@@ -59,3 +59,32 @@ add_ggspatial <- function(font = "LoraIt"){
   )
 
 }
+
+## Create a spatial data frame with around 0.01 deg resolution --------------
+#' Create a spatial data frame with around 0.01 deg resolution
+#'
+#' @param rs a terra SpatRaster object
+#'
+#' @noRd
+make_df <- function(rs){
+
+  rs_res <- terra::res(rs)[1]
+
+  if (rs_res < 0.01) {
+
+    df <- terra::aggregate(rs, fact = round(0.01 / rs_res, 3)) %>%
+      terra::as.data.frame(xy = TRUE, na.rm = T) %>%
+      dplyr::as_tibble()
+
+  } else {
+
+    df <- rs %>%
+      terra::as.data.frame(xy = TRUE, na.rm = T) %>%
+      dplyr::as_tibble()
+
+  }
+
+  df
+
+}
+

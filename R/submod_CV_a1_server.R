@@ -187,25 +187,25 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
         session     = session
         )
 
-      rv_cv$df_avitabile <- terra::mask(rv_cv$rs_avitabile, terra::vect(rv_cv$sf_aoi)) %>%
-        terra::as.data.frame(xy = TRUE) %>%
-        as_tibble() %>%
-        na.omit()
+      shinyWidgets::updateProgressBar(session = session, id = "prog_avit", value = 80)
 
-      updateProgressBar(session = session, id = "prog_avit", value = 100, status = "success")
+      rv_cv$df_avitabile <- make_df(rs = rv_cv$rs_avitabile)
+
+      shinyWidgets::updateProgressBar(session = session, id = "prog_avit", value = 100, status = "success")
+
 
       ## + + Santoro et al. 2018 map, download, load and make map ---------
       rv_cv$rs_santoro <- get_santoro(
         path_data   = file_path(),
         sf_aoi      = rv_cv$sf_aoi,
         progress_id = "prog_sant",
-        session     = session
+        session     = session,
+        tile_name = NULL
         )
 
-      rv_cv$df_santoro <- terra::mask(rv_cv$rs_santoro, terra::vect(rv_cv$sf_aoi)) %>%
-        terra::as.data.frame(rv_cv$rs_santoro, xy = TRUE) %>%
-        dplyr::as_tibble() %>%
-        stats::na.omit()
+      shinyWidgets::updateProgressBar(session = session, id = "prog_sant", value = 80, status = "success")
+
+      rv_cv$df_santoro <- make_df(rs = rv_cv$rs_santoro)
 
       shinyWidgets::updateProgressBar(session = session, id = "prog_sant", value = 100, status = "success")
 
@@ -213,16 +213,14 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
 
       ## + Calculate CV =====================================================
 
-      rv_cv$cv_avitabile <- get_CV_AGB(df = rv_cv$df_avitabile, agb_min = input$agb_min) %>%
+      rv_cv$cv_avitabile <- get_CV_AGB(rs = rv_cv$rs_avitabile, agb_min = input$agb_min) %>%
         dplyr::mutate(
-          area_init = terra::res(rv_cv$rs_avitabile)[1]^2 / 100^2,
-          source    = "Avitabile et al. 2016"
+          source = "Avitabile et al. 2016"
           )
 
-      rv_cv$cv_santoro <- get_CV_AGB(df = rv_cv$df_santoro, agb_min = input$agb_min) %>%
+      rv_cv$cv_santoro <- get_CV_AGB(rs = rv_cv$rs_santoro, agb_min = input$agb_min) %>%
         dplyr::mutate(
-          area_init = terra::res(rv_cv$rs_santoro)[1]^2 / 100^2,
-          source    = "Santoro et al. 2018"
+          source = "Santoro et al. 2018"
         )
 
       ## Pass cv_mixed and area_aoi to global reactive Value
