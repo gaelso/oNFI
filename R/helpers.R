@@ -72,7 +72,7 @@ make_df <- function(rs){
 
   if (rs_fct > 1) {
 
-    df <- terra::aggregate(rs, fact =  rs_res) %>%
+    df <- terra::aggregate(rs, fact =  rs_fct) %>%
       terra::as.data.frame(xy = TRUE, na.rm = T) %>%
       dplyr::as_tibble()
 

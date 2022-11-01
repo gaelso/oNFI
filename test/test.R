@@ -18,7 +18,13 @@ rs_san <- get_santoro(
   url = "globbiomass.org/wp-content/uploads/GB_Maps/"
 )
 
-rs_out <- rs_san
+df_san <- make_df(rs = rs_san)
+
+cv_san <- get_CV_AGB(rs = rs_san, agb_min = 2) %>%
+  dplyr::mutate(
+    source = "Santoro et al. 2018"
+  )
+
 
 ## Detailed run
 
