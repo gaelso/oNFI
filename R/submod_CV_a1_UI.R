@@ -199,7 +199,7 @@ submod_CV_a1_UI <- function(id){
           shinyWidgets::progressBar(
             id = ns("prog_cv"),
             value = 0,
-            title = "Calculate initial CV for optimization",
+            title = "Calculate initial CV",
             display_pct = TRUE
           ),
 

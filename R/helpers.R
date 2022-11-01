@@ -68,11 +68,11 @@ add_ggspatial <- function(font = "LoraIt"){
 #' @noRd
 make_df <- function(rs){
 
-  rs_res <- terra::res(rs)[1]
+  rs_fct <- round(0.01 / terra::res(rs)[1], 3)
 
-  if (rs_res < 0.01) {
+  if (rs_fct > 1) {
 
-    df <- terra::aggregate(rs, fact = round(0.01 / rs_res, 3)) %>%
+    df <- terra::aggregate(rs, fact =  rs_res) %>%
       terra::as.data.frame(xy = TRUE, na.rm = T) %>%
       dplyr::as_tibble()
 

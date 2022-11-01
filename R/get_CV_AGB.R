@@ -26,8 +26,8 @@ get_CV_AGB <- function(rs, agb_min = 0){
 
   } else {
 
-    agb_mean <- terra::global(rs_out, fun = "mean", na.rm = TRUE)
-    agb_sd   <- terra::global(rs_out, fun = "sd"  , na.rm = TRUE)
+    agb_mean <- terra::global(rs, fun = "mean", na.rm = TRUE)
+    agb_sd   <- terra::global(rs, fun = "sd"  , na.rm = TRUE)
 
   }
 

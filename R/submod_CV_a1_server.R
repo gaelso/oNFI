@@ -203,7 +203,7 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
         tile_name = NULL
         )
 
-      shinyWidgets::updateProgressBar(session = session, id = "prog_sant", value = 80, status = "success")
+      shinyWidgets::updateProgressBar(session = session, id = "prog_sant", value = 80)
 
       rv_cv$df_santoro <- make_df(rs = rv_cv$rs_santoro)
 
@@ -218,10 +218,14 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
           source = "Avitabile et al. 2016"
           )
 
+      shinyWidgets::updateProgressBar(session = session, id = "prog_cv", value = 30)
+
       rv_cv$cv_santoro <- get_CV_AGB(rs = rv_cv$rs_santoro, agb_min = input$agb_min) %>%
         dplyr::mutate(
           source = "Santoro et al. 2018"
         )
+
+      shinyWidgets::updateProgressBar(session = session, id = "prog_cv", value = 80)
 
       ## Pass cv_mixed and area_aoi to global reactive Value
       rv$cv_model$cv_mixed <- dplyr::tibble(
