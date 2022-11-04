@@ -68,7 +68,7 @@ add_ggspatial <- function(font = "LoraIt"){
 #' @noRd
 make_df <- function(rs){
 
-  rs_fct <- round(0.01 / terra::res(rs)[1], 3)
+  rs_fct <- round(0.01 / terra::res(rs)[1])
 
   if (rs_fct > 1) {
 
