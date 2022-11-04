@@ -1,13 +1,37 @@
 
-#library(oNFI)
-
+#devtools::load_all()
+library(oNFI)
 library(sf)
 library(tidyverse)
 library(terra)
 
-sf_aoi_wgs84 <- sf_aoi <- st_read("data/gadm41_IDN_0.json")
+sf_aoi_wgs84 <- sf_aoi <- st_read("data/gadm41_IDN_1.json")
 
-sf_aoi_wgs84 <- sf_aoi <- st_read("data/TimorLeste.geoJSON")
+sf_aoi$NAME_1
+
+sf_sumatra <- sf_aoi %>%
+  filter(NAME_1 %in% c("Aceh", "SumateraUtara", "Riau", "SumateraBarat", "Jambi", "SumateraSelatan", "Lampung")) %>%
+  summarise()
+
+sf::st_is_valid(sf_sumatra)
+
+sf_sumatra <- sf::st_make_valid(sf_sumatra)
+
+ggplot() +
+  geom_sf(data = sf_sumatra, fill = NA)
+
+sf::st_write(sf_sumatra, "data/gadm41_IDN_sumatra.geojson")
+
+bali_nusa_tenggara <- sf_aoi %>%
+  filter(NAME_1 %in% c())
+
+sf::st_is_valid(sf_sumatra)
+
+# sf_aoi <- st_read("data/TimorLeste.geoJSON")
+# sf_aoi_wgs84 <- sf_aoi %>% st_transform(crs = 4326)
+
+ggplot() +
+  geom_sf(data = sf_aoi)
 
 rs_san <- get_santoro(
   path_data   = "data",
@@ -20,22 +44,52 @@ rs_san <- get_santoro(
 
 df_san <- make_df(rs = rs_san)
 
+
+gr2 <- ggplot() +
+  geom_tile(data = df_san, aes(x = .data$x, y = .data$y, fill = .data$agb_santoro)) +
+  scale_fill_viridis_c(direction = -1) +
+  geom_sf(data = sf_aoi, fill = NA, col = "darkred", size = 1) +
+  theme_bw() +
+  theme(legend.key.height = unit(2, "cm")) +
+  add_ggspatial(font = "LoraIt") +
+  labs(x = "", y = "", fill = "AGB (ton/ha)", title = "Santoro et al. 2018 aboveground biomass") +
+  coord_sf(crs = 4326)
+gr2
+
 cv_san <- get_CV_AGB(rs = rs_san, agb_min = 2) %>%
   dplyr::mutate(
     source = "Santoro et al. 2018"
   )
 
+## ---
+
+rs_avi <- get_avitabile(
+  path_data = "data",
+  progress_id = NULL,
+  session = NULL,
+  sf_aoi = sf_aoi,
+  url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"
+)
+
+df_avi <- make_df(rs = rs_avi)
+
+cv_avi <- get_CV_AGB(rs = rs_avi, agb_min = 2)
+
+
+area_aoi <- round(as.numeric(sf::st_area(sf_aoi)) / 1000^2)
+
 
 ## Detailed run
-
+path_data  <-  "data"
 santoro_tiles    <- get_santoro_tiles(sf_aoi = sf_aoi_wgs84)
 santoro_filelist <- list.files(file.path(path_data, "Santoro_agb"), pattern = "_agb.tif")
 santoro_files    <- santoro_filelist[match(paste0(santoro_tiles, ".tif"), santoro_filelist)]
 
 ## Load files
-rs_list <- purrr::map(santoro_files, function(x){
+tictoc::tic()
+rs_list <- purrr::map(seq_along(santoro_files), function(x){
 
-  rs <- terra::rast(file.path(paste0(path_data, "/Santoro_agb"), x))
+  rs <- terra::rast(file.path(paste0(path_data, "/Santoro_agb"), santoro_files[x]))
 
   if (!is.null(sf_aoi_wgs84)) {
 
@@ -46,41 +100,46 @@ rs_list <- purrr::map(santoro_files, function(x){
       rs_tmp1 <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
       rs_out <- terra::mask(rs_tmp1, terra::vect(sf_aoi_wgs84))
 
-      # rs_proj <- terra::project(rs_tmp1, "ESRI:54017", method = "near")
-      # rs_res <- terra::res(rs_proj)[1]^2 / 100^2
-
-      } else {
-
-        rs_out <- rs
-
-      }
-
-
     } else {
 
-      rs_out <- rs
+      rs_out <- NULL
 
     }
 
-  # df_out <- rs_out %>%
-  #   terra::as.data.frame(xy = TRUE) %>%
-  #   dplyr::as_tibble() %>%
-  #   stats::na.omit()
+  } else {
 
-  # # if (!is.null(sf_aoi)) {
-  # #
-  # #   rs_out_proj <- terra::project(rs_out, "ESRI:54017", method = "near")
-  # #
-  # # } else {
-  # #
-  # #   rs_out_proj <- rs_out
-  # #
-  # # }
+    rs_out <- rs
+
+  }
+
+  rs_out
 
 })
 
+tictoc::toc()
+
+length(rs_list)
+
+for (i in seq_along(rs_list)) {
+
+  plot(rs_list[[i]])
+
+}
+
 rs_coll <- terra::sprc(rs_list)
 rs_out <- terra::merge(rs_coll)
+
+names(rs_out) <- "agb_santoro"
+
+plot(rs_out)
+
+df_out <- make_df(rs = rs_out)
+
+ggplot() +
+  geom_tile(data = df_out, aes(x = x, y = y , fill = agb_santoro)) +
+  scale_fill_viridis_c(direction = -1) +
+  theme_bw() +
+  coord_sf(crs = 4326)
 
 
 #
