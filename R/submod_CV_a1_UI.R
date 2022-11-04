@@ -235,12 +235,12 @@ submod_CV_a1_UI <- function(id){
             ## !!! TO BE IMPROVED !!!
             tableOutput(outputId = ns("cv_table")),
 
-            hr(),
-
-            h5(strong("Area of AOI from uploaded shapefile")),
-
-            ## !!! TO BE IMPROVED !!!
-            textOutput(outputId = ns("area_aoi")),
+            # hr(),
+            #
+            # h5(strong("Area of AOI from uploaded shapefile")),
+            #
+            # ## !!! TO BE IMPROVED !!!
+            # textOutput(outputId = ns("area_aoi")),
 
             br()
 

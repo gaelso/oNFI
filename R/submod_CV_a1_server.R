@@ -234,7 +234,7 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
         source = "Average CV"
       )
 
-      rv$cv_model$area_aoi <- round(as.numeric(sf::st_area(rv_cv$sf_aoi)) / 1000^2)
+      #rv$cv_model$area_aoi <- round(as.numeric(sf::st_area(rv_cv$sf_aoi)) / 1000^2)
 
       shinyWidgets::updateProgressBar(session = session, id = "prog_cv", value = 100, status = "success")
 
@@ -286,13 +286,13 @@ submod_CV_a1_server <- function(id, rv, rv_cv) {
     })
 
 
-    output$area_aoi <- renderText({
-
-      req(rv$cv_model$area_aoi)
-
-      paste0("Based on the shapefile uploaded the size of the area of interest is: ",  rv$cv_model$area_aoi, " sq. km.")
-
-    })
+    # output$area_aoi <- renderText({
+    #
+    #   req(rv$cv_model$area_aoi)
+    #
+    #   paste0("Based on the shapefile uploaded the size of the area of interest is: ",  rv$cv_model$area_aoi, " sq. km.")
+    #
+    # })
 
 
     ## Update show / hide panels
