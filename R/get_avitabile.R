@@ -91,11 +91,8 @@ get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi 
 
     sf_aoi_wgs84 <- sf_aoi %>% sf::st_transform(crs = 4326)
 
-    #sf_aoi2 <- sf_aoi %>% st_buffer(dist = 1)
-
-    rs_out <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
-
-    #rs_out_proj <- terra::project(rs_out, "ESRI:54017", method = "near")
+    rs_tmp1 <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
+    rs_out <- terra::mask(rs_tmp1, terra::vect(sf_aoi_wgs84))
 
   } else {
 

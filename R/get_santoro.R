@@ -70,17 +70,35 @@ get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = 
   santoro_filelist <- list.files(file.path(path_data, "Santoro_agb"), pattern = "_agb.tif")
   santoro_files    <- santoro_filelist[match(paste0(santoro_tiles, ".tif"), santoro_filelist)]
 
-  ## Load files
-  rs_list <- purrr::map(santoro_files, function(x){
 
-    rs <- terra::rast(file.path(paste0(path_data, "/Santoro_agb"), x))
+  rs_list <- purrr::map(seq_along(santoro_files), function(x){
 
-    if (!is.null(sf_aoi)) {
+    if (!is.null(progress_id)) shinyWidgets::updateProgressBar(session = session, id = progress_id, value = 50 + x * 2)
+
+    rs <- terra::rast(file.path(paste0(path_data, "/Santoro_agb"), santoro_files[x]))
+
+    if (!is.null(sf_aoi_wgs84)) {
+
       check <- terra::intersect(terra::ext(rs), terra::vect(sf_aoi_wgs84))
-      if (!is.null(check))  rs_out <- terra::crop(rs, terra::vect(sf_aoi_wgs84)) else rs_out <- rs
+
+      if (!is.null(check)) {
+
+        rs_tmp1 <- terra::crop(rs, terra::vect(sf_aoi_wgs84))
+        rs_out <- terra::mask(rs_tmp1, terra::vect(sf_aoi_wgs84))
+
+      } else {
+
+        rs_out <- NULL
+
+      }
+
     } else {
+
       rs_out <- rs
+
     }
+
+    rs_out
 
   })
 
@@ -95,7 +113,7 @@ get_santoro <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = 
 
   } else {
 
-    rs_out <- rs_list
+    rs_out <- rs_list[[1]]
 
     rm(rs_list)
 
@@ -133,20 +151,20 @@ get_santoro_tiles <- function(sf_aoi){
   nb_hz <- (abs(x_end - x_start) / 40 + 1)
   nb_vt <- (abs(y_end - y_start) / 40 + 1)
 
-  tile_names <- matrix("", ncol = nb_vt, nrow = nb_hz)
+  tile_names <- matrix("", nrow = nb_vt, ncol = nb_hz)
 
   for (i in 1:nb_hz) {
     for (j in 1:nb_vt) {
 
       x1 <- x_start + 40 * (i - 1)
-      y1 <- y_start + 40 * (j - 2)
+      y1 <- y_start + 40 * (1 - j)
 
       x_chr <- if_else(x1 == 0, "00", if_else(x1 < 100, paste0("0", as.character(abs(x1))), as.character(abs(x1))))
       y_chr <- if_else(y1 == 0, "00", as.character(abs(y1)))
       x_dir <- if_else(x1 < 0, "W", "E")
       y_dir <- if_else(y1 < 0, "S", "N")
 
-      tile_names[i, j] <- paste0(y_dir, y_chr, x_dir, x_chr, "_agb")
+      tile_names[j, i] <- paste0(y_dir, y_chr, x_dir, x_chr, "_agb")
 
     }
   }
