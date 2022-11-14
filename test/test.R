@@ -1,4 +1,8 @@
 
+if (!require("remotes")) install.packages("remotes")
+remotes::install_github("gaelso/oNFI")
+oNFI::shiny_optimize_NFI()
+
 #devtools::load_all()
 library(oNFI)
 library(sf)
@@ -13,19 +17,16 @@ sf_sumatra <- sf_aoi %>%
   filter(NAME_1 %in% c("Aceh", "SumateraUtara", "Riau", "SumateraBarat", "Jambi", "SumateraSelatan", "Lampung")) %>%
   summarise()
 
-sf::st_is_valid(sf_sumatra)
+# sf::st_is_valid(sf_sumatra)
+#
+# sf_sumatra <- sf::st_make_valid(sf_sumatra)
+#
+# ggplot() +
+#   geom_sf(data = sf_sumatra, fill = NA)
+#
+# sf::st_write(sf_sumatra, "data/gadm41_IDN_sumatra.geojson")
 
-sf_sumatra <- sf::st_make_valid(sf_sumatra)
-
-ggplot() +
-  geom_sf(data = sf_sumatra, fill = NA)
-
-sf::st_write(sf_sumatra, "data/gadm41_IDN_sumatra.geojson")
-
-bali_nusa_tenggara <- sf_aoi %>%
-  filter(NAME_1 %in% c())
-
-sf::st_is_valid(sf_sumatra)
+sf_aoi <- sf_sumatra
 
 # sf_aoi <- st_read("data/TimorLeste.geoJSON")
 # sf_aoi_wgs84 <- sf_aoi %>% st_transform(crs = 4326)
