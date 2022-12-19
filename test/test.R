@@ -13,6 +13,8 @@ sf_aoi_wgs84 <- sf_aoi <- st_read("data/gadm41_IDN_1.json")
 
 sf_aoi$NAME_1
 
+
+## Develop subnational island based boundaries
 sf_sumatra <- sf_aoi %>%
   filter(NAME_1 %in% c("Aceh", "SumateraUtara", "Riau", "SumateraBarat", "Jambi", "SumateraSelatan", "Lampung")) %>%
   summarise()
@@ -25,6 +27,17 @@ sf_sumatra <- sf_aoi %>%
 #   geom_sf(data = sf_sumatra, fill = NA)
 #
 # sf::st_write(sf_sumatra, "data/gadm41_IDN_sumatra.geojson")
+
+# Bali Nusa Tenggara
+# Jawa
+# Kalimantan
+# Maluku
+# Papua
+# Sulawesi
+# Sumatera
+
+
+
 
 sf_aoi <- sf_sumatra
 
