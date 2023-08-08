@@ -21,3 +21,8 @@ The app targets National Forest Inventory but will work on any area of interest.
 
     oNFI::shiny_optimize_NFI()
 
+## Cloud-based version
+
+Alternatively the app can be launched here but may not work for large areas: [](https://gaelsola.shinyapps.io/onfi/)
+
+ 
