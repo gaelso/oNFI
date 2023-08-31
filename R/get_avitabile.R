@@ -16,6 +16,7 @@
 #' @param sf_aoi a simple feature object to clip the raster data
 #' @param url URL for downloading the map. Defaults to:
 #'            http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip
+#'            ## Changed to https://www.geo-informatie.nl/projects/lucid/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip 2023-08-17
 
 #'
 #' @return a raster object of type terra::rast()
@@ -33,9 +34,13 @@
 #'}
 #'
 #' @export
-get_avitabile <- function(path_data, progress_id = NULL, session = NULL, sf_aoi = NULL,
-                          url = "http://lucid.wur.nl/storage/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"){
-
+get_avitabile <- function(
+    path_data,
+    progress_id = NULL,
+    session = NULL,
+    sf_aoi = NULL,
+    url = "https://www.geo-informatie.nl/projects/lucid/downloads/high-carbon-ecosystems/Avitabile_AGB_Map.zip"
+  ){
 
   ## + Download if necessary ----
   ## Get file name from URL
