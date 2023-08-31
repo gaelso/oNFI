@@ -310,6 +310,15 @@ mod_time_UI <- function(id){
             step = 1
           ),
 
+          ##!!!
+          radioButtons(
+            inputId = ns("complex_time"),
+            label = "Simple time or more advanced time function?",
+            choices = c("Simple", "Advanced"), ## full list but not implemented yet c("C", "L", "P", "R", "S")
+            selected = "Simple",
+            inline = TRUE
+          ),
+
           hr(),
 
           p("This table recaps where default

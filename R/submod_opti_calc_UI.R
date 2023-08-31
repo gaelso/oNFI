@@ -68,6 +68,16 @@ submod_opti_calc_UI <- function(id){
 
       br(),
 
+      ##!!!
+      div(
+        plotOutput(outputId = ns("gr_plot_time"), height = 400),
+        style = "padding: 0.375em; border: 1px solid #e3e3e3;
+              border-radius: 4px; width: 600px;
+              margin: 0px auto;"
+      ),
+
+      br(),
+
       downloadButton(outputId = ns("download_results"), label = 'Download the results')
 
     ))

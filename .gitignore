@@ -4,6 +4,7 @@ fonts/
 inst/assets/scott-webb-2OPTOJNNY2Y-unsplash.jpg
 results/
 rsconnect/
+.DS_Store
 
 # History files
 .Rhistory

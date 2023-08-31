@@ -86,7 +86,7 @@ mod_time_server <- function(id, rv) {
     observe({
       req(
         input$drive_time, input$walk_time, input$march_speed,
-        input$auth_time, input$working_hour, input$working_day
+        input$auth_time, input$working_hour, input$working_day, input$complex_time #S#!!!
       )
 
       rv$time$unit_times <- tibble(
@@ -95,7 +95,8 @@ mod_time_server <- function(id, rv) {
         march_speed  = input$march_speed,
         auth_time    = input$auth_time,
         working_hour = input$working_hour,
-        working_day  = input$working_day
+        working_day  = input$working_day,
+        complex_time = input$complex_time ## !!!
       )
     })
 

@@ -81,7 +81,20 @@ submod_opti_calc_server <- function(id, rv) {
 
 
         ## + + Calculate total time -----------------------------------------
-        total_time <- plot_time$time_plot * n_plot / (rv$time$unit_times$working_hour * rv$time$unit_times$working_day)
+        # total_time <- plot_time$time_plot * n_plot / (rv$time$unit_times$working_hour * rv$time$unit_times$working_day)
+        #!!!
+        if (rv$time$unit_times$complex_time == "Simple") {
+
+          total_time <- plot_time$time_plot * n_plot / (rv$time$unit_times$working_hour * rv$time$unit_times$working_day)
+
+        } else if (rv$time$unit_times$complex_time == "Advanced") {
+          n_days_plot   <- ceiling(plot_time$time_plot / rv$time$unit_times$working_hour)
+          n_days_legs   <- 10
+          n_legs_months <- floor(rv$time$unit_times$working_day / (n_days_legs + 2))
+          n_legs        <- ceiling(n_days_plot * n_plot / n_days_legs)
+          total_time    <- n_legs / n_legs_months
+
+        }
 
         ## + + Output the parameters with the calculation results -----------
         params %>%
@@ -147,6 +160,50 @@ submod_opti_calc_server <- function(id, rv) {
           )
 
     })
+
+    ## !!!
+    output$gr_plot_time <- renderPlot({
+      req(rv$cv_model$cv_approach, rv$opti$results)
+
+      if (rv$cv_model$cv_approach == "a1") {
+
+        med_nest2 <- round(stats::median(rv$opti$results$nest2_radius))
+        med_dist  <- round(stats::median(rv$opti$results$distance_multiplier))
+
+        tt <- rv$opti$results %>%
+          dplyr::filter(
+            rv$opti$results$nest2_radius == med_nest2,
+            rv$opti$results$distance_multiplier == med_dist,
+          )
+
+      } else {
+
+        tt <- rv$opti$results
+
+      }
+
+      ggplot(tt, aes(x = .data$total_time, y = .data$n_plot)) +
+        geom_point(aes(
+          color = .data$n_plot,
+          fill  = .data$n_plot,
+          shape = as.factor(.data$subplot_count),
+          size  = .data$nest1_radius
+        )) +
+        scale_color_viridis_c(alpha = 0.8) +
+        scale_fill_viridis_c(alpha = 0.8) +
+        scale_shape_manual(values = c(21, 22, 23, 24, 25, 8, 9, 7)) +
+        theme_bw() +
+        labs(
+          x     = "Time (months)",
+          y     = "Sample size",
+          color = "",
+          fill  = "",
+          shape = "Number of subplots",
+          size  = "subplot level 1 radius (m)"
+        )
+
+    })
+
 
 
     observe({
